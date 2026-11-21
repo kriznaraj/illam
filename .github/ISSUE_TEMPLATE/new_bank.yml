@@ -1,0 +1,40 @@
+name: Support a bank, card or statement
+description: Ask for (or offer to write) a reader for mail Illam doesn't understand yet
+labels: [bank-support]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks! **Do not attach real statements or paste real alerts.** Rewrite every number, name and reference with made-up values, keeping the exact wording and layout.
+  - type: input
+    id: bank
+    attributes:
+      label: Bank or provider
+      placeholder: e.g. IDFC FIRST Bank
+    validations:
+      required: true
+  - type: checkboxes
+    id: kinds
+    attributes:
+      label: What kind of mail?
+      options:
+        - label: Transaction alerts (UPI, card, NEFT/IMPS)
+        - label: Credit card statement (PDF)
+        - label: Bank account statement (PDF)
+        - label: Investment / CAS / NPS statement
+  - type: input
+    id: sender
+    attributes:
+      label: Sender address
+      placeholder: alerts@bank.example
+  - type: textarea
+    id: sample
+    attributes:
+      label: A sample, with every value made up
+      render: text
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Contributing
+      options:
+        - label: I'd like to write the reader myself (see CONTRIBUTING.md)

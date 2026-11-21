@@ -1,0 +1,14 @@
+# One origin for the app and its API, the way supabase-js expects it:
+#   /rest/v1/*  PostgREST   /auth/v1/*  GoTrue   everything else  the Next.js app
+# Put TLS in front of this (or replace :8000 with your domain) when exposing it beyond localhost.
+:8000 {
+	handle_path /rest/v1/* {
+		reverse_proxy rest:3000
+	}
+	handle_path /auth/v1/* {
+		reverse_proxy auth:9999
+	}
+	handle {
+		reverse_proxy app:3000
+	}
+}

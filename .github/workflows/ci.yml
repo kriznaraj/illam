@@ -1,0 +1,43 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.5.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: npx tsc --noEmit
+      - run: pnpm test:ci
+      - run: pnpm build:skip-tests
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: http://localhost:8000
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder
+
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # The CLI, not gitleaks-action: it needs no write token, so it also runs on fork PRs.
+      - run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.28.0 detect --source /repo --config /repo/.gitleaks.toml --redact --no-banner
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build --build-arg NEXT_PUBLIC_SUPABASE_URL=http://localhost:8000 --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY=ci-placeholder -t illam:ci .

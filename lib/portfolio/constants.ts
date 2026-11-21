@@ -1,0 +1,1 @@
+export const INVESTMENT_START_MONTH = '2025-04';

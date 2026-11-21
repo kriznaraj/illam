@@ -1,0 +1,35 @@
+# Minor and patch updates only, and only once a release is two weeks old. Major upgrades
+# (a new Next.js, Tailwind or Node line) are planned by hand, not merged from a bot PR.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14
+    open-pull-requests-limit: 3
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 14
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 14
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']

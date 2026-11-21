@@ -1,0 +1,10 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Synthetic values in docs and tests"
+paths = [
+  '''\.env\.example''',
+  '''household\.example\.json''',
+  '''pnpm-lock\.yaml''',
+]

@@ -1,0 +1,32 @@
+{
+  "members": [
+    {
+      "slug": "alice",
+      "name": "Alice",
+      "username": "alice",
+      "payeeNames": ["ALICE"],
+      "cas": { "demat": "00000000-0000-4000-8000-000000000001", "folios": "00000000-0000-4000-8000-000000000002" },
+      "statementAccounts": {
+        "hdfc_account_statement:3101": "00000000-0000-4000-8000-000000000003",
+        "hdfc_account_statement:1202": "00000000-0000-4000-8000-000000000004",
+        "nps_protean:1404": "00000000-0000-4000-8000-000000000005"
+      },
+      "contributionDestinations": {
+        "1606": { "accountId": "00000000-0000-4000-8000-000000000006", "alsoCheck": [] }
+      }
+    },
+    {
+      "slug": "bob",
+      "name": "Bob",
+      "payeeNames": ["BOB"],
+      "cas": { "demat": "00000000-0000-4000-8000-000000000007", "folios": "00000000-0000-4000-8000-000000000008" },
+      "statementAccounts": {
+        "hdfc_account_statement:1303": "00000000-0000-4000-8000-000000000009",
+        "kotak_account_statement:1505": "00000000-0000-4000-8000-00000000000a"
+      },
+      "contributionDestinations": {
+        "1707": { "accountId": "00000000-0000-4000-8000-00000000000b", "alsoCheck": ["00000000-0000-4000-8000-000000000007"] }
+      }
+    }
+  ]
+}

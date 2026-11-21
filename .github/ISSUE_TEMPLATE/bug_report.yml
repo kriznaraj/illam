@@ -1,0 +1,38 @@
+name: Bug report
+description: Something doesn't work as expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Please never paste real bank mail, statements, account numbers or amounts.** Describe the shape, or make up values in the bank's exact wording.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+  - type: input
+    id: version
+    attributes:
+      label: Version (git commit or tag)
+      placeholder: e.g. 82e36b1
+  - type: dropdown
+    id: setup
+    attributes:
+      label: How is it running?
+      options:
+        - docker compose with bundled Postgres
+        - docker compose with my own Postgres
+        - Hosted Supabase
+        - Local development (pnpm dev)
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs (secrets removed)
+      description: "`docker compose logs app` / `auth` / `rest`"
+      render: shell

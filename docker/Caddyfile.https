@@ -1,0 +1,21 @@
+# Used by docker-compose.https.yml: Caddy gets and renews a Let's Encrypt certificate for
+# $DOMAIN. Port 8000 stays plain HTTP for the app's own server-side calls inside the network.
+(illam) {
+	handle_path /rest/v1/* {
+		reverse_proxy rest:3000
+	}
+	handle_path /auth/v1/* {
+		reverse_proxy auth:9999
+	}
+	handle {
+		reverse_proxy app:3000
+	}
+}
+
+{$DOMAIN} {
+	import illam
+}
+
+:8000 {
+	import illam
+}
