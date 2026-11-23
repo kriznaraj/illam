@@ -183,3 +183,9 @@
 .fade-right { mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent); }
 .fade-left { mask-image: linear-gradient(to left, #000 calc(100% - 2rem), transparent); }
 .fade-x { mask-image: linear-gradient(to right, transparent, #000 2rem, #000 calc(100% - 2rem), transparent); }
+
+/* Launch splash (components/LaunchSplash.tsx): shown once per session, hidden after 3s even
+   if scripts never run. */
+#launch-splash { display: none; }
+:root[data-splash] #launch-splash { display: flex; animation: splash-out 0.3s ease 3s forwards; }
+@keyframes splash-out { to { opacity: 0; visibility: hidden; } }

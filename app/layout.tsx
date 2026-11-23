@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import { THEME_INIT_SCRIPT } from '@/lib/theme';
 import { ThemeSync } from '@/components/ThemeSync';
+import { LaunchSplash } from '@/components/LaunchSplash';
+import { SPLASH_INIT_SCRIPT } from '@/lib/splash';
 import './globals.css';
 import { AuthProvider } from '@/lib/AuthContext';
 import ClientNavigation from '@/components/ClientNavigation';
@@ -48,12 +50,13 @@ export default function RootLayout({
     // data-theme is set before React loads (a chosen light/dark theme), so it may differ.
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT + SPLASH_INIT_SCRIPT }} />
       </head>
       <body>
         {/* API address and anon key, read at runtime so one build serves any install (lib/api/config.ts). */}
         <Script src="/api/runtime-config" strategy="beforeInteractive" />
         <ThemeSync />
+        <LaunchSplash />
         <ErrorBoundary>
           <PWARegister />
           <OfflineIndicator />

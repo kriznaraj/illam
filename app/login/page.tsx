@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import IllamLogo from '@/components/IllamLogo';
 import { PWAInstallMenuItem } from '@/components/PWAInstallMenuItem';
 import { ABOUT } from '@/lib/about';
+import { FromAatra } from '@/components/FromAatra';
 import {
   isBiometricAvailable,
   isBiometricRegistered,
@@ -207,6 +208,7 @@ export default function LoginPage() {
           </a>{' '}
           under the {ABOUT.licence.name}.
         </p>
+        <FromAatra className="mt-6" />
       </div>
     </div>
   );

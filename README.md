@@ -105,8 +105,6 @@ a bank. Please follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 Illam is an open-source project from [Aatra](https://aatra.ai). Contributions are welcome:
 see [CONTRIBUTING.md](CONTRIBUTING.md).
 
-Krishnaraj Venkatesan, founder of Aatra and maintainer ([@kriznaraj](https://github.com/kriznaraj)).
-
 ## License
 
 Copyright © 2026 Aatra and the Illam contributors.

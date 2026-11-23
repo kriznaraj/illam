@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { BookOpen, Bug, Code2, ExternalLink, Github, Scale, ShieldCheck } from 'lucide-react';
+import { BookOpen, Bug, Code2, ExternalLink, Heart, Scale, ShieldCheck } from 'lucide-react';
 import { PageContainer } from '@/components/PageContainer';
 import IllamLogo, { IllamWordmark } from '@/components/IllamLogo';
 import { ABOUT, repoLink } from '@/lib/about';
@@ -50,27 +50,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="card mb-4">
-        <h2 className="text-sm font-semibold text-gray-900">Made by</h2>
-        <p className="mt-1 text-sm text-gray-600">
-          Illam is an open-source project from{' '}
-          <a href={ABOUT.maker.url} target="_blank" rel="noreferrer" className="font-medium text-primary-700 hover:underline">
-            {ABOUT.maker.name}
-          </a>{' '}
-          ({ABOUT.maker.url.replace('https://', '')}). Contributions are welcome.{' '}
-          <a href={repoLink('/blob/main/CONTRIBUTING.md')} target="_blank" rel="noreferrer" className="font-medium text-primary-700 hover:underline">
-            See how to help
-          </a>
-          .
-        </p>
-        <div className="mt-2 divide-y divide-gray-100">
-          {ABOUT.maintainers.map((m) => (
-            <Row key={m.github} href={`https://github.com/${m.github}`} icon={Github} label={m.name} hint={`${m.role} · @${m.github}`} />
-          ))}
-        </div>
-      </section>
-
-      <section className="card mb-4">
+      <section className="card">
         <h2 className="text-sm font-semibold text-gray-900">Your data</h2>
         <p className="mt-1 text-sm text-gray-600">
           This copy of Illam runs on your household&apos;s own server. The people who make Illam never see your
@@ -78,19 +58,18 @@ export default function AboutPage() {
         </p>
       </section>
 
-      <section className="card">
-        <h2 className="text-sm font-semibold text-gray-900">Built with</h2>
-        <p className="mt-2 text-sm text-gray-600">
-          {ABOUT.builtWith.map((b, i) => (
-            <span key={b.name}>
-              {i > 0 && ' · '}
-              <a href={b.url} target="_blank" rel="noreferrer" className="hover:text-gray-900 hover:underline">
-                {b.name}
-              </a>
-            </span>
-          ))}
-        </p>
-      </section>
+      <p className="mt-8 text-center text-sm text-gray-500">
+        Made with <Heart size={14} className="inline -mt-0.5 fill-rose-500 text-rose-500" aria-label="love" /> by{' '}
+        <a href={ABOUT.maker.url} target="_blank" rel="noreferrer" className="font-semibold text-gray-700 hover:underline">
+          {ABOUT.maker.name}
+        </a>
+        <span className="block text-xs text-gray-400">
+          Contributions welcome.{' '}
+          <a href={repoLink('/blob/main/CONTRIBUTING.md')} target="_blank" rel="noreferrer" className="hover:text-gray-600 hover:underline">
+            See how to help
+          </a>
+        </span>
+      </p>
     </PageContainer>
   );
 }
