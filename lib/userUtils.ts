@@ -1,13 +1,14 @@
 import { User } from '@/types';
 
 /**
- * Get user icon with fallback
- * Returns user's icon if available, otherwise returns a default icon based on username
+ * The icon a user picked for themselves (stored on the user row), or null when they have
+ * none. Callers show a neutral person icon in that case (components/UserIcon.tsx), so the
+ * interface does not fall back to an emoji.
  */
-export function getUserIcon(user: User | undefined | null): string {
-  if (!user) return '👤';
+export function getUserIcon(user: User | undefined | null): string | null {
+  if (!user) return null;
 
   if (user.icon) return user.icon;
 
-  return '👤';
+  return null;
 }

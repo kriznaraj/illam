@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import type { PortfolioAccount, PortfolioInvestment } from '@/types';
 import Modal from '@/components/Modal';
 import { formatCurrency } from '@/lib/utils';
+import { Trash2 } from 'lucide-react';
 
 const AUTO_RECURRING_NOTE = '__AUTO_MONTHLY__';
 const AUTO_SIP_VIRTUAL_NOTE = '__AUTO_SIP_VIRTUAL__';
@@ -232,7 +233,9 @@ export default function InvestmentDetailModal({
         </form>
       ) : showDeleteConfirm ? (
         <div className="flex flex-col items-center justify-center py-8 text-center">
-          <div className="text-4xl mb-3">🗑️</div>
+          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">
+                <Trash2 size={20} aria-hidden />
+              </div>
           <h3 className="text-base font-semibold text-gray-900 mb-1">Delete this investment?</h3>
           <p className="text-sm text-gray-500 mb-6">This action cannot be undone.</p>
           <div className="flex gap-3 w-full">
@@ -254,8 +257,8 @@ export default function InvestmentDetailModal({
                 : 'Recurring entry. Edit affects this month only.'}
             </div>
           )}
-          <div className="text-center py-4 bg-blue-50 rounded-xl">
-            <p className="text-4xl font-bold text-blue-900">{formatCurrency(Number(investment.amount ?? 0))}</p>
+          <div className="text-center py-4 bg-primary-50 rounded-xl">
+            <p className="text-4xl font-bold text-primary-900">{formatCurrency(Number(investment.amount ?? 0))}</p>
           </div>
           <div className="text-sm text-gray-600 space-y-1">
             <p><span className="font-medium text-gray-800">Account:</span> {investment.account?.name ?? 'Account'}</p>

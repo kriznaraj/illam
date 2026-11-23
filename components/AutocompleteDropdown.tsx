@@ -159,7 +159,7 @@ export default function AutocompleteDropdown({
                 key={option.id}
                 type="button"
                 onClick={() => handleSelectOption(option)}
-                className="w-full px-3 py-2 text-left hover:bg-blue-50 border-b border-gray-100 last:border-b-0 transition-colors"
+                className="w-full px-3 py-2 text-left hover:bg-primary-50 border-b border-gray-100 last:border-b-0 transition-colors"
               >
                 {renderOption ? renderOption(option) : defaultRenderOption(option)}
               </button>

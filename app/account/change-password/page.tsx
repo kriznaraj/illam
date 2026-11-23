@@ -45,7 +45,7 @@ export default function ChangePasswordPage() {
   return (
     <PageContainer maxWidth="2xl">
       <PageHeader
-        title="Change Password"
+        title="Change password"
         description="Update your account password"
       />
 

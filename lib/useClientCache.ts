@@ -125,7 +125,7 @@ export function clearAllCache(): void {
     // Mutation events trigger toasts, which we don't want on refresh
     window.dispatchEvent(new CustomEvent('cacheCleared'));
 
-    console.log('✅ Cache cleared (auth session preserved)');
+    console.log('Cache cleared (auth session preserved)');
   } catch {
     // ignore
   }

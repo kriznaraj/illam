@@ -13,6 +13,7 @@ import TagSelector from './TagSelector';
 import { useCategories } from '@/lib/hooks/useCategories';
 import { useEvents } from '@/lib/hooks/useEvents';
 import { useExpenses } from '@/lib/hooks/useExpenses';
+import { CircleCheck, Camera, Sparkles, Lightbulb, Search, Star, Calendar, Tag as TagIcon } from 'lucide-react';
 
 interface QuickAddExpenseProps {
   isOpen: boolean;
@@ -366,20 +367,23 @@ export default function QuickAddExpense({ isOpen, onClose, onSuccess }: QuickAdd
               >
                 {showSuccess ? (
                   <div className="flex flex-col items-center justify-center py-20 px-6">
-                    <div className="text-6xl mb-4 animate-bounce">✅</div>
+                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-50 text-green-600 animate-bounce">
+                      <CircleCheck size={20} aria-hidden />
+                    </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">Expense Added!</h3>
                     <p className="text-sm text-gray-600">{formatCurrency(parseFloat(amount))}</p>
                   </div>
                 ) : (
                   <>
                     {/* Header - Simplified */}
-                    <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700">
-                      <Dialog.Title className="text-lg font-bold text-white">
-                        Quick Add Expense
+                    <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
+                      <Dialog.Title className="text-lg font-semibold text-gray-900">
+                        Add expense
                       </Dialog.Title>
                       <button
                         onClick={onClose}
-                        className="text-white hover:text-blue-100 text-3xl leading-none w-8 h-8 flex items-center justify-center"
+                        className="icon-button-sm text-gray-400 hover:text-gray-700 hover:bg-gray-100 text-2xl leading-none"
+                        aria-label="Close"
                       >
                         ×
                       </button>
@@ -408,7 +412,14 @@ export default function QuickAddExpense({ isOpen, onClose, onSuccess }: QuickAdd
                             disabled={scanning}
                             className="btn btn-secondary btn-sm w-full justify-center disabled:opacity-60"
                           >
-                            {scanning ? 'Reading receipt…' : '📷 Scan a receipt'}
+                            {scanning ? (
+                              'Reading receipt…'
+                            ) : (
+                              <>
+                                <Camera size={16} aria-hidden />
+                                Scan a receipt
+                              </>
+                            )}
                           </button>
                           {scanError && (
                             <p className="mt-1 text-xs text-amber-700">
@@ -421,7 +432,7 @@ export default function QuickAddExpense({ isOpen, onClose, onSuccess }: QuickAdd
                       {/* Amount Input - Ultra prominent */}
                       <div className="mb-4 bg-gray-50 rounded-xl p-4">
                         <div className="relative">
-                          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-4xl text-blue-600 font-bold">
+                          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-4xl text-primary-600 font-bold">
                             ₹
                           </span>
                           <input
@@ -443,7 +454,7 @@ export default function QuickAddExpense({ isOpen, onClose, onSuccess }: QuickAdd
                       {/* Description/Note - First for smart suggestion */}
                       <div className="mb-3">
                         <label className="label">
-                          What did you buy? 💭
+                          What did you buy?
                         </label>
                         <input
                           type="text"
@@ -460,15 +471,25 @@ export default function QuickAddExpense({ isOpen, onClose, onSuccess }: QuickAdd
                       <div className="mb-3 relative">
                         {/* Smart Suggestion (if available and no selection) */}
                         {suggestedCategory && !selectedCategory && (
-                          <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-2 mb-2">
+                          <div className="bg-primary-50 border-2 border-primary-300 rounded-lg p-2 mb-2">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
                                 <span className="text-lg">
                                   {getCategoryIcon(categories.find(c => c.id === suggestedCategory)!)}
                                 </span>
                                 <div>
-                                  <p className="text-xs text-blue-700 font-medium">
-                                    {suggestionSource === 'ai' ? '✨ AI suggested:' : '💡 Suggested:'}
+                                  <p className="flex items-center gap-1 text-xs text-primary-700 font-medium">
+                                    {suggestionSource === 'ai' ? (
+                                      <>
+                                        <Sparkles size={14} aria-hidden />
+                                        AI suggested:
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Lightbulb size={14} aria-hidden />
+                                        Suggested:
+                                      </>
+                                    )}
                                   </p>
                                   <p className="text-sm font-bold text-gray-900">
                                     {categories.find(c => c.id === suggestedCategory)?.name}
@@ -520,9 +541,7 @@ export default function QuickAddExpense({ isOpen, onClose, onSuccess }: QuickAdd
                             // Autocomplete input when no selection
                             <>
                               <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                  🔍
-                                </span>
+                                <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden />
                                 <input
                                   type="text"
                                   id="quick-add-category-search"
@@ -570,8 +589,9 @@ export default function QuickAddExpense({ isOpen, onClose, onSuccess }: QuickAdd
                                     {/* Favorites Section */}
                                     {favoriteCategories.length > 0 && !searchQuery && (
                                       <div className="p-2 border-b border-gray-100">
-                                        <div className="text-xs font-medium text-gray-500 mb-2 px-2">
-                                          ⭐ Favorites
+                                        <div className="flex items-center gap-1 text-xs font-medium text-gray-500 mb-2 px-2">
+                                          <Star size={14} aria-hidden />
+                                          Favorites
                                         </div>
                                         <div className="space-y-1">
                                           {favoriteCategories.map(cat => (
@@ -582,7 +602,7 @@ export default function QuickAddExpense({ isOpen, onClose, onSuccess }: QuickAdd
                                                 selectCategory(cat.id);
                                                 setShowCategoryDropdown(false);
                                               }}
-                                              className="w-full flex items-center gap-3 p-2 hover:bg-blue-50 rounded-lg transition-colors text-left"
+                                              className="w-full flex items-center gap-3 p-2 hover:bg-primary-50 rounded-lg transition-colors text-left"
                                             >
                                               <span className="text-2xl">{getCategoryIcon(cat)}</span>
                                               <div className="flex-1 min-w-0">
@@ -599,7 +619,7 @@ export default function QuickAddExpense({ isOpen, onClose, onSuccess }: QuickAdd
                                     <div className="p-2">
                                       {searchQuery && (
                                         <div className="text-xs font-medium text-gray-500 mb-2 px-2">
-                                          🔍 Results ({filteredCategories.length})
+                                          Results ({filteredCategories.length})
                                         </div>
                                       )}
                                       {categoriesLoading ? (
@@ -617,7 +637,7 @@ export default function QuickAddExpense({ isOpen, onClose, onSuccess }: QuickAdd
                                       ) : (searchQuery ? filteredCategories : otherCategories).length === 0 ? (
                                         <div className="text-center py-8 text-gray-400">
                                           <p className="text-sm mb-2">
-                                            {searchQuery ? 'No categories found' : 'All categories are in favourites ⭐'}
+                                            {searchQuery ? 'No categories found' : 'All categories are in favourites'}
                                           </p>
                                           <button
                                             type="button"
@@ -625,7 +645,7 @@ export default function QuickAddExpense({ isOpen, onClose, onSuccess }: QuickAdd
                                               setShowNewCategoryForm(true);
                                               setShowCategoryDropdown(false);
                                             }}
-                                            className="text-blue-600 text-xs font-medium hover:underline"
+                                            className="text-primary-600 text-xs font-medium hover:underline"
                                           >
                                             + Create New Category
                                           </button>
@@ -645,7 +665,7 @@ export default function QuickAddExpense({ isOpen, onClose, onSuccess }: QuickAdd
                                                 selectCategory(cat.id);
                                                 setShowCategoryDropdown(false);
                                               }}
-                                              className="w-full flex items-center gap-3 p-2 hover:bg-blue-50 rounded-lg transition-colors text-left"
+                                              className="w-full flex items-center gap-3 p-2 hover:bg-primary-50 rounded-lg transition-colors text-left"
                                             >
                                               <span className="text-2xl">{getCategoryIcon(cat)}</span>
                                               <div className="flex-1 min-w-0">
@@ -668,8 +688,9 @@ export default function QuickAddExpense({ isOpen, onClose, onSuccess }: QuickAdd
                                                   }}
                                                   className="text-gray-400 hover:text-yellow-500 text-sm px-1 cursor-pointer"
                                                   title="Add to favorites"
+                                                  aria-label="Add to favorites"
                                                 >
-                                                  ⭐
+                                                  <Star size={14} aria-hidden />
                                                 </span>
                                               )}
                                             </button>
@@ -687,7 +708,7 @@ export default function QuickAddExpense({ isOpen, onClose, onSuccess }: QuickAdd
                                             setShowNewCategoryForm(true);
                                             setShowCategoryDropdown(false);
                                           }}
-                                          className="w-full py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-colors"
+                                          className="w-full py-2 text-sm text-primary-600 hover:bg-primary-50 rounded-lg font-medium transition-colors"
                                         >
                                           + Create New Category
                                         </button>
@@ -762,7 +783,7 @@ export default function QuickAddExpense({ isOpen, onClose, onSuccess }: QuickAdd
 
                       {/* Labels Selection - Moved up, always visible */}
                       <div className="mb-3">
-                        <label className="label mb-1.5">🔖 Labels</label>
+                        <label className="label mb-1.5">Labels</label>
                         <TagSelector
                           selectedTags={selectedTags}
                           onTagsChange={setSelectedTags}
@@ -775,8 +796,9 @@ export default function QuickAddExpense({ isOpen, onClose, onSuccess }: QuickAdd
                         {/* Date Picker */}
                         <details className="group bg-gray-50 rounded-lg overflow-hidden">
                           <summary className="flex items-center justify-between cursor-pointer select-none py-2.5 px-3 hover:bg-gray-100 transition-colors list-none active:bg-gray-200">
-                            <span className="text-xs font-medium text-gray-600">
-                              📅 {selectedDate !== format(new Date(), 'yyyy-MM-dd')
+                            <span className="flex items-center gap-1.5 text-xs font-medium text-gray-600">
+                              <Calendar size={14} aria-hidden />
+                              {selectedDate !== format(new Date(), 'yyyy-MM-dd')
                                 ? formatDateSafe(selectedDate, 'MMM dd, yyyy')
                                 : 'Today'
                               }
@@ -799,8 +821,9 @@ export default function QuickAddExpense({ isOpen, onClose, onSuccess }: QuickAdd
                         {events.length > 0 && (
                           <details className="group bg-gray-50 rounded-lg overflow-hidden">
                             <summary className="flex items-center justify-between cursor-pointer select-none py-2.5 px-3 hover:bg-gray-100 transition-colors list-none active:bg-gray-200">
-                              <span className="text-xs font-medium text-gray-600">
-                                🏷️ {selectedEvent
+                              <span className="flex items-center gap-1.5 text-xs font-medium text-gray-600">
+                                <TagIcon size={14} aria-hidden />
+                                {selectedEvent
                                   ? events.find(e => e.id === selectedEvent)?.name
                                   : 'Event'
                                 }
@@ -836,9 +859,9 @@ export default function QuickAddExpense({ isOpen, onClose, onSuccess }: QuickAdd
                         type="submit"
                         form="quick-add-form"
                         disabled={loading || selectedCategory === '' || amount === '' || parseFloat(amount) <= 0}
-                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-base hover:from-blue-700 hover:to-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl active:scale-[0.98] touch-manipulation"
+                        className="w-full bg-primary-600 text-white py-3.5 rounded-xl font-semibold text-base hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors touch-manipulation"
                       >
-                        {loading ? '⏳ Adding...' : '✓ Add Expense'}
+                        {loading ? 'Adding…' : 'Add expense'}
                       </button>
                     </div>
                   </>

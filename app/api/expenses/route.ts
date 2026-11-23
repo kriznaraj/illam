@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClientFromRequest } from '@/lib/supabase-server';
+import { createServerClientFromRequest } from '@/lib/api/server';
 import { cachedJson } from '@/lib/utils';
 import { invalidateInsightsCache } from '@/lib/cache-invalidation';
 import { ExpenseService } from '@/lib/services/ExpenseService';

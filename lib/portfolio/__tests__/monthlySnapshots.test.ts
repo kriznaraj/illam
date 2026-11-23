@@ -3,7 +3,6 @@ import {
   latestPerAccountMonth,
   latestRowPerAccountMonth,
   monthlyTotals,
-  totalForMonth,
 } from '../monthlySnapshots';
 
 const snap = (account_id: string, snapshot_date: string, amount: number) => ({
@@ -102,13 +101,13 @@ describe('monthlyTotals', () => {
   });
 });
 
-describe('totalForMonth', () => {
+describe('monthlyTotals for a single month', () => {
   it('returns the deduped total for one month', () => {
-    expect(totalForMonth(FEB_DUPLICATES, '2026-02')).toBeCloseTo(3_716_155.46, 2);
+    expect(monthlyTotals(FEB_DUPLICATES).get('2026-02')).toBeCloseTo(3_716_155.46, 2);
   });
 
-  it('returns 0 for a month with no snapshots', () => {
-    expect(totalForMonth(FEB_DUPLICATES, '2026-05')).toBe(0);
+  it('has no entry for a month with no snapshots', () => {
+    expect(monthlyTotals(FEB_DUPLICATES).get('2026-05')).toBeUndefined();
   });
 });
 
@@ -138,5 +137,55 @@ describe('latestRowPerAccountMonth', () => {
     expect(backwards.get('alice-mf')!.get('2026-02')!.snapshot_date).toBe(
       forwards.get('alice-mf')!.get('2026-02')!.snapshot_date
     );
+  });
+});
+
+describe('monthlyTotals with carryForward', () => {
+  // October fully recorded; in November only one of the two accounts has its row so far.
+  const PARTIAL_NOVEMBER = [
+    snap('kite-alice', '2026-10-01', 1_000_000),
+    snap('alice-mf', '2026-10-01', 500_000),
+    snap('kite-alice', '2026-11-01', 990_000),
+  ];
+
+  it('without it, a month only counts the accounts recorded in it', () => {
+    expect(monthlyTotals(PARTIAL_NOVEMBER).get('2026-11')).toBe(990_000);
+  });
+
+  it('fills an account with no row in a month from its last known balance', () => {
+    const totals = monthlyTotals(PARTIAL_NOVEMBER, undefined, { carryForward: true });
+
+    expect(totals.get('2026-10')).toBe(1_500_000);
+    expect(totals.get('2026-11')).toBe(1_490_000);
+  });
+
+  it('does not carry an account back to months before its first snapshot', () => {
+    const totals = monthlyTotals(
+      [snap('old', '2026-09-01', 100), snap('old', '2026-10-01', 100), snap('new', '2026-10-01', 50)],
+      undefined,
+      { carryForward: true }
+    );
+
+    expect(totals.get('2026-09')).toBe(100);
+    expect(totals.get('2026-10')).toBe(150);
+  });
+
+  it('carries across a gap of several months', () => {
+    const totals = monthlyTotals(
+      [snap('a', '2026-01-01', 10), snap('b', '2026-01-01', 5), snap('b', '2026-04-01', 7)],
+      undefined,
+      { carryForward: true }
+    );
+
+    expect([...totals.entries()]).toEqual([
+      ['2026-01', 15],
+      ['2026-04', 17],
+    ]);
+  });
+
+  it('still respects the account filter', () => {
+    const totals = monthlyTotals(PARTIAL_NOVEMBER, ['alice-mf'], { carryForward: true });
+
+    expect(totals.get('2026-11')).toBe(500_000);
   });
 });

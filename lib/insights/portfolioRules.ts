@@ -132,8 +132,6 @@ export interface PreparedPortfolioData {
 
 // --- preparation ------------------------------------------------------------
 
-const monthKey = (isoDate: string) => isoDate.slice(0, 7);
-
 /** Ascending list of yyyy-MM between two keys, inclusive. */
 export function monthRange(startKey: string, endKey: string): string[] {
   const out: string[] = [];
@@ -373,8 +371,8 @@ export interface GrowthDecomposition {
  * crossed into them, less catch-ups. A ₹40,000 transfer from the salary account into
  * a brokerage raises the investment accounts by ₹40,000 and is subtracted as a
  * contribution, so it is no gain; cash falls by the same ₹40,000, so it is no saving
- * either. Measuring gain on net worth instead — what this engine used to do — subtracted
- * that transfer from a total it had never been added to.
+ * either. Measuring gain on net worth instead would subtract that transfer from a total
+ * it had never been added to.
  *
  * The annual review uses this too, so the two pages cannot drift apart.
  */
@@ -467,7 +465,7 @@ const creditCardSignRule: Rule = (d) => {
       id: 'cc-sign-anomaly',
       type: 'data_quality',
       severity: 'danger',
-      icon: '🚨',
+      icon: 'alert',
       title: 'Credit Card Balances Have the Wrong Sign',
       description:
         `${plural(offenders.length, 'card')} carry a positive balance in ${d.analysisLabel}, ` +
@@ -499,7 +497,7 @@ const staleSnapshotRule: Rule = (d) => {
       id: 'stale-snapshots',
       type: 'data_quality',
       severity: frozenValue > sumValues(d.contributionsByMonth) ? 'warning' : 'info',
-      icon: '🧊',
+      icon: 'stale',
       title: 'Balances Have Stopped Moving',
       description:
         `${plural(stale.length, 'active account')} holding ${inrShort(frozenValue)} have carried the same ` +
@@ -538,7 +536,7 @@ const contributionContradictionRule: Rule = (d) => {
       id: 'contribution-contradiction',
       type: 'data_quality',
       severity: 'warning',
-      icon: '🔀',
+      icon: 'shuffle',
       title: 'Contributions Recorded but Balances Flat',
       description:
         `${joinList(lines)}. Contributions and snapshots are separate records and they disagree: ` +
@@ -577,7 +575,7 @@ const contributionVsGrowthRule: Rule = (d) => {
       id: 'contribution-vs-growth',
       type: 'performance',
       severity: g.marketGain < 0 ? 'warning' : 'info',
-      icon: '⚖️',
+      icon: 'scale',
       title: 'What Actually Drove the Growth',
       description:
         `Net worth moved ${inrShort(g.start)} → ${inrShort(g.end)} over ${plural(d.months.length - 1, 'month')} ` +
@@ -622,7 +620,7 @@ const liabilityPaydownRule: Rule = (d) => {
       id: 'liability-paydown',
       type: 'trend',
       severity: repaid > 0 ? 'success' : 'warning',
-      icon: repaid > 0 ? '🏦' : '⚠️',
+      icon: repaid > 0 ? 'bank' : 'warning',
       title: repaid > 0 ? 'Debt Is Coming Down' : 'Debt Is Growing',
       description:
         `Loan balance moved ${inrShort(Math.abs(start))} → ${inrShort(Math.abs(end))} across ` +
@@ -670,7 +668,7 @@ const drawdownRule: Rule = (d) => {
       id: 'drawdown',
       type: 'performance',
       severity: worst > 0.2 ? 'warning' : 'info',
-      icon: '📉',
+      icon: 'trending-down',
       title: 'Largest Drop in the Window',
       description:
         `Net worth fell ${(worst * 100).toFixed(0)}% from ${inrShort(worstPeak)} in ${worstPeakMonth} to ` +
@@ -706,7 +704,7 @@ const concentrationRule: Rule = (d) => {
       id: concentrated ? 'concentration-risk' : 'diversification',
       type: 'diversification',
       severity: concentrated ? 'warning' : 'info',
-      icon: concentrated ? '🎯' : '🌈',
+      icon: concentrated ? 'target' : 'allocation',
       title: concentrated ? `Concentrated in ${topType}` : 'Reasonably Spread',
       description:
         `${inrShort(gross)} of gross assets across ${plural(assetTypes.length, 'type')}: ${joinList(breakdown)}. ` +
@@ -742,7 +740,7 @@ const fyProgressRule: Rule = (d) => {
       id: 'fy-progress',
       type: 'trend',
       severity: change >= 0 ? 'success' : 'warning',
-      icon: change >= 0 ? '📈' : '📉',
+      icon: change >= 0 ? 'trending-up' : 'trending-down',
       title: `FY${fyStartYear}–${String(fyStartYear + 1).slice(2)} So Far`,
       description:
         `${plural(monthsIn, 'month')} into the financial year, net worth has moved ` +
@@ -786,7 +784,7 @@ const projectionRule: Rule = (d) => {
       id: 'net-worth-projection',
       type: 'projection',
       severity: 'info',
-      icon: '🔭',
+      icon: 'telescope',
       title: 'Twelve Months Out',
       description:
         `From ${inrShort(current)} today, twelve months lands somewhere around ` +
@@ -838,7 +836,7 @@ const monthMoveRule: Rule = (d) => {
       id: 'month-move',
       type: 'trend',
       severity: change >= 0 ? 'success' : 'warning',
-      icon: change >= 0 ? '📈' : '📉',
+      icon: change >= 0 ? 'trending-up' : 'trending-down',
       title: change >= 0 ? 'Net Worth Rose This Month' : 'Net Worth Fell This Month',
       description:
         `${d.analysisLabel} moved ${change >= 0 ? '+' : ''}${inrShort(change)} (${changePercent >= 0 ? '+' : ''}` +
@@ -866,7 +864,7 @@ const milestoneRule: Rule = (d) => {
       id: 'milestone',
       type: 'achievement',
       severity: 'success',
-      icon: '🎯',
+      icon: 'target',
       title: 'Milestone Crossed',
       description:
         `Net worth passed ${inrShort(crossed * MILESTONE_STEP)} in ${d.analysisLabel}, reaching ` +
@@ -912,7 +910,7 @@ const topMoverRule: Rule = (d) => {
       id: 'top-mover',
       type: 'performance',
       severity: 'info',
-      icon: top.delta >= 0 ? '⭐' : '🔻',
+      icon: top.delta >= 0 ? 'star' : 'down',
       title: `${top.name} Moved Most`,
       description:
         `${top.name} went ${inrShort(top.before)} → ${inrShort(top.now)} in ${d.analysisLabel}, ` +

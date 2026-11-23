@@ -296,19 +296,6 @@ describe('InboxAutomationService.process', () => {
     );
   });
 
-  it('still adds the expense when migration 038 has not run', async () => {
-    repos.inbox.listUnconsumed.mockResolvedValue([alert()]);
-    repos.expenses.create
-      .mockRejectedValueOnce(new Error("Failed to create expenses: Could not find the 'spent_time' column of 'expenses' in the schema cache"))
-      .mockImplementationOnce(async (row: object) => ({ id: 'expense-new', ...row }));
-
-    const result = await service.process({ now: NOW });
-
-    expect(result.counts.created).toBe(1);
-    expect(repos.expenses.create).toHaveBeenCalledTimes(2);
-    expect(repos.expenses.create.mock.calls[1][0]).not.toHaveProperty('spent_time');
-  });
-
   it('asks Haiku only when history and keywords cannot place the payee', async () => {
     repos.inbox.listUnconsumed.mockResolvedValue([alert({ merchant: 'KAVERI NILAYAM' })]);
     repos.categorizer.suggestOne.mockResolvedValue({ categoryId: 'cat-dining', categoryName: 'Dining Out', confidence: 'high', source: 'ai' });

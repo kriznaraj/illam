@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServiceClient } from '@/lib/supabase-server';
+import { createServiceClient } from '@/lib/api/server';
 import { InboxAutomationService } from '@/lib/services/InboxAutomationService';
 import { authenticateScriptRequest } from '@/lib/inbox/requestAuth';
 

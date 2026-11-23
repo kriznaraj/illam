@@ -16,7 +16,7 @@ interface InboxRecordSheetProps {
 }
 
 /**
- * Move one alert into Selavu from Madal.
+ * Move one inbox alert into Expenses.
  *
  * Automation acts on an alert once and its answer sticks, so a spend dated before the
  * go-live cut, a credit, or anything it could not read simply sat in the list with nothing
@@ -28,7 +28,7 @@ export default function InboxRecordSheet({ item, data, onRecord }: InboxRecordSh
   const isCredit = data.direction === 'credit';
   // Rows written before extractor v5 store a footer sentence here. Asking the category
   // service what the household files "all times. If you have not done…" under would be
-  // noise, and pre-filling the description with it would write that sentence into Selavu.
+  // noise, and pre-filling the description with it would write that sentence into the expense.
   const merchant = cleanPayee(data.merchant);
 
   /*
@@ -81,10 +81,10 @@ export default function InboxRecordSheet({ item, data, onRecord }: InboxRecordSh
   };
 
   return (
-    <div className="rounded-lg border border-blue-100 bg-blue-50/40 p-3 space-y-3">
+    <div className="rounded-lg border border-primary-100 bg-primary-50/40 p-3 space-y-3">
       <div>
         <p className="text-sm font-semibold text-gray-900">
-          {isCredit ? 'Record this as income' : 'Add this to Selavu'}
+          {isCredit ? 'Record this as income' : 'Add as an expense'}
         </p>
         <p className="text-xs text-gray-500 mt-0.5">
           {formatMoney(data.amount, data.currency)} · {formatters.toFullDate(date)}
@@ -112,7 +112,7 @@ export default function InboxRecordSheet({ item, data, onRecord }: InboxRecordSh
         </div>
       ) : foreignSpend ? (
         <p className="text-xs text-gray-600">
-          This was spent in {data.currency}. Selavu records rupees only, so add it by hand with the rate you were
+          This was spent in {data.currency}. Expenses are recorded in rupees only, so add it by hand with the rate you were
           charged.
         </p>
       ) : (

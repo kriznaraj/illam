@@ -1,14 +1,10 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { BaseRepository, isTableMissing } from './BaseRepository';
+import { BaseRepository } from './BaseRepository';
 import type { MadalDecision } from '@/types';
 
 export type MadalDecisionWrite = Omit<MadalDecision, 'id' | 'created_at' | 'undone_at'>;
 
-/**
- * What Madal decided on its own (migration 039). Reads degrade to "nothing decided" while the
- * table is missing; a write fails loudly, because a decision without its undo record must not
- * happen at all.
- */
+/** What Madal decided on its own, each with the record needed to undo it. */
 export class MadalDecisionRepository extends BaseRepository<MadalDecision> {
   constructor(supabase: SupabaseClient) {
     super(supabase, 'madal_decisions');
@@ -34,10 +30,7 @@ export class MadalDecisionRepository extends BaseRepository<MadalDecision> {
       if (res.error && this.isTransientSupabaseError(res.error)) throw res.error;
       return res;
     });
-    if (error) {
-      if (isTableMissing(error)) return [];
-      throw new Error(`Failed to fetch Madal decisions: ${error.message}`);
-    }
+    if (error) throw new Error(`Failed to fetch Madal decisions: ${error.message}`);
     return (data ?? []) as unknown as MadalDecision[];
   }
 
@@ -48,11 +41,7 @@ export class MadalDecisionRepository extends BaseRepository<MadalDecision> {
       .from(this.tableName)
       .select(`${column}, evidence_key`)
       .in(column, ids as string[]);
-    if (error) {
-      // No table, no history: but then nothing may be decided either — the caller's write fails.
-      if (isTableMissing(error)) return new Set();
-      throw new Error(`Failed to fetch Madal decisions: ${error.message}`);
-    }
+    if (error) throw new Error(`Failed to fetch Madal decisions: ${error.message}`);
     return new Set(
       ((data ?? []) as Record<string, string | null>[]).map((row) => `${row[column]}|${row.evidence_key ?? ''}`)
     );

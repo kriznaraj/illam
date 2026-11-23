@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClientFromRequest } from '@/lib/supabase-server';
+import { createServerClientFromRequest } from '@/lib/api/server';
 import { InboxService } from '@/lib/services/InboxService';
 
 export const dynamic = 'force-dynamic';
 
-/** Statements that stopped arriving on their usual rhythm — the Selvam snapshots page shows them. */
+/** Statements that stopped arriving on their usual rhythm — the Net worth snapshots page shows them. */
 export async function GET(request: NextRequest) {
   try {
     const late = await new InboxService(createServerClientFromRequest(request)).lateStatements();

@@ -19,6 +19,7 @@ import { useExpenses } from '@/lib/hooks/useExpenses';
 import { usePaymentSources } from '@/lib/hooks/usePaymentSources';
 import { awaitsDecision } from '@/lib/expenses/autoTag';
 import ExpenseDetailModal from '@/components/ExpenseDetailModal';
+import { Inbox } from 'lucide-react';
 
 const DEFAULT_AVG_DAILY_BASELINE = 1500;
 const DEFAULT_PREVENTABLE_THRESHOLD = 1000;
@@ -67,7 +68,7 @@ const getAvgDailyTone = (avgDaily: number, baselineDaily: number) => {
   if (ratio <= 0.6) {
     return {
       label: 'Greener',
-      cardClass: 'from-emerald-50 to-emerald-100 border-emerald-200',
+      cardClass: 'bg-emerald-50 border-emerald-200',
       labelClass: 'text-emerald-700',
       valueClass: 'text-emerald-900',
       tip: 'Excellent pace.',
@@ -76,7 +77,7 @@ const getAvgDailyTone = (avgDaily: number, baselineDaily: number) => {
   if (ratio <= 0.9) {
     return {
       label: 'Green',
-      cardClass: 'from-green-50 to-green-100 border-green-200',
+      cardClass: 'bg-green-50 border-green-200',
       labelClass: 'text-green-700',
       valueClass: 'text-green-900',
       tip: 'Healthy spending pace.',
@@ -85,7 +86,7 @@ const getAvgDailyTone = (avgDaily: number, baselineDaily: number) => {
   if (ratio <= 1.2) {
     return {
       label: 'Warm',
-      cardClass: 'from-amber-50 to-amber-100 border-amber-200',
+      cardClass: 'bg-amber-50 border-amber-200',
       labelClass: 'text-amber-700',
       valueClass: 'text-amber-900',
       tip: 'Watch pace closely.',
@@ -94,7 +95,7 @@ const getAvgDailyTone = (avgDaily: number, baselineDaily: number) => {
   if (ratio <= 1.5) {
     return {
       label: 'Warmer',
-      cardClass: 'from-orange-50 to-orange-100 border-orange-200',
+      cardClass: 'bg-orange-50 border-orange-200',
       labelClass: 'text-orange-700',
       valueClass: 'text-orange-900',
       tip: 'Consider slowing down.',
@@ -103,7 +104,7 @@ const getAvgDailyTone = (avgDaily: number, baselineDaily: number) => {
   if (ratio <= 2) {
     return {
       label: 'High',
-      cardClass: 'from-red-50 to-red-100 border-red-200',
+      cardClass: 'bg-red-50 border-red-200',
       labelClass: 'text-red-700',
       valueClass: 'text-red-900',
       tip: 'High burn rate. Slow down.',
@@ -111,7 +112,7 @@ const getAvgDailyTone = (avgDaily: number, baselineDaily: number) => {
   }
   return {
     label: 'Critical',
-    cardClass: 'from-rose-100 to-rose-200 border-rose-300',
+    cardClass: 'bg-rose-100 border-rose-300',
     labelClass: 'text-rose-800',
     valueClass: 'text-rose-900',
     tip: 'Critical pace. Cut discretionary spend.',
@@ -128,7 +129,7 @@ type BarRowProps = {
   barStyle?: CSSProperties;
 };
 
-function BarRow({ label, rightValue, percent, subText, onClick, barClassName = 'bg-blue-600', barStyle }: BarRowProps) {
+function BarRow({ label, rightValue, percent, subText, onClick, barClassName = 'bg-primary-600', barStyle }: BarRowProps) {
   const clampedPercent = Math.max(0, Math.min(percent, 100));
   return (
     <button
@@ -137,7 +138,7 @@ function BarRow({ label, rightValue, percent, subText, onClick, barClassName = '
       onClick={onClick}
     >
       <div className="flex justify-between text-sm mb-1 gap-3">
-        <span className="font-medium text-gray-700 group-hover:text-blue-600 transition-colors truncate">
+        <span className="font-medium text-gray-700 group-hover:text-primary-600 transition-colors truncate">
           {label}
         </span>
         <span className="text-gray-900 font-semibold whitespace-nowrap">{rightValue}</span>
@@ -205,7 +206,7 @@ export default function ExpensesDashboardPage() {
 
   // Use the useExpenses hook with date range
   const { expenses: fetchedExpenses, loading, refetch } = useExpenses(dateRange.startDate, dateRange.endDate);
-  // Names and colours the payment-source dot from Selvam's cards; empty until it loads.
+  // Names and colours the payment-source dot from the cards under Net worth; empty until it loads.
   const { cards: paymentCards } = usePaymentSources();
 
   // Sort expenses by date
@@ -535,13 +536,13 @@ export default function ExpensesDashboardPage() {
   return (
     <PageContainer>
       <PageHeader
-        title="Selavu"
+        title="Expenses"
         description={periodLabel}
       />
 
       {/* Auto-switched notice */}
       {autoSwitchedNotice && (
-        <div className="mb-4 flex items-center justify-between gap-2 rounded-lg bg-blue-50 border border-blue-100 px-4 py-2.5 text-sm text-blue-700">
+        <div className="mb-4 flex items-center justify-between gap-2 rounded-lg bg-primary-50 border border-primary-100 px-4 py-2.5 text-sm text-primary-700">
           <span>No expenses yet this month — showing <strong>{autoSwitchedNotice}</strong>.</span>
           <button
             onClick={() => {
@@ -640,7 +641,7 @@ export default function ExpensesDashboardPage() {
           <p className="text-3xl font-bold text-gray-900 mt-2">{formatCurrency(totalBreakdown.total)}</p>
         </div>
 
-        <div className={`card p-4 border bg-gradient-to-br ${avgDailyTone.cardClass}`}>
+        <div className={`card ${avgDailyTone.cardClass}`}>
           <div className="flex items-start justify-between gap-2">
             <p className={`text-xs uppercase tracking-wide ${avgDailyTone.labelClass}`}>Avg / Day</p>
             <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full bg-white/60 ${avgDailyTone.labelClass}`}>
@@ -665,7 +666,7 @@ export default function ExpensesDashboardPage() {
               percent={trackerBreakdown.needPct}
               subText={formatCurrency(trackerBreakdown.need)}
               onClick={() => setFilterModal({ type: 'target', target: 'need', name: 'Need Expenses' })}
-              barClassName="bg-blue-600"
+              barClassName="bg-primary-600"
             />
             <BarRow
               label="Want"
@@ -717,7 +718,7 @@ export default function ExpensesDashboardPage() {
               <button
                 type="button"
                 onClick={() => setBreakdownListModal(breakdownTab)}
-                className="text-sm font-medium text-blue-600 hover:text-blue-800 whitespace-nowrap"
+                className="text-sm font-medium text-primary-600 hover:text-primary-800 whitespace-nowrap"
               >
                 See all
               </button>
@@ -853,7 +854,7 @@ export default function ExpensesDashboardPage() {
           </div>
           <Link
             href="/expenses/browse"
-            className="text-sm text-blue-600 hover:text-blue-700 font-medium px-2 py-2 rounded-md"
+            className="text-sm text-primary-600 hover:text-primary-700 font-medium px-2 py-2 rounded-md"
           >
             Advanced Filters →
           </Link>
@@ -862,7 +863,7 @@ export default function ExpensesDashboardPage() {
           <MonthViewSkeleton count={3} />
         ) : expenses.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            <p className="text-4xl mb-2">📭</p>
+            <Inbox size={20} className="mx-auto mb-2 text-gray-400" aria-hidden />
             <p>No expenses for this month</p>
           </div>
         ) : (
@@ -895,7 +896,7 @@ export default function ExpensesDashboardPage() {
                         </p>
                       </div>
                       <div className="text-right w-32 flex-shrink-0 pr-1">
-                        <p className="text-base font-bold text-blue-900" suppressHydrationWarning>
+                        <p className="text-base font-bold text-primary-900" suppressHydrationWarning>
                           {formatCurrency(dayTotal)}
                         </p>
                       </div>

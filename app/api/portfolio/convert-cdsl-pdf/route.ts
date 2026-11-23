@@ -28,10 +28,6 @@ function toNumber(raw: string): number {
   return Number(String(raw).replace(/,/g, ''));
 }
 
-function isNumToken(t: string): boolean {
-  return /^[\d,]+(\.\d+)?$/.test(t);
-}
-
 function extractNumberStrings(raw: string): string[] {
   return String(raw).match(/[\d,]+(?:\.\d+)?/g) ?? [];
 }

@@ -1,5 +1,6 @@
-import type { Metadata } from 'next';
-import { Inter, Noto_Sans_Tamil } from 'next/font/google';
+import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
+import { THEME_INIT_SCRIPT } from '@/lib/theme';
 import './globals.css';
 import { AuthProvider } from '@/lib/AuthContext';
 import ClientNavigation from '@/components/ClientNavigation';
@@ -9,12 +10,13 @@ import OfflineIndicator from '@/components/OfflineIndicator';
 import CreditCardDuePopup from '@/components/CreditCardDuePopup';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
-const inter = Inter({ subsets: ['latin'] });
-const tamilFont = Noto_Sans_Tamil({
-  subsets: ['tamil'],
-  weight: ['400', '700'],
-  variable: '--font-tamil',
-});
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#1c1c1b' },
+  ],
+};
+
 export const metadata: Metadata = {
   title: 'Illam',
   description: 'Household finance for Indian families: spending, bank mail, statements and net worth.',
@@ -42,8 +44,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} ${tamilFont.variable}`}>
+    // data-theme is set before React loads (a chosen light/dark theme), so it may differ.
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
+      <body>
+        {/* API address and anon key, read at runtime so one build serves any install (lib/api/config.ts). */}
+        <Script src="/api/runtime-config" strategy="beforeInteractive" />
         <ErrorBoundary>
           <PWARegister />
           <OfflineIndicator />

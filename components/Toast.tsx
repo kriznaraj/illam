@@ -13,7 +13,7 @@ interface ToastProps {
 const toastConfig = {
   success: { bg: 'bg-green-500', Icon: CheckCircle },
   error:   { bg: 'bg-red-500',   Icon: XCircle },
-  info:    { bg: 'bg-blue-500',  Icon: Info },
+  info:    { bg: 'bg-primary-500',  Icon: Info },
 };
 
 export default function Toast({ message, type, duration = 3000, onClose }: ToastProps) {

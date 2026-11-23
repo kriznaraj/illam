@@ -5,7 +5,7 @@ import type { InboxOwner, StatementSample } from '@/types';
 /** `created_at` is rewritten on every save, so a row shows when it was last refreshed. */
 export type StatementSampleWrite = Omit<StatementSample, 'id' | 'created_at'> & { created_at?: string };
 
-/** TEMPORARY (migration 031). */
+/** Masked statement text, captured only while INBOX_CAPTURE_STATEMENT_TEXT=1 so new statement readers can be written. */
 export class StatementSampleRepository extends BaseRepository<StatementSample> {
   constructor(supabase: SupabaseClient) {
     super(supabase, 'statement_samples');

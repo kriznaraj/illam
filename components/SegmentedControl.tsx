@@ -59,7 +59,7 @@ export function SegmentedControl<T extends string>({
             className={classNames(
               'btn',
               size === 'sm' ? 'btn-sm' : undefined,
-              isActive ? 'btn-primary' : 'btn-ghost',
+              isActive ? 'bg-white text-gray-900 shadow-sm ring-1 ring-gray-200' : 'btn-ghost',
               fullWidth && 'flex-1',
               optionClassName,
               option.className,

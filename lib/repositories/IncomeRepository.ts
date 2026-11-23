@@ -1,15 +1,12 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { BaseRepository, isTableMissing } from './BaseRepository';
+import { BaseRepository } from './BaseRepository';
 import type { Income, IncomeWithUser } from '@/types';
 
 /** The relation graph every read returns, so the UI never has to fetch the user separately. */
 const WITH_USER = '*, user:users(*)';
 
-// A read before migration 035 answers empty — an Income page saying "nothing yet" is a
-// truthful thing to show — while a *write* still fails loudly (isTableMissing).
-
 /**
- * Income (migration 035). Deliberately thin: income has no tags, no events and no
+ * Income. Deliberately thin: income has no tags, no events and no
  * denormalised monthly rollup, so it needs none of the machinery ExpenseRepository grew.
  */
 export class IncomeRepository extends BaseRepository<Income> {
@@ -30,21 +27,6 @@ export class IncomeRepository extends BaseRepository<Income> {
         .lte('date', endDate)
         .order('date', { ascending: false });
 
-      if (isTableMissing(error)) return [];
-      if (error) throw new Error(`Failed to fetch income: ${error.message}`);
-      return (data ?? []) as unknown as IncomeWithUser[];
-    });
-  }
-
-  async findRecent(limit = 100): Promise<IncomeWithUser[]> {
-    return this.withRetry(async () => {
-      const { data, error } = await this.supabase
-        .from(this.tableName)
-        .select(WITH_USER)
-        .order('date', { ascending: false })
-        .limit(limit);
-
-      if (isTableMissing(error)) return [];
       if (error) throw new Error(`Failed to fetch income: ${error.message}`);
       return (data ?? []) as unknown as IncomeWithUser[];
     });
@@ -63,18 +45,16 @@ export class IncomeRepository extends BaseRepository<Income> {
         .eq('inbox_item_id', inboxItemId)
         .maybeSingle();
 
-      if (isTableMissing(error)) return null;
       if (error) throw new Error(`Failed to look up income by alert: ${error.message}`);
       return (data as unknown as Income) ?? null;
     });
   }
 
-  /** Which of these statement lines already became income (migration 037). */
+  /** Which of these statement lines already became income. */
   async findStatementRefs(refs: readonly string[]): Promise<Set<string>> {
     if (refs.length === 0) return new Set();
     return this.withRetry(async () => {
       const { data, error } = await this.supabase.from(this.tableName).select('statement_ref').in('statement_ref', [...refs]);
-      if (isTableMissing(error)) return new Set<string>();
       if (error) throw new Error(`Failed to look up statement income: ${error.message}`);
       return new Set(((data ?? []) as { statement_ref: string | null }[]).map((row) => row.statement_ref).filter((ref): ref is string => !!ref));
     });

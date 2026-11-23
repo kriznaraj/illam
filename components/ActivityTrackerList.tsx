@@ -18,6 +18,11 @@ interface ActivityTrackerListProps {
   isHistory?: boolean;
 }
 
+function EventTypeIcon({ type }: { type: keyof typeof EVENT_TYPE_ICON }) {
+  const Icon = EVENT_TYPE_ICON[type];
+  return <Icon size={14} className="flex-shrink-0 text-gray-500" aria-hidden />;
+}
+
 export default function ActivityTrackerList({
   events,
   onViewDetails,
@@ -59,7 +64,7 @@ export default function ActivityTrackerList({
             <ListItemRow
               title={
                 <span className="flex items-center gap-2">
-                  <span className="text-sm">{EVENT_TYPE_ICON[event.event_type]}</span>
+                  <EventTypeIcon type={event.event_type} />
                   <span className="truncate">{event.title}</span>
                 </span>
               }
@@ -102,7 +107,7 @@ export default function ActivityTrackerList({
                   className={`w-full py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2 disabled:cursor-not-allowed ${
                     loggedToday
                       ? 'text-green-700 bg-green-50'
-                      : 'text-blue-700 bg-blue-50 hover:bg-blue-100 disabled:opacity-60'
+                      : 'text-primary-700 bg-primary-50 hover:bg-primary-100 disabled:opacity-60'
                   }`}
                 >
                   {isLogging ? (

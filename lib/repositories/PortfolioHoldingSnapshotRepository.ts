@@ -1,5 +1,4 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { PortfolioHoldingSnapshot } from '@/types';
 
 export class PortfolioHoldingSnapshotRepository {
   constructor(private supabase: SupabaseClient) {}

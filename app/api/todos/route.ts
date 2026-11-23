@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase-server';
+import { createServerClientFromRequest } from '@/lib/api/server';
 import { TodoService } from '@/lib/services/TodoService';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = createServerClientFromRequest(request);
     const todoService = new TodoService(supabase);
 
     const searchParams = request.nextUrl.searchParams;
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = createServerClientFromRequest(request);
     const todoService = new TodoService(supabase);
 
     const body = await request.json();
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = createServerClientFromRequest(request);
     const todoService = new TodoService(supabase);
 
     const body = await request.json();
@@ -77,7 +77,7 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = createServerClientFromRequest(request);
     const todoService = new TodoService(supabase);
 
     const searchParams = request.nextUrl.searchParams;

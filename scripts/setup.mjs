@@ -53,7 +53,6 @@ const publicUrl = args['public-url'] || existing.PUBLIC_URL || 'http://localhost
 
 const env = {
   PUBLIC_URL: publicUrl,
-  NEXT_PUBLIC_SUPABASE_URL: publicUrl,
   POSTGRES_PASSWORD: postgresPassword,
   DATABASE_URL:
     args['database-url'] || existing.DATABASE_URL || `postgres://illam:${postgresPassword}@db:5432/illam?sslmode=disable`,
@@ -68,8 +67,6 @@ const env = {
   url.searchParams.set('search_path', 'auth');
   env.AUTH_DATABASE_URL = url.toString();
 }
-env.NEXT_PUBLIC_SUPABASE_ANON_KEY = env.ANON_KEY;
-env.SUPABASE_SERVICE_ROLE_KEY = env.SERVICE_ROLE_KEY;
 for (const member of household.members) {
   const key = `INBOX_SECRET_${String(member.slug).toUpperCase()}`;
   env[key] = keep(key, () => hex(32));
@@ -79,6 +76,7 @@ for (const member of household.members) {
 for (const [key, value] of Object.entries(existing)) {
   if (key in env) continue;
   if (key.startsWith('INBOX_SECRET_')) continue; // a member removed from household.json
+  if (['NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY'].includes(key)) continue; // copies early installs kept
   env[key] = value;
 }
 if (!('ANTHROPIC_API_KEY' in env)) env.ANTHROPIC_API_KEY = '';
@@ -90,4 +88,4 @@ const lines = [
 ];
 fs.writeFileSync(ENV_PATH, lines.join('\n') + '\n', { mode: 0o600 });
 console.log(`Wrote ${ENV_PATH} for ${household.members.length} member(s) at ${publicUrl}.`);
-console.log('Next: docker compose --profile bundled-db up -d --build');
+console.log(args['database-url'] ? 'Next: docker compose up -d' : 'Next: docker compose --profile bundled-db up -d');

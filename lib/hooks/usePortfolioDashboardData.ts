@@ -95,7 +95,7 @@ export function usePortfolioDashboardData(): UsePortfolioDashboardDataResult {
         const message = extractApiErrorMessage(!accountsResponse.ok ? accountsPayload : snapshotsPayload);
         if (looksLikeMissingPortfolioTables(combined) || looksLikeMissingPortfolioTables(message)) {
           setErrorKind('setup');
-          setError('Portfolio tables not found. Please run migration 005_create_portfolio_tables.sql in Supabase.');
+          setError('Portfolio tables not found. Check that the database migrations ran (docker compose logs migrate).');
         } else {
           setErrorKind('load');
           setError(`Failed to load portfolio data. ${message}`);
@@ -108,7 +108,7 @@ export function usePortfolioDashboardData(): UsePortfolioDashboardDataResult {
         const combined = { accounts: accountsPayload, snapshots: snapshotsPayload };
         if (looksLikeMissingPortfolioTables(combined)) {
           setErrorKind('setup');
-          setError('Portfolio tables not found. Please run migration 005_create_portfolio_tables.sql in Supabase.');
+          setError('Portfolio tables not found. Check that the database migrations ran (docker compose logs migrate).');
         } else {
           setErrorKind('load');
           setError(`Failed to load portfolio data. ${extractApiErrorMessage(combined)}`);

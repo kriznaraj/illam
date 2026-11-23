@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { classNames } from '@/lib/utils';
 
-type MetricTone = 'default' | 'blue' | 'green' | 'purple' | 'orange';
+type MetricTone = 'default' | 'primary' | 'green' | 'purple' | 'orange';
 
 interface MetricCardProps {
   label: ReactNode;
@@ -16,12 +16,13 @@ interface MetricGridProps {
   className?: string;
 }
 
-const toneClassMap: Record<MetricTone, string> = {
-  default: 'card border border-gray-200 text-gray-900',
-  blue: 'card bg-gradient-to-r from-blue-500 to-blue-600 text-white',
-  green: 'card bg-gradient-to-r from-green-500 to-green-600 text-white',
-  purple: 'card bg-gradient-to-r from-purple-500 to-purple-600 text-white',
-  orange: 'card bg-gradient-to-r from-orange-500 to-orange-600 text-white',
+// The tone colours only the value, so a row of metrics stays calm and readable.
+const valueToneClass: Record<MetricTone, string> = {
+  default: 'text-gray-900',
+  primary: 'text-primary-700',
+  green: 'text-green-700',
+  purple: 'text-purple-700',
+  orange: 'text-orange-700',
 };
 
 export function MetricCard({
@@ -31,21 +32,13 @@ export function MetricCard({
   tone = 'default',
   className,
 }: MetricCardProps) {
-  const isDefaultTone = tone === 'default';
-
   return (
-    <div className={classNames(toneClassMap[tone], className)}>
-      <p className={classNames('mb-1', isDefaultTone ? 'text-sm text-gray-600' : 'text-xs sm:text-sm opacity-90')}>
-        {label}
-      </p>
-      <div className={classNames('font-bold', isDefaultTone ? 'text-2xl text-gray-900' : 'text-lg sm:text-2xl')}>
+    <div className={classNames('card', className)}>
+      <p className="mb-1 text-xs sm:text-sm text-gray-500">{label}</p>
+      <div className={classNames('text-lg sm:text-2xl font-semibold tabular-nums', valueToneClass[tone])}>
         {value}
       </div>
-      {subtext && (
-        <p className={classNames('mt-1 text-xs', isDefaultTone ? 'text-gray-500' : 'opacity-90')}>
-          {subtext}
-        </p>
-      )}
+      {subtext && <p className="mt-1 text-xs text-gray-500">{subtext}</p>}
     </div>
   );
 }

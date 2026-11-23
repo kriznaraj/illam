@@ -54,7 +54,7 @@ export default function EmojiPicker({ value, onChange, placeholder = 'Pick an em
         <button
           type="button"
           onClick={() => setShowPicker(!showPicker)}
-          className="w-16 h-10 rounded-lg border-2 border-blue-300 bg-blue-50 flex items-center justify-center text-2xl cursor-pointer hover:bg-blue-100 hover:border-blue-400 transition-all shadow-sm"
+          className="w-16 h-10 rounded-lg border-2 border-primary-300 bg-primary-50 flex items-center justify-center text-2xl cursor-pointer hover:bg-primary-100 hover:border-primary-400 transition-all shadow-sm"
           title="Click to open emoji picker"
         >
           {value || '😊'}
@@ -87,7 +87,7 @@ export default function EmojiPicker({ value, onChange, placeholder = 'Pick an em
                 onClick={() => setSelectedCategory(category)}
                 className={`px-3 py-2 text-xs font-medium whitespace-nowrap transition-colors ${
                   selectedCategory === category
-                    ? 'bg-white text-blue-600 border-b-2 border-blue-600'
+                    ? 'bg-white text-primary-600 border-b-2 border-primary-600'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
@@ -103,8 +103,8 @@ export default function EmojiPicker({ value, onChange, placeholder = 'Pick an em
                 <button
                   key={emoji}
                   onClick={() => handleEmojiClick(emoji)}
-                  className={`w-10 h-10 text-2xl rounded hover:bg-blue-50 transition-colors flex items-center justify-center ${
-                    value === emoji ? 'bg-blue-100 ring-2 ring-blue-500' : ''
+                  className={`w-10 h-10 text-2xl rounded hover:bg-primary-50 transition-colors flex items-center justify-center ${
+                    value === emoji ? 'bg-primary-100 ring-2 ring-primary-500' : ''
                   }`}
                   title={emoji}
                 >

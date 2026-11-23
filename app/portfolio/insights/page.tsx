@@ -16,6 +16,8 @@ import { format } from 'date-fns';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine } from 'recharts';
 import { ExpandableChart } from '@/components/charts/ExpandableChart';
 import type { Insight, InsightType } from '@/types';
+import { ReportViews } from '@/components/ReportViews';
+import { ChartColumn, Compass, Lightbulb } from 'lucide-react';
 
 interface Summary {
   totalNetWorth: number;
@@ -35,15 +37,15 @@ interface Summary {
 
 /** Label and icon per insight type, used to build the filter tabs from what is present. */
 const TYPE_LABELS: Partial<Record<InsightType, string>> = {
-  trend: '📈 Trends',
-  projection: '🔭 Projections',
-  prediction: '🔮 Predictions',
-  performance: '⚖️ Performance',
-  diversification: '🌈 Allocation',
-  data_quality: '🩺 Data health',
-  achievement: '🌟 Achievements',
-  pattern: '📊 Patterns',
-  anomaly: '⚠️ Anomalies',
+  trend: 'Trends',
+  projection: 'Projections',
+  prediction: 'Predictions',
+  performance: 'Performance',
+  diversification: 'Allocation',
+  data_quality: 'Data health',
+  achievement: 'Achievements',
+  pattern: 'Patterns',
+  anomaly: 'Anomalies',
 };
 
 interface ProjectionData {
@@ -226,12 +228,13 @@ export default function PortfolioInsightsPage() {
     return (
       <PageContainer maxWidth="7xl">
         <PageHeader
-          title="Selvam Insights"
+          title="Net worth insights"
           description={insightsSourceLabel}
         />
+        <ReportViews section="net-worth" current="insights" />
         <div className="mb-6">{monthNavigation}</div>
         <EmptyState
-          icon="📊"
+          icon={ChartColumn}
           title="No Data for This Month"
           description="There are no portfolio snapshots recorded for the selected month. Try selecting a different month or add snapshots to generate insights."
         />
@@ -262,7 +265,7 @@ export default function PortfolioInsightsPage() {
   return (
     <PageContainer maxWidth="7xl">
       <PageHeader
-        title="Selvam Insights 💡"
+        title="Net worth insights"
         description={insightsSourceLabel}
       />
 
@@ -277,7 +280,7 @@ export default function PortfolioInsightsPage() {
           subtext="Total portfolio value"
         />
         <MetricCard
-          tone="blue"
+          tone="primary"
           label="Month Growth"
           value={`${summary.monthGrowth >= 0 ? '↑' : '↓'} ${Math.abs(summary.monthGrowth).toFixed(2)}%`}
           subtext={`${summary.monthChange >= 0 ? '+' : ''}${formatCurrency(summary.monthChange)} vs previous month`}
@@ -399,7 +402,7 @@ export default function PortfolioInsightsPage() {
       )}
 
       {/* Filter Tabs */}
-      <div className="card mb-4 bg-gradient-to-r from-gray-50 to-gray-100">
+      <div className="card mb-4 bg-gray-50">
         <SegmentedControl
           value={filter}
           onChange={setFilter}
@@ -412,7 +415,7 @@ export default function PortfolioInsightsPage() {
       {/* Insights Grid */}
       {filteredInsights.length === 0 ? (
         <EmptyState
-          icon="🧭"
+          icon={Compass}
           title="No insights in this category"
           description="Try another insight type filter."
         />
@@ -422,6 +425,7 @@ export default function PortfolioInsightsPage() {
             <InsightCard
               key={`${insight.id}-${index}`}
               icon={insight.icon}
+              type={insight.type}
               title={insight.title}
               description={insight.description}
               severity={insight.severity}
@@ -434,10 +438,13 @@ export default function PortfolioInsightsPage() {
       )}
 
       {/* Info Footer */}
-      <div className="card bg-blue-50 border border-blue-200 mt-4">
-        <p className="text-sm text-blue-800">
-          💡 Growth is split into money you added, debt repaid and valuation change — only the last is
+      <div className="card bg-primary-50 border border-primary-200 mt-4">
+        <p className="flex items-start gap-2 text-sm text-primary-800">
+          <Lightbulb size={16} className="mt-0.5 flex-shrink-0" aria-hidden />
+          <span>
+          Growth is split into money you added, debt repaid and valuation change — only the last is
           performance. Projections state their assumptions; they are not forecasts of markets.
+          </span>
         </p>
         <Link href="/annual-review" className="btn btn-link btn-sm mt-2 px-0">
           Open the twelve-month review →

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Wifi, WifiOff } from 'lucide-react';
 
 export default function OfflineIndicator() {
   const [isOnline, setIsOnline] = useState(true);
@@ -42,7 +43,7 @@ export default function OfflineIndicator() {
       }`}
     >
       <div className="flex items-center gap-2">
-        <span className="text-xl">{isOnline ? '✅' : '📡'}</span>
+        {isOnline ? <Wifi size={18} aria-hidden /> : <WifiOff size={18} aria-hidden />}
         <span className="font-medium">
           {isOnline ? 'Back Online' : 'You are offline'}
         </span>

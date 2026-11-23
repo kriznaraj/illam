@@ -40,7 +40,7 @@ export class TodoService extends BaseService {
         priority: data.priority ?? 'medium',
         due_date: data.due_date ?? null,
         completed_at: (data.status ?? 'pending') === 'completed' ? new Date().toISOString() : null,
-      } as any);
+      });
     } catch (error) {
       this.handleError(error, 'create todo');
     }
@@ -59,7 +59,7 @@ export class TodoService extends BaseService {
   ): Promise<Todo> {
     try {
       this.validateUUID(id, 'Todo ID');
-      const updates: Record<string, unknown> = {};
+      const updates: Partial<Todo> = {};
       if (patch.title !== undefined) updates.title = patch.title.trim();
       if (patch.description !== undefined) updates.description = patch.description;
       if (patch.priority !== undefined) updates.priority = patch.priority;
@@ -70,7 +70,7 @@ export class TodoService extends BaseService {
         updates.completed_at = patch.status === 'completed' ? new Date().toISOString() : null;
       }
 
-      return await this.todoRepo.update(id, updates as any);
+      return await this.todoRepo.update(id, updates);
     } catch (error) {
       this.handleError(error, 'update todo');
     }

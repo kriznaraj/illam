@@ -54,7 +54,7 @@ export class CreditCardOverviewService extends BaseService {
   async getOverview(params: { month?: string | null; today?: Date }) {
     try {
       // Anchored to the APP_TIMEZONE calendar day rather than the server clock
-      // (UTC in production), so getFullYear/getMonth/getDate below -- and the
+      // (often UTC), so getFullYear/getMonth/getDate below -- and the
       // ymd() and daysBetween() calls further down -- all read IST dates.
       const today = params.today ?? parseAppDate(getTodayAppDate());
       const monthParam = params.month ?? null; // yyyy-MM

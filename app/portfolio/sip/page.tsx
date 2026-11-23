@@ -18,6 +18,7 @@ import {
   type SipAmountChange,
 } from '@/lib/portfolio/sipSchedule';
 import { getAppMonthKey } from '@/lib/utils/dateUtils';
+import { TrendingUp } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -229,7 +230,7 @@ export default function SipPage() {
   return (
     <PageContainer maxWidth="7xl">
       <PageHeader
-        title="SIP Schedule"
+        title="SIP schedule"
         description="Active systematic investment plans"
         action={
           <Link href="/portfolio/settings" className="btn btn-secondary text-sm">
@@ -260,7 +261,7 @@ export default function SipPage() {
 
       {accounts.length === 0 ? (
         <EmptyState
-          icon="📈"
+          icon={TrendingUp}
           title="No MF accounts yet"
           description="Add Mutual Fund accounts in Settings."
           action={{ label: 'Go to Settings', onClick: () => window.location.href = '/portfolio/settings' }}
@@ -361,7 +362,7 @@ export default function SipPage() {
                 <div key={idx}>
                   {editingFund?.idx === idx ? (
                     /* Inline edit row */
-                    <div className="px-4 sm:px-6 py-3 bg-blue-50 space-y-2">
+                    <div className="px-4 sm:px-6 py-3 bg-primary-50 space-y-2">
                       <input
                         type="text" className="input text-sm" placeholder="Fund name"
                         value={editingFund.fund.name}

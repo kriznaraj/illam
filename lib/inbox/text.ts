@@ -13,7 +13,7 @@ const MONTHS: Record<string, number> = {
 const MONTH_NAME = '(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\\.?';
 
 /**
- * Drop the asterisks plain-text mail uses for bold. HDFC's card alert (seen live 2026-10) reads
+ * Drop the asterisks plain-text mail uses for bold. HDFC's card alert reads
  * "ending *1909* towards *RSP*BHARTI AIRTEL LIMI* on *17 Oct, 2026 at 16:50:04*", and every
  * shape below failed on it: no payee, no card, no time. Only a lone `*` at a word edge goes —
  * one inside a descriptor (RSP*BHARTI) and a run masking a number (**********8723) both stay.
@@ -142,9 +142,8 @@ export function findMonthPeriod(text: string): { from: string; to: string } | nu
  *
  * Axis card alerts are a table, not a sentence — "Transaction Amount / INR 289 / Merchant Name /
  * SRI SWEETS / Axis Bank Credit Card No. / XX0001 / Date & Time / 19-09-2026, 13:20:46 IST". The
- * prose patterns find nothing in it, so 31 of 46 Axis alerts arrived with no payee at all, were
- * described "Axis Bank card ••2303 payment", and left the category matcher nothing to read —
- * which is why they all landed in Miscellaneous.
+ * prose patterns find nothing in it, which would leave such an alert with no payee and the
+ * category matcher nothing to read.
  *
  * Read **line by line**, on the body before `oneLine` flattens it. Collapsed to one line the
  * split is genuinely ambiguous: "INR 289 Merchant Name:" reads as the label "INR 289 Merchant

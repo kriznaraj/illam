@@ -13,6 +13,7 @@ import { ExpandableChart } from '@/components/charts/ExpandableChart';
 import { usePortfolioDashboardData } from '@/lib/hooks/usePortfolioDashboardData';
 import { computeScopedPortfolioData } from '@/lib/portfolio/dashboardCalculations';
 import { SegmentedControl } from '@/components/SegmentedControl';
+import { Briefcase, TriangleAlert } from 'lucide-react';
 
 
 export default function PortfolioDashboard() {
@@ -84,8 +85,9 @@ export default function PortfolioDashboard() {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="card border-red-200 bg-red-50">
-          <h2 className="text-xl font-bold text-red-900 mb-4">
-            {errorKind === 'setup' ? '⚠️ Portfolio Setup Required' : '⚠️ Portfolio Load Failed'}
+          <h2 className="flex items-center gap-2 text-xl font-bold text-red-900 mb-4">
+            <TriangleAlert size={20} className="flex-shrink-0" aria-hidden />
+            {errorKind === 'setup' ? 'Portfolio Setup Required' : 'Portfolio Load Failed'}
           </h2>
           <p className="text-red-800 mb-4">{error}</p>
           {errorKind === 'setup' ? (
@@ -124,8 +126,8 @@ export default function PortfolioDashboard() {
     return (
       <PageContainer maxWidth="7xl">
         <EmptyState
-          icon="💼"
-          title="No Selvam Accounts Yet"
+          icon={Briefcase}
+          title="No accounts yet"
           description="Start tracking your investments, savings, and assets by adding your first account."
           action={{
             label: "Add Your First Account",
@@ -143,7 +145,7 @@ export default function PortfolioDashboard() {
   return (
     <PageContainer maxWidth="7xl">
       <PageHeader
-        title="Selvam"
+        title="Net worth"
         action={
           <SegmentedControl
             value={scope}
@@ -158,14 +160,14 @@ export default function PortfolioDashboard() {
       />
 
       {/* Net Worth Summary */}
-      <div className="card bg-gradient-to-r from-green-500 to-green-600 text-white mb-6">
+      <div className="card mb-6">
         <div className="flex items-center justify-between mb-1">
-          <div className="text-xs opacity-80">
-            {scope === 'equity' ? 'Total Equity' : 'Total Net Worth'}
+          <div className="text-sm text-gray-500">
+            {scope === 'equity' ? 'Total equity' : 'Total net worth'}
           </div>
           <button
             onClick={() => setShowAmounts(v => !v)}
-            className="opacity-70 hover:opacity-100 transition-opacity p-2 -mr-1 rounded-md"
+            className="icon-button-sm -mr-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100"
             aria-label={showAmounts ? 'Hide amounts' : 'Show amounts'}
           >
             {showAmounts ? (
@@ -180,23 +182,23 @@ export default function PortfolioDashboard() {
             )}
           </button>
         </div>
-        <div className="text-3xl font-bold mb-3">{displayAmount(totalNetWorth)}</div>
+        <div className="text-3xl font-semibold tabular-nums mb-4">{displayAmount(totalNetWorth)}</div>
         <div className="grid grid-cols-3 gap-3 text-sm">
           <div>
-            <div className="text-xs opacity-80">Month</div>
-            <div className="font-bold">
+            <div className="text-xs text-gray-500">Month</div>
+            <div className="font-semibold tabular-nums">
               {growthMetrics.mom >= 0 ? '↑' : '↓'} {Math.abs(growthMetrics.mom).toFixed(2)}%
             </div>
           </div>
           <div>
-            <div className="text-xs opacity-80">YTD</div>
-            <div className="font-bold">
+            <div className="text-xs text-gray-500">YTD</div>
+            <div className="font-semibold tabular-nums">
               {growthMetrics.ytd >= 0 ? '↑' : '↓'} {Math.abs(growthMetrics.ytd).toFixed(2)}%
             </div>
           </div>
           <div>
-            <div className="text-xs opacity-80">YOY</div>
-            <div className="font-bold">
+            <div className="text-xs text-gray-500">YOY</div>
+            <div className="font-semibold tabular-nums">
               {growthMetrics.yoy >= 0 ? '↑' : '↓'} {Math.abs(growthMetrics.yoy).toFixed(2)}%
             </div>
           </div>
@@ -207,14 +209,14 @@ export default function PortfolioDashboard() {
       {portfolioTrend.length > 0 && (
         <div className="card mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-bold text-gray-900">Selvam Growth</h2>
+            <h2 className="text-base font-bold text-gray-900">Net worth over time</h2>
             <div className="flex items-center gap-3 text-xs">
               <div className="flex items-center gap-1">
                 <div className="w-4 h-0.5 bg-green-600"></div>
                 <span className="text-gray-600">Actual</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-4 h-0.5 bg-blue-500"></div>
+                <div className="w-4 h-0.5 bg-primary-500"></div>
                 <span className="text-gray-600">6M Avg</span>
               </div>
               <div className="flex items-center gap-1">
@@ -223,7 +225,7 @@ export default function PortfolioDashboard() {
               </div>
             </div>
           </div>
-          <ExpandableChart title="Selvam Growth" height={220} expandedHeight={560} overlayButton>
+          <ExpandableChart title="Net worth over time" height={220} expandedHeight={560} overlayButton>
             {() => (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={portfolioTrend}>

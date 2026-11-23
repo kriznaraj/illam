@@ -11,9 +11,10 @@ import { ModalRecordActions } from '@/components/ModalRecordActions';
 import { Todo, User } from '@/types';
 import { format, isSameDay, parseISO, endOfWeek } from 'date-fns';
 import { getTodayAppDate } from '@/lib/utils/dateUtils';
+import { ListChecks, Trash2 } from 'lucide-react';
 
 const PRIORITY_COLORS: Record<Todo['priority'], string> = {
-  low: 'bg-blue-100 text-blue-700',
+  low: 'bg-primary-100 text-primary-700',
   medium: 'bg-yellow-100 text-yellow-700',
   high: 'bg-red-100 text-red-700',
 };
@@ -27,7 +28,7 @@ const STATUS_LABELS: Record<Todo['status'], string> = {
 
 const STATUS_COLORS: Record<Todo['status'], string> = {
   pending: 'bg-gray-100 text-gray-700',
-  in_progress: 'bg-blue-100 text-blue-700',
+  in_progress: 'bg-primary-100 text-primary-700',
   completed: 'bg-green-100 text-green-700',
   cancelled: 'bg-gray-100 text-gray-400',
 };
@@ -319,7 +320,7 @@ export default function TodosPage() {
   return (
     <PageContainer maxWidth="7xl">
       <PageHeader
-        title="Seyal"
+        title="To-dos"
         description={format(new Date(), 'EEEE, MMM d')}
         action={
           <button onClick={handleCreateTodo} className="btn btn-primary">
@@ -425,7 +426,7 @@ export default function TodosPage() {
       {filteredTodos.length === 0 && (
         <div className="mt-6">
           <EmptyState
-            icon="✓"
+            icon={ListChecks}
             title={searchQuery ? 'No tasks match your search' : 'No tasks'}
             description={searchQuery ? 'Try a different search term' : 'Create your first task to get started'}
           />
@@ -654,7 +655,9 @@ export default function TodosPage() {
         ) : selectedTodo ? (
           showDeleteConfirm ? (
             <div className="flex flex-col items-center justify-center py-8 text-center">
-              <div className="text-4xl mb-3">🗑️</div>
+              <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">
+                <Trash2 size={20} aria-hidden />
+              </div>
               <h3 className="text-base font-semibold text-gray-900 mb-1">Delete this task?</h3>
               <p className="text-sm text-gray-500 mb-6">This action cannot be undone.</p>
               <div className="flex gap-3">

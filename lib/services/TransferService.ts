@@ -54,7 +54,7 @@ const SIP_CHECKED_KINDS: ReadonlySet<TransferKind> = new Set(['investment', 'oth
 export interface TransferDecision {
   /**
    * A transfer kind — or 'expense', when the money was spent after all, or 'income', when a
-   * credit turned out to be money earned rather than money moved (migration 035).
+   * credit turned out to be money earned rather than money moved.
    */
   kind: TransferKind | 'expense' | 'income';
   account_id?: string | null;
@@ -334,7 +334,7 @@ export class TransferService extends BaseService {
     return findContributionCandidates({
       date: transfer.date,
       amount: Number(transfer.amount),
-      // A row a transfer points at is taken even before migration 034 records it on the row.
+      // A row a transfer points at (transfers.portfolio_investment_id) is taken even without its own transfer_id.
       rows: rows.map((row) => ({ ...row, transfer_id: row.transfer_id ?? (linkedIds.has(row.id) ? 'linked' : null) })),
       funds: funds as SipFund[],
       claimedSips,

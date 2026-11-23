@@ -1,9 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { createServerClient as createSsrClient, type CookieOptions } from '@supabase/ssr';
-import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import { Agent, fetch as undiciFetch } from 'undici';
-import { SESSION_COOKIE_NAME, SUPABASE_ANON_KEY as supabaseAnonKey, SUPABASE_SERVER_URL as supabaseUrl } from './supabase-config';
+import { SESSION_COOKIE_NAME, serverApiConfig } from './config';
 
 const cookieOptions = { name: SESSION_COOKIE_NAME };
 
@@ -68,34 +67,14 @@ const noStoreFetch: typeof fetch = (input, init) => {
 /**
  * Server client for API routes, acting as the signed-in user.
  *
- * Reads the session from the request's cookies (Next's `cookies()`), so the database sees the
- * `authenticated` role. The anon role has no grants at all (db/migrations), so a client without
- * a session can read nothing.
+ * Reads the session from the request's cookies, so the database sees the `authenticated`
+ * role. The anon role has no grants at all (db/migrations), so a client without a session
+ * can read nothing. Middleware refreshes the session and writes cookies on responses, so
+ * this client never sets them.
  */
-export function createServerClient() {
-  const store = cookies();
-  return createSsrClient(supabaseUrl, supabaseAnonKey, {
-    cookieOptions,
-    cookies: {
-      get(name: string) {
-        return store.get(name)?.value;
-      },
-      // Middleware refreshes the session and writes cookies on responses.
-      set(_name: string, _value: string, _options: CookieOptions) {},
-      remove(_name: string, _options: CookieOptions) {},
-    },
-    global: { fetch: noStoreFetch },
-  });
-}
-
-export function createServerClientNoCache() {
-  return createServerClient();
-}
-
-export function createServerClientFromRequest(request?: NextRequest) {
-  if (!request) return createServerClient();
-
-  return createSsrClient(supabaseUrl, supabaseAnonKey, {
+export function createServerClientFromRequest(request: NextRequest) {
+  const { serverApiUrl, anonKey } = serverApiConfig();
+  return createSsrClient(serverApiUrl, anonKey, {
     cookieOptions,
     cookies: {
       get(name: string) {
@@ -111,16 +90,13 @@ export function createServerClientFromRequest(request?: NextRequest) {
 /**
  * Service-role client, for the session-less routes that verify their own HMAC signature
  * (/api/inbox/ingest and /api/inbox/process — see middleware.ts). Never use it in a route a
- * browser session reaches, and never expose SUPABASE_SERVICE_ROLE_KEY to the client.
+ * browser session reaches, and never expose SERVICE_ROLE_KEY to the client.
  */
 export function createServiceClient() {
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!serviceKey) throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set');
-  return createClient(supabaseUrl, serviceKey, {
+  const { serverApiUrl, serviceKey } = serverApiConfig();
+  if (!serviceKey) throw new Error('SERVICE_ROLE_KEY is not set');
+  return createClient(serverApiUrl, serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false },
     global: { fetch: noStoreFetch },
   });
 }
-
-// Alias for consistency
-export { createServerClient as createClient };

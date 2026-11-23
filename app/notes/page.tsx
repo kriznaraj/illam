@@ -10,6 +10,7 @@ import Toast from '@/components/Toast';
 import { ModalRecordActions } from '@/components/ModalRecordActions';
 import { Note } from '@/types';
 import { format } from 'date-fns';
+import { StickyNote, Trash2, Pin, Star } from 'lucide-react';
 
 export default function NotesPage() {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -193,7 +194,7 @@ export default function NotesPage() {
   return (
     <PageContainer maxWidth="7xl">
       <PageHeader
-        title="Kurippu"
+        title="Notes"
         description="Personal notes and ideas"
         action={
           <div className="flex items-center gap-2">
@@ -224,7 +225,7 @@ export default function NotesPage() {
       {/* Notes Grid */}
       {notes.length === 0 ? (
         <EmptyState
-          icon="📝"
+          icon={StickyNote}
           title={searchQuery ? 'No notes match your search' : 'No notes yet'}
           description={searchQuery ? 'Try a different search term' : 'Create your first note to get started'}
         />
@@ -238,14 +239,15 @@ export default function NotesPage() {
             >
               <div className="flex items-start justify-between mb-2">
                 <h3 className="font-semibold text-gray-900 flex-1 mr-2">
-                  {note.is_pinned && <span className="mr-1">📌</span>}
+                  {note.is_pinned && <Pin size={14} className="mr-1 inline-block align-[-2px] text-gray-500" aria-hidden />}
                   {note.title}
                 </h3>
                 <button
                   onClick={(e) => handleTogglePin(note, e)}
                   className="text-gray-300 hover:text-yellow-400 transition-colors flex-shrink-0 text-lg leading-none"
+                  aria-label={note.is_pinned ? 'Unpin note' : 'Pin note'}
                 >
-                  {note.is_pinned ? '★' : '☆'}
+                  <Star size={18} fill={note.is_pinned ? 'currentColor' : 'none'} aria-hidden />
                 </button>
               </div>
               {note.content && (
@@ -330,7 +332,9 @@ export default function NotesPage() {
         ) : selectedNote ? (
           showDeleteConfirm ? (
             <div className="flex flex-col items-center justify-center py-8 text-center">
-              <div className="text-4xl mb-3">🗑️</div>
+              <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">
+                <Trash2 size={20} aria-hidden />
+              </div>
               <h3 className="text-base font-semibold text-gray-900 mb-1">Delete this note?</h3>
               <p className="text-sm text-gray-500 mb-6">This action cannot be undone.</p>
               <div className="flex gap-3">

@@ -252,7 +252,7 @@ export default function ActivityTrackerPage() {
   return (
     <PageContainer maxWidth="5xl">
       <PageHeader
-        title="Activity Tracker"
+        title="Activity tracker"
         description="Family dates and reminders"
         action={
           <button onClick={handleCreateClick} className="btn btn-primary" aria-label="Create new event">
@@ -273,7 +273,7 @@ export default function ActivityTrackerPage() {
             label: (
               <>
                 {tab.label}
-                <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-white/80 text-blue-700">
+                <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-white/80 text-primary-700">
                   {tabCounts[tab.value]}
                 </span>
               </>

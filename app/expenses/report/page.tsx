@@ -22,6 +22,7 @@ import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { PageContainer } from '@/components/PageContainer';
 import Modal from '@/components/Modal';
 import { ExpandableChart } from '@/components/charts/ExpandableChart';
+import { ReportViews } from '@/components/ReportViews';
 
 interface CategoryData {
   category: {
@@ -180,14 +181,15 @@ export default function ExpenseReportPage() {
 
   return (
     <PageContainer maxWidth="full">
-      <PageHeader title="Selavu Report" description="Monthly spending trends and category breakdown" />
+      <PageHeader title="Spending report" description="Monthly spending trends and category breakdown" />
+      <ReportViews section="expenses" current="trends" />
 
       {/* Category Report lived only behind an orphaned /expenses/reports hub that
           nothing linked to, so the whole page was unreachable. Linked from here now. */}
       <Link href="/expenses/reports/category-monthly" className="block mb-4 sm:mb-6">
         <div className="card card-hover flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900">📊 Category Report</h2>
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Category Report</h2>
             <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
               Month-by-month breakdown and trendline for a single category
             </p>
@@ -288,13 +290,13 @@ export default function ExpenseReportPage() {
                   />
                 ))}
                 {otherCatIds.size > 0 && (
-                  <Bar yAxisId="left" dataKey="Other" stackId="a" fill="#d1d5db" maxBarSize={40} />
+                  <Bar yAxisId="left" dataKey="Other" stackId="a" fill="rgb(var(--gray-300))" maxBarSize={40} />
                 )}
                 <Line
                   yAxisId="left"
                   type="monotone"
                   dataKey="total"
-                  stroke="#1e3a5f"
+                  stroke="rgb(var(--primary-600))"
                   strokeWidth={2}
                   dot={{ r: 3 }}
                   activeDot={{ r: 5 }}
@@ -487,7 +489,7 @@ export default function ExpenseReportPage() {
                       <YAxis tick={{ fontSize: 9 }} tickFormatter={fmtShort} width={44} />
                       <Tooltip formatter={(v: number) => [formatCurrency(v), selectedGroup]} contentStyle={{ fontSize: '11px' }} />
                       <ReferenceLine y={groupAvg} stroke="#94a3b8" strokeDasharray="4 3" strokeOpacity={0.7} />
-                      <Line type="monotone" dataKey="amount" stroke="#1e3a5f" strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+                      <Line type="monotone" dataKey="amount" stroke="rgb(var(--primary-600))" strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>

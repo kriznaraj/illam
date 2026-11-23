@@ -1,15 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import {
   formatters,
-  dateOps,
-  dateCompare,
   monthKeys,
   toAppTimezoneDate,
   getTodayAppDate,
   daysFromTodayApp,
   getAppMonthKey,
 } from '../dateUtils';
-import { addDays, addYears, startOfMonth, endOfMonth, parseISO, format } from 'date-fns';
+import { addDays, addYears } from 'date-fns';
 
 describe('App timezone (IST)', () => {
   it('maps late UTC to the next IST calendar day', () => {
@@ -123,245 +121,6 @@ describe('Date Formatters', () => {
 
     it('should use default fallback if not specified', () => {
       expect(formatters.safe('invalid', 'yyyy-MM-dd')).toBe('N/A');
-    });
-  });
-});
-
-describe('Date Operations', () => {
-  describe('dateOps.addMonths', () => {
-    it('should add months correctly', () => {
-      const result = dateOps.addMonths('2024-01-15', 3);
-      expect(result).toBe('2024-04-15');
-    });
-
-    it('should handle year boundary', () => {
-      const result = dateOps.addMonths('2023-11-15', 3);
-      expect(result).toBe('2024-02-15');
-    });
-
-    it('should handle month-end dates', () => {
-      const result = dateOps.addMonths('2024-01-31', 1);
-      // February doesn't have 31 days, so it should adjust to Feb 29 (2024 is leap year)
-      expect(result).toBe('2024-02-29');
-    });
-
-    it('should handle non-leap year February', () => {
-      const result = dateOps.addMonths('2023-01-31', 1);
-      expect(result).toBe('2023-02-28');
-    });
-
-    it('should return empty string for invalid dates', () => {
-      expect(dateOps.addMonths('invalid', 1)).toBe('');
-    });
-  });
-
-  describe('dateOps.subMonths', () => {
-    it('should subtract months correctly', () => {
-      const result = dateOps.subMonths('2024-04-15', 3);
-      expect(result).toBe('2024-01-15');
-    });
-
-    it('should handle year boundary', () => {
-      const result = dateOps.subMonths('2024-02-15', 3);
-      expect(result).toBe('2023-11-15');
-    });
-
-    it('should return empty string for invalid dates', () => {
-      expect(dateOps.subMonths('invalid', 1)).toBe('');
-    });
-  });
-
-  describe('dateOps.getCurrentMonth', () => {
-    it('should return current month as yyyy-MM', () => {
-      const result = dateOps.getCurrentMonth();
-      expect(result).toMatch(/^\d{4}-\d{2}$/);
-    });
-  });
-
-  describe('dateOps.getCurrentDate', () => {
-    it('should return current date as yyyy-MM-dd', () => {
-      const result = dateOps.getCurrentDate();
-      expect(result).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-    });
-  });
-
-  describe('dateOps.getMonthRange', () => {
-    it('should return start and end dates for month', () => {
-      const result = dateOps.getMonthRange('2024-01');
-      expect(result.start).toBe('2024-01-01');
-      expect(result.end).toBe('2024-01-31');
-    });
-
-    it('should handle February in leap year', () => {
-      const result = dateOps.getMonthRange('2024-02');
-      expect(result.start).toBe('2024-02-01');
-      expect(result.end).toBe('2024-02-29');
-    });
-
-    it('should handle February in non-leap year', () => {
-      const result = dateOps.getMonthRange('2023-02');
-      expect(result.start).toBe('2023-02-01');
-      expect(result.end).toBe('2023-02-28');
-    });
-
-    it('should handle months with 30 days', () => {
-      const result = dateOps.getMonthRange('2024-04');
-      expect(result.start).toBe('2024-04-01');
-      expect(result.end).toBe('2024-04-30');
-    });
-
-    it('should return current month for invalid input', () => {
-      const result = dateOps.getMonthRange('invalid');
-      expect(result.start).toMatch(/^\d{4}-\d{2}-01$/);
-      expect(result.end).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-    });
-  });
-
-  describe('dateOps.getMonthBoundaries', () => {
-    it('should return Date objects for month boundaries', () => {
-      const date = new Date('2024-01-15');
-      const result = dateOps.getMonthBoundaries(date);
-
-      expect(result.start).toBeInstanceOf(Date);
-      expect(result.end).toBeInstanceOf(Date);
-      expect(formatters.toISODate(result.start)).toBe('2024-01-01');
-      expect(formatters.toISODate(result.end)).toBe('2024-01-31');
-    });
-
-    it('should use current date if none provided', () => {
-      const result = dateOps.getMonthBoundaries();
-      expect(result.start).toBeInstanceOf(Date);
-      expect(result.end).toBeInstanceOf(Date);
-    });
-  });
-
-  describe('dateOps.getWeekRange', () => {
-    it('should return week boundaries (Monday to Sunday)', () => {
-      const date = new Date('2024-01-15'); // Monday
-      const result = dateOps.getWeekRange(date);
-
-      expect(result.start).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-      expect(result.end).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-    });
-
-    it('should use current date if none provided', () => {
-      const result = dateOps.getWeekRange();
-      expect(result.start).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-      expect(result.end).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-    });
-  });
-
-  describe('dateOps.isValid', () => {
-    it('should return true for valid dates', () => {
-      expect(dateOps.isValid('2024-01-15')).toBe(true);
-      expect(dateOps.isValid(new Date('2024-01-15'))).toBe(true);
-    });
-
-    it('should return false for invalid dates', () => {
-      expect(dateOps.isValid('invalid')).toBe(false);
-      expect(dateOps.isValid('')).toBe(false);
-    });
-  });
-
-  describe('dateOps.parse', () => {
-    it('should parse valid date strings', () => {
-      const result = dateOps.parse('2024-01-15');
-      expect(result).toBeInstanceOf(Date);
-      expect(result!.getFullYear()).toBe(2024);
-    });
-
-    it('should return null for invalid dates', () => {
-      expect(dateOps.parse('invalid')).toBeNull();
-      expect(dateOps.parse('')).toBeNull();
-    });
-  });
-});
-
-describe('Date Comparisons', () => {
-  describe('dateCompare.isSameDay', () => {
-    it('should return true for same calendar day', () => {
-      const date1 = new Date('2024-01-15T10:00:00');
-      const date2 = new Date('2024-01-15T18:00:00');
-      expect(dateCompare.isSameDay(date1, date2)).toBe(true);
-    });
-
-    it('should return false for different days', () => {
-      const date1 = new Date('2024-01-15T23:59:59');
-      const date2 = new Date('2024-01-16T00:00:01');
-      expect(dateCompare.isSameDay(date1, date2)).toBe(false);
-    });
-
-    it('should handle string dates', () => {
-      expect(dateCompare.isSameDay('2024-01-15', '2024-01-15')).toBe(true);
-      expect(dateCompare.isSameDay('2024-01-15', '2024-01-16')).toBe(false);
-    });
-
-    it('should return false for invalid dates', () => {
-      expect(dateCompare.isSameDay('invalid', '2024-01-15')).toBe(false);
-    });
-  });
-
-  describe('dateCompare.isSameMonth', () => {
-    it('should return true for dates in same month', () => {
-      expect(dateCompare.isSameMonth('2024-01-15', '2024-01-20')).toBe(true);
-      expect(dateCompare.isSameMonth('2024-01-01', '2024-01-31')).toBe(true);
-    });
-
-    it('should return false for dates in different months', () => {
-      expect(dateCompare.isSameMonth('2024-01-31', '2024-02-01')).toBe(false);
-      expect(dateCompare.isSameMonth('2023-12-31', '2024-01-01')).toBe(false);
-    });
-
-    it('should return false for invalid dates', () => {
-      expect(dateCompare.isSameMonth('invalid', '2024-01-15')).toBe(false);
-    });
-  });
-
-  describe('dateCompare.isFuture', () => {
-    it('should return true for future dates', () => {
-      const futureDate = addDays(new Date(), 5);
-      expect(dateCompare.isFuture(futureDate)).toBe(true);
-    });
-
-    it('should return false for past dates', () => {
-      const pastDate = addDays(new Date(), -5);
-      expect(dateCompare.isFuture(pastDate)).toBe(false);
-    });
-
-    it('should return false for invalid dates', () => {
-      expect(dateCompare.isFuture('invalid')).toBe(false);
-    });
-  });
-
-  describe('dateCompare.isPast', () => {
-    it('should return true for past dates', () => {
-      const pastDate = addDays(new Date(), -5);
-      expect(dateCompare.isPast(pastDate)).toBe(true);
-    });
-
-    it('should return false for future dates', () => {
-      const futureDate = addDays(new Date(), 5);
-      expect(dateCompare.isPast(futureDate)).toBe(false);
-    });
-
-    it('should return false for invalid dates', () => {
-      expect(dateCompare.isPast('invalid')).toBe(false);
-    });
-  });
-
-  describe('dateCompare.isToday', () => {
-    it('should return true for today', () => {
-      expect(dateCompare.isToday(getTodayAppDate())).toBe(true);
-    });
-
-    it('should return false for yesterday', () => {
-      const yesterday = format(addDays(parseISO(getTodayAppDate()), -1), 'yyyy-MM-dd');
-      expect(dateCompare.isToday(yesterday)).toBe(false);
-    });
-
-    it('should return false for tomorrow', () => {
-      const tomorrow = format(addDays(parseISO(getTodayAppDate()), 1), 'yyyy-MM-dd');
-      expect(dateCompare.isToday(tomorrow)).toBe(false);
     });
   });
 });
@@ -481,11 +240,6 @@ describe('Date Edge Cases', () => {
       expect(formatters.toISODate(dayAfter)).toBe('2024-03-01');
     });
 
-    it('should handle adding months from Feb 29', () => {
-      const result = dateOps.addMonths('2024-02-29', 1);
-      expect(result).toBe('2024-03-29');
-    });
-
     it('should handle adding year from Feb 29 to non-leap year', () => {
       const feb29 = new Date('2024-02-29');
       const nextYear = addYears(feb29, 1);
@@ -506,13 +260,6 @@ describe('Date Edge Cases', () => {
       const jan31 = addDays(feb1, -1);
       expect(formatters.toISODate(jan31)).toBe('2024-01-31');
     });
-
-    it('should handle month operations with different month lengths', () => {
-      const mar31 = '2024-03-31';
-      const apr30 = dateOps.addMonths(mar31, 1);
-      // April has 30 days
-      expect(apr30).toBe('2024-04-30');
-    });
   });
 
   describe('Year Boundary Operations', () => {
@@ -526,115 +273,6 @@ describe('Date Edge Cases', () => {
       const jan1 = new Date('2024-01-01');
       const dec31 = addDays(jan1, -1);
       expect(formatters.toISODate(dec31)).toBe('2023-12-31');
-    });
-
-    it('should handle adding months across year boundary', () => {
-      const result = dateOps.addMonths('2023-11-15', 3);
-      expect(result).toBe('2024-02-15');
-    });
-  });
-});
-
-describe('Real-World Use Cases', () => {
-  describe('Expense Due Dates', () => {
-    it('should calculate next month credit card statement date', () => {
-      const statementDate = '2024-01-15';
-      const nextStatement = dateOps.addMonths(statementDate, 1);
-      expect(nextStatement).toBe('2024-02-15');
-    });
-
-    it('should handle recurring monthly expenses on 31st', () => {
-      // Gas cylinder refill on Jan 31, next should be Feb 29 (2024 is leap year)
-      const jan31 = '2024-01-31';
-      const nextMonth = dateOps.addMonths(jan31, 1);
-      expect(nextMonth).toBe('2024-02-29');
-    });
-
-    it('should calculate quarterly expense (3 months)', () => {
-      const jan15 = '2024-01-15';
-      const apr15 = dateOps.addMonths(jan15, 3);
-      expect(apr15).toBe('2024-04-15');
-    });
-  });
-
-  describe('Date Range Calculations', () => {
-    it('should calculate month start and end for reports', () => {
-      const monthRange = dateOps.getMonthRange('2024-01');
-      expect(monthRange.start).toBe('2024-01-01');
-      expect(monthRange.end).toBe('2024-01-31');
-    });
-
-    it('should calculate previous month for reports', () => {
-      const today = '2024-06-15';
-      const lastMonth = dateOps.subMonths(today, 1);
-      expect(lastMonth).toBe('2024-05-15');
-
-      const monthKey = formatters.toMonthKey(lastMonth);
-      const range = dateOps.getMonthRange(monthKey);
-      expect(range.start).toBe('2024-05-01');
-      expect(range.end).toBe('2024-05-31');
-    });
-  });
-
-  describe('Birthday/Anniversary Recurrence', () => {
-    it('should calculate next birthday - Bob (Apr 7)', () => {
-      const birthday = new Date('2024-04-07');
-      const nextYear = addYears(birthday, 1);
-      expect(formatters.toISODate(nextYear)).toBe('2025-04-07');
-    });
-
-    it('should calculate next birthday - Alice (Nov 15)', () => {
-      const birthday = new Date('2024-11-15');
-      const nextYear = addYears(birthday, 1);
-      expect(formatters.toISODate(nextYear)).toBe('2025-11-15');
-    });
-
-    it('should calculate wedding anniversary (Jun 12)', () => {
-      const anniversary = new Date('2024-06-12');
-      const nextYear = addYears(anniversary, 1);
-      expect(formatters.toISODate(nextYear)).toBe('2025-06-12');
-    });
-
-    it('should handle leap year birthdays', () => {
-      const leapBirthday = new Date('2024-02-29');
-      const nextYear = addYears(leapBirthday, 1);
-      // In non-leap year, Feb 29 → Feb 28
-      expect(formatters.toISODate(nextYear)).toBe('2025-02-28');
-    });
-  });
-
-  describe('Monthly Bill Cycles', () => {
-    it('should calculate next electric bill (EB)', () => {
-      const lastBill = '2024-01-05';
-      const nextBill = dateOps.addMonths(lastBill, 1);
-      expect(nextBill).toBe('2024-02-05');
-    });
-
-    it('should calculate next broadband bill', () => {
-      const lastBill = '2024-01-01';
-      const nextBill = dateOps.addMonths(lastBill, 1);
-      expect(nextBill).toBe('2024-02-01');
-    });
-
-    it('should calculate next mobile recharge (monthly)', () => {
-      const lastRecharge = '2024-01-20';
-      const nextRecharge = dateOps.addMonths(lastRecharge, 1);
-      expect(nextRecharge).toBe('2024-02-20');
-    });
-  });
-
-  describe('Gas Cylinder Refill Tracking', () => {
-    it('should calculate next refill from last refill date', () => {
-      const lastRefill = '2024-01-15';
-      const nextRefill = dateOps.addMonths(lastRefill, 1);
-      expect(nextRefill).toBe('2024-02-15');
-    });
-
-    it('should handle delayed refill (from actual completion date)', () => {
-      // Due: Jan 15, but actually refilled on Jan 20
-      const actualRefill = '2024-01-20';
-      const nextDue = dateOps.addMonths(actualRefill, 1);
-      expect(nextDue).toBe('2024-02-20'); // Next due from actual completion
     });
   });
 });

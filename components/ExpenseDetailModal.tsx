@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ExpenseWithCategory, Category, Event, Tag } from '@/types';
 import { getCategoryIcon } from '@/lib/categoryUtils';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { getUserIcon } from '@/lib/userUtils';
+import { UserIcon } from '@/components/UserIcon';
 import { formatters } from '@/lib/utils/dateUtils';
 import { displayTags, isAutoExpense } from '@/lib/expenses/autoTag';
 import { describePaymentSource, parsePaymentSource, type CardIndex } from '@/lib/expenses/paymentSource';
@@ -13,6 +13,7 @@ import { startOfMonth, endOfMonth, parseISO, format } from 'date-fns';
 import TagSelector from './TagSelector';
 import Modal from './Modal';
 import Toast from './Toast';
+import { Trash2, Search } from 'lucide-react';
 
 type ToastState = { message: string; type: 'success' | 'error' | 'info' } | null;
 
@@ -196,7 +197,7 @@ export default function ExpenseDetailModal({
           showError(await parseErrorResponse(res, 'Failed to change the category'), setToast);
           return;
         }
-        setToast({ message: `✅ Filed under ${categoryName}`, type: 'success' });
+        setToast({ message: `Filed under ${categoryName}`, type: 'success' });
         onSuccess?.();
       } catch (err) {
         showError(err instanceof Error ? err.message : 'Network error', setToast);
@@ -212,14 +213,14 @@ export default function ExpenseDetailModal({
       const res = await fetch('/api/categories');
 
       if (!res.ok) {
-        setToast({ message: '⚠️ Could not load categories', type: 'error' });
+        setToast({ message: 'Could not load categories', type: 'error' });
         return;
       }
 
       const data = await res.json();
       setCategories(Array.isArray(data) ? data : []);
     } catch (err) {
-      setToast({ message: '⚠️ Error loading categories: ' + String(err), type: 'error' });
+      setToast({ message: 'Error loading categories: ' + String(err), type: 'error' });
     }
   };
 
@@ -279,7 +280,7 @@ export default function ExpenseDetailModal({
         return;
       }
 
-      setToast({ message: '✅ Expense updated!', type: 'success' });
+      setToast({ message: 'Expense updated!', type: 'success' });
       onSuccess?.();
       setIsEditing(false);
     } catch (err) {
@@ -304,7 +305,7 @@ export default function ExpenseDetailModal({
         return;
       }
 
-      setToast({ message: '🗑️ Expense deleted!', type: 'success' });
+      setToast({ message: 'Expense deleted!', type: 'success' });
       onSuccess?.();
       setTimeout(onClose, 500);
     } catch (err) {
@@ -486,7 +487,7 @@ export default function ExpenseDetailModal({
               ) : (
                 <>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+                    <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden />
                     <input
                       type="text"
                       value={categorySearch}
@@ -525,7 +526,7 @@ export default function ExpenseDetailModal({
                               setCategorySearch('');
                               setShowCategoryDropdown(false);
                             }}
-                            className="w-full text-left px-3 py-2 hover:bg-blue-50 transition-colors flex items-center gap-2"
+                            className="w-full text-left px-3 py-2 hover:bg-primary-50 transition-colors flex items-center gap-2"
                           >
                             <span className="text-lg">{getCategoryIcon(cat)}</span>
                             <div className="min-w-0">
@@ -595,7 +596,9 @@ export default function ExpenseDetailModal({
         </form>
       ) : showDeleteConfirm ? (
         <div className="flex flex-col items-center justify-center py-8 text-center">
-          <div className="text-4xl mb-3">🗑️</div>
+          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">
+                <Trash2 size={20} aria-hidden />
+              </div>
           <h3 className="text-base font-semibold text-gray-900 mb-1">Delete this expense?</h3>
           <p className="text-sm text-gray-500 mb-6">This action cannot be undone.</p>
           <div className="flex gap-3 w-full">
@@ -610,8 +613,8 @@ export default function ExpenseDetailModal({
       ) : (
         <div className="space-y-4">
           {/* Amount hero */}
-          <div className="text-center py-4 bg-blue-50 rounded-xl">
-            <p className="text-4xl font-bold text-blue-900">
+          <div className="text-center py-4 bg-primary-50 rounded-xl">
+            <p className="text-4xl font-bold text-primary-900">
               {formatCurrency(parseFloat(expense.amount.toString()))}
             </p>
           </div>
@@ -658,7 +661,7 @@ export default function ExpenseDetailModal({
             >
               {getCategoryIcon(expense.category)}
             </div>
-            <span className="text-sm text-gray-700 group-hover:text-blue-600 group-hover:underline transition-colors">
+            <span className="text-sm text-gray-700 group-hover:text-primary-600 group-hover:underline transition-colors">
               {shownCategory.name}
             </span>
           </button>
@@ -679,17 +682,17 @@ export default function ExpenseDetailModal({
               type="button"
               onClick={() => applyCategory(suggestion.categoryId, suggestion.categoryName)}
               disabled={loading}
-              className="flex w-full items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-left hover:bg-blue-100 disabled:opacity-60"
+              className="flex w-full items-center justify-between gap-3 rounded-lg border border-primary-200 bg-primary-50 px-3 py-2 text-left hover:bg-primary-100 disabled:opacity-60"
             >
               <span className="min-w-0">
-                <span className="block text-sm font-semibold text-blue-900">File under {suggestion.categoryName}</span>
-                <span className="block text-xs text-blue-700">
+                <span className="block text-sm font-semibold text-primary-900">File under {suggestion.categoryName}</span>
+                <span className="block text-xs text-primary-700">
                   {suggestion.source === 'history'
                     ? `You filed ${expense.merchant} there ${suggestion.count === 1 ? 'once' : `${suggestion.count} times`} before.`
                     : 'Suggested from the payee.'}
                 </span>
               </span>
-              <span className="text-xs font-medium text-blue-700 whitespace-nowrap">Use it</span>
+              <span className="text-xs font-medium text-primary-700 whitespace-nowrap">Use it</span>
             </button>
           )}
 
@@ -705,7 +708,7 @@ export default function ExpenseDetailModal({
                 <button
                   type="button"
                   onClick={() => setShowAllCategories((open) => !open)}
-                  className="text-xs font-medium text-blue-600 hover:underline"
+                  className="text-xs font-medium text-primary-600 hover:underline"
                 >
                   {showAllCategories ? 'Less' : 'All'}
                 </button>
@@ -719,7 +722,7 @@ export default function ExpenseDetailModal({
                     disabled={loading}
                     className={`flex-shrink-0 inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors disabled:opacity-60 ${
                       cat.id === suggestion?.categoryId
-                        ? 'border-blue-300 bg-blue-50 text-blue-800 hover:bg-blue-100'
+                        ? 'border-primary-300 bg-primary-50 text-primary-800 hover:bg-primary-100'
                         : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
                     }`}
                   >
@@ -756,7 +759,7 @@ export default function ExpenseDetailModal({
                       {candidate.needs_review ? ' · also to review' : ''}
                     </span>
                   </span>
-                  <span className="text-xs font-medium text-blue-600 whitespace-nowrap">Merge</span>
+                  <span className="text-xs font-medium text-primary-600 whitespace-nowrap">Merge</span>
                 </button>
               ))}
             </div>
@@ -782,7 +785,7 @@ export default function ExpenseDetailModal({
             </DetailRow>
 
             <DetailRow label="Paid by">
-              {getUserIcon(expense.user)} {expense.user?.full_name}
+              <UserIcon user={expense.user} /> {expense.user?.full_name}
             </DetailRow>
 
             {paymentSource && (
@@ -816,7 +819,7 @@ export default function ExpenseDetailModal({
             {isAuto && (
               <DetailRow label="Source">
                 <span className="text-gray-500">
-                  {expense.source === 'statement' ? 'Card statement' : 'Bank alert via Madal'}
+                  {expense.source === 'statement' ? 'Card statement' : 'Bank alert (inbox)'}
                 </span>
               </DetailRow>
             )}

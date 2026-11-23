@@ -73,7 +73,7 @@ export default function PortfolioTypeDetailsPage() {
 
         // Deduped per (account, month): summing every row counts an account with two
         // snapshots in one month twice, spiking this chart far above its neighbouring months.
-        const monthly = monthlyTotals(snaps, ofType.map((a) => a.id));
+        const monthly = monthlyTotals(snaps, ofType.map((a) => a.id), { carryForward: true });
         setTypeTrend(
           Array.from(monthly.entries())
             .sort(([a], [b]) => a.localeCompare(b))

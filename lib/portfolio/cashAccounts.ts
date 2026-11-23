@@ -8,7 +8,7 @@
  * *investment* accounts instead: money crossing into them from cash (or straight from
  * payroll, like EPF) is a contribution, and a move within either side is not.
  *
- * `portfolio_accounts.is_cash` (migration 033) is nullable. NULL means "decide from the
+ * `portfolio_accounts.is_cash` is nullable. NULL means "decide from the
  * type"; true/false is an explicit override, such as the Prepaid account named Cash.
  */
 

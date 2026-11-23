@@ -12,6 +12,7 @@ import Modal from '@/components/Modal';
 import { ModalRecordActions } from '@/components/ModalRecordActions';
 import { getAppMonthKey } from '@/lib/utils/dateUtils';
 import { isCashAccount } from '@/lib/portfolio/cashAccounts';
+import { Landmark, TriangleAlert } from 'lucide-react';
 
 interface AccountType {
   id: string;
@@ -60,7 +61,8 @@ function AccountGroup({
                     <p className="text-sm text-gray-900">{account.name}</p>
                     {showWarning && (
                       <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700">
-                        ⚠ ₹{balance!.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                        <TriangleAlert size={12} aria-hidden />
+                        ₹{balance!.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                       </span>
                     )}
                   </div>
@@ -68,7 +70,7 @@ function AccountGroup({
                     <p className="text-xs text-gray-400 mt-0.5 truncate max-w-xs">{account.notes}</p>
                   )}
                   {account.unit && account.multiplier && (
-                    <p className="text-xs text-blue-500 mt-0.5">
+                    <p className="text-xs text-primary-500 mt-0.5">
                       {account.unit} · ₹{account.multiplier.toLocaleString()}/{account.unit}
                     </p>
                   )}
@@ -461,7 +463,7 @@ function SettingsAccountsPage() {
 
           {accounts.length === 0 ? (
             <EmptyState
-              icon="🏦"
+              icon={Landmark}
               title="No accounts yet"
               description="Add your first account to start tracking."
               action={{ label: '+ New Account', onClick: openNewAccount }}

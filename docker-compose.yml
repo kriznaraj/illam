@@ -1,7 +1,9 @@
-# Illam, self-hosted. Quick start:
-#   pnpm setup                                  # writes .env (secrets, keys, household)
-#   docker compose --profile bundled-db up -d   # Postgres included
-#   pnpm create-user -- --email you@example.com --member alice
+# Illam, self-hosted. Quick start (full guide: docs/self-hosting.md):
+#   node scripts/setup.mjs                      # writes .env (secrets, keys, household)
+#   docker compose --profile bundled-db up -d   # Postgres included; pulls the published image
+#   node scripts/create-user.mjs --email you@example.com --member alice
+# Update: git pull && docker compose pull && docker compose up -d
+# Build from source instead of pulling: docker compose up -d --build
 #
 # Using your own Postgres (Neon, RDS, a local server)? Set DATABASE_URL in .env and run
 # `docker compose up -d` without the bundled-db profile.
@@ -65,7 +67,7 @@ services:
       GOTRUE_JWT_AUD: authenticated
       GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
       GOTRUE_JWT_ADMIN_ROLES: service_role
-      # Accounts are created with `pnpm create-user`; nobody can sign up from the login page.
+      # Accounts are created with scripts/create-user.mjs; nobody can sign up from the login page.
       GOTRUE_DISABLE_SIGNUP: 'true'
       GOTRUE_EXTERNAL_EMAIL_ENABLED: 'true'
       GOTRUE_MAILER_AUTOCONFIRM: 'true'
@@ -74,17 +76,14 @@ services:
         condition: service_completed_successfully
 
   app:
-    build:
-      context: .
-      args:
-        NEXT_PUBLIC_SUPABASE_URL: ${PUBLIC_URL:-http://localhost:8000}
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${ANON_KEY:?run node scripts/setup.mjs first}
+    # The published image; ILLAM_VERSION pins a release (default: the latest).
+    image: ${ILLAM_IMAGE:-ghcr.io/kriznaraj/illam}:${ILLAM_VERSION:-latest}
+    build: .
     restart: unless-stopped
     env_file: .env
     environment:
-      # Server-side calls reach the API inside the compose network; the browser uses PUBLIC_URL.
-      SUPABASE_INTERNAL_URL: http://gateway:8000
-      SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
+      # Server-side calls reach the API inside the compose network; the browser uses its own origin.
+      ILLAM_INTERNAL_API_URL: http://gateway:8000
     depends_on:
       - rest
       - auth

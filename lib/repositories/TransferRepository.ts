@@ -90,7 +90,7 @@ export class TransferRepository extends BaseRepository<Transfer> {
     return ((data ?? []) as unknown as Transfer[]).map((row) => ({ ...row, amount: Number(row.amount) }));
   }
 
-  /** Contribution rows a transfer created or linked — readable before migration 034 too. */
+  /** Contribution rows a transfer created or linked (via `transfers.portfolio_investment_id`). */
   async listLinkedInvestmentIds(): Promise<Set<string>> {
     const { data, error } = await this.supabase
       .from(this.tableName)
@@ -103,10 +103,6 @@ export class TransferRepository extends BaseRepository<Transfer> {
     return new Set(((data ?? []) as unknown as { portfolio_investment_id: string }[]).map((row) => row.portfolio_investment_id));
   }
 
-  /**
-   * SIP instalments already claimed on an account for a month, as `fund|month` keys (the same
-   * shape as `sipClaimKey` in lib/portfolio/contributionMatch.ts). Empty before migration 034.
-   */
   /**
    * `fund|month` keys other transfers already claimed on this account, over the months a
    * debit could be settling. Month-scoped rather than whole-table so the set stays small,

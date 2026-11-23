@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClientFromRequest } from '@/lib/supabase-server';
+import { createServerClientFromRequest } from '@/lib/api/server';
 import { MadalDecisionRepository } from '@/lib/repositories/MadalDecisionRepository';
 
 export const dynamic = 'force-dynamic';

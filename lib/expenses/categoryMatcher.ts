@@ -4,11 +4,8 @@
  * This is the fallback for AI categorization and the instant local guess in
  * QuickAddExpense, so it must work standalone with no network and no API key.
  *
- * It replaces an earlier table that keyed off *group* names ('food', 'transport', …)
- * and then checked whether a category name contained that key. After migration 022
- * renamed every category, only 4 of 23 categories were reachable and the matcher was
- * effectively dead. Keywords here map directly to canonical category names instead,
- * so renaming a category breaks loudly (see the test) rather than silently.
+ * Keywords map directly to canonical category names, so renaming a category breaks
+ * loudly (see the test) rather than silently.
  *
  * Keywords are matched on word boundaries and the LONGEST match wins, so a specific
  * phrase beats a generic word: 'entry ticket' → Recreation, bare 'ticket' → Commute.
@@ -81,7 +78,7 @@ const CATEGORY_KEYWORDS: Record<string, string[]> = {
     'sun nxt', 'zee5', 'sony liv', 'icloud', 'google one', 'membership',
     'domain', 'hosting',
   ],
-  'Kids & Toys': ['toy', 'toys', 'kids', 'carol', 'baby', 'diaper', 'diapers', 'doll', 'cycle'],
+  'Kids & Toys': ['toy', 'toys', 'kids', 'baby', 'diaper', 'diapers', 'doll', 'cycle'],
   'Temple & Pooja': [
     'temple', 'pooja', 'puja', 'kovil', 'koil', 'archanai', 'prasadam',
     'annadhanam', 'donation', 'hundial', 'abhishekam', 'vratham', 'homam',

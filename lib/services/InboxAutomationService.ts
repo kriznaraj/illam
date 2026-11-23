@@ -21,7 +21,7 @@ import { findTwinAlert } from '@/lib/inbox/automation/duplicates';
 import { findHouseholdPairs } from '@/lib/inbox/automation/householdPairs';
 import { paymentMethodLabel } from '@/lib/inbox/automation/owners';
 import { memberName, memberSlugs, ownerUsername } from '@/lib/household';
-import { isSpendTimeColumnMissing, spendTime } from '@/lib/inbox/automation/spendTime';
+import { spendTime } from '@/lib/inbox/automation/spendTime';
 import { ExpenseCategorizationService } from './ExpenseCategorizationService';
 import { TransferResolverService, type ResolverOutcome } from './TransferResolverService';
 import { matchCategoryByKeyword } from '@/lib/expenses/categoryMatcher';
@@ -56,7 +56,7 @@ import type {
  * current" against "the list is tidy", and a future change may want it back at a few hours.
  */
 export const AUTO_ADD_GRACE_HOURS = 0;
-/** app_config key (migration 030): alerts dated before it only enrich, never create. */
+/** app_config key: alerts dated before it only enrich, never create. */
 export const AUTO_ADD_FROM_KEY = 'inbox_auto_add_from';
 const STATEMENT_LOOKBACK_DAYS = 60;
 
@@ -86,8 +86,8 @@ export interface ProcessResult {
 }
 
 /**
- * The first live run timed out at Vercel's 60 s limit after 132 of 155 alerts —
- * ~0.4 s of round trips each. A few run at once, and each call stops starting
+ * Each alert costs ~0.4 s of round trips, so a large backlog would outlast a 60 s
+ * request limit run serially. A few run at once, and each call stops starting
  * new items once its budget is spent, so a backlog drains over several calls
  * instead of failing.
  */
@@ -117,12 +117,12 @@ interface RunContext {
   categories: Category[];
   miscellaneousId: string | null;
   autoAddFrom: string | null;
-  /** The shared `auto` label (migration 036), stamped on every row automation creates. */
+  /** The shared `auto` label, stamped on every row automation creates. */
   autoTagId: string | null;
   userIds: Record<InboxOwner, string | null>;
   /** Transaction alerts around this run's items, to spot a bank sending one alert twice. */
   alerts: InboxItem[];
-  /** Insurance premiums and EMIs (migration 037): a debit paying one is never an expense or a transfer. */
+  /** Insurance premiums and EMIs: a debit paying one is never an expense or a transfer. */
   commitments: Commitment[];
   /** When this run started (wall clock), so the AI step can stand aside near the time budget. */
   startedAtMs: number;
@@ -344,9 +344,9 @@ export class InboxAutomationService extends BaseService {
       this.appConfig.getKeys([AUTO_ADD_FROM_KEY]),
       Promise.all(memberSlugs().map(async (slug) => [slug, (await this.users.findByUsername(ownerUsername(slug)))?.id ?? null] as const)),
       this.inbox.listTransactionsBetween(`${shiftDays(first, -1)}T00:00:00+05:30`, `${shiftDays(last, 1)}T23:59:59+05:30`),
-      // Missing before migration 036 runs; a null just means no label is stamped.
+      // Best-effort: without the tag, no label is stamped.
       this.tags.findByName(AUTO_TAG_NAME).catch(() => null),
-      // Missing before migration 037; no commitments means every alert is decided as before.
+      // Best-effort: with no commitments, every alert is decided on its own merits.
       new CommitmentRepository(this.supabase).listAll().catch(() => []),
     ]);
 
@@ -376,7 +376,7 @@ export class InboxAutomationService extends BaseService {
       claimedExpenses: new Set(),
       categories,
       miscellaneousId: categories.find((c) => c.name.toLowerCase() === 'miscellaneous')?.id ?? null,
-      // No cut configured means never auto-add — the safe reading of a missing migration.
+      // No cut configured means never auto-add — the safe default.
       autoAddFrom: configured && /^\d{4}-\d{2}-\d{2}$/.test(configured) ? configured : null,
       autoTagId: autoTag?.id ?? null,
       userIds: Object.fromEntries(memberUsers),
@@ -471,7 +471,7 @@ export class InboxAutomationService extends BaseService {
   }
 
   /**
-   * A credit the mail named outright — today only an INDmoney dividend (migration 035).
+   * A credit the mail named outright — today only an INDmoney dividend.
    * Recorded in the currency it was paid in: these arrive in USD inside the US wallet, and
    * the app holds no rate to turn them into rupees with.
    */
@@ -526,10 +526,7 @@ export class InboxAutomationService extends BaseService {
       ctx.claimedExpenses.add(match.id);
       if (!ctx.dryRun) {
         // Enrich only: the person's description, category and date are theirs.
-        await this.writeExpense(
-          (fields) => this.expenses.update(match.id, { inbox_item_id: item.id, payment_method: method, merchant: data.merchant, ...fields }),
-          when
-        );
+        await this.expenses.update(match.id, { inbox_item_id: item.id, payment_method: method, merchant: data.merchant, ...when });
         await this.consume(item, { action: 'linked', expense_id: match.id, at }, ctx);
       }
       return { outcome: 'linked', detail: match.id };
@@ -561,23 +558,19 @@ export class InboxAutomationService extends BaseService {
 
     let expenseId: string;
     try {
-      const expense = await this.writeExpense(
-        (fields) =>
-          this.expenses.create({
-            date: txnDate,
-            amount: data.amount,
-            category_id: categoryId,
-            description,
-            user_id: userId,
-            source: 'inbox',
-            inbox_item_id: item.id,
-            payment_method: method,
-            merchant: data.merchant,
-            needs_review: !confirmed,
-            ...fields,
-          }),
-        when
-      );
+      const expense = await this.expenses.create({
+        date: txnDate,
+        amount: data.amount,
+        category_id: categoryId,
+        description,
+        user_id: userId,
+        source: 'inbox',
+        inbox_item_id: item.id,
+        payment_method: method,
+        merchant: data.merchant,
+        needs_review: !confirmed,
+        ...when,
+      });
       expenseId = expense.id;
     } catch (error) {
       if (!isDuplicateKey(error)) throw error;
@@ -601,7 +594,7 @@ export class InboxAutomationService extends BaseService {
         ? { needs_attention: true, attention_reason: 'Expense added · pick a category' }
         : { needs_attention: false, attention_reason: null }
     );
-    // Every auto-added row moves the month's numbers now (migration 036), not only the ones
+    // Every auto-added row moves the month's numbers now, not only the ones
     // a payee rule confirmed, so the cached insights for its month are stale either way.
     await invalidateInsightsCache(this.supabase, txnDate);
     return { outcome: 'created', detail: expenseId };
@@ -612,8 +605,7 @@ export class InboxAutomationService extends BaseService {
    *
    * Best-effort on purpose. The expense is already written by the time this runs, and a
    * missing label is cosmetic where a thrown error here would leave the alert unconsumed and
-   * the spend re-decided on the next pass. Before migration 036 the tag does not exist at
-   * all, and this is then a no-op rather than a failure.
+   * the spend re-decided on the next pass. With no `auto` tag this is a no-op, not a failure.
    */
   private async stampAutoTag(expenseId: string, ctx: RunContext): Promise<void> {
     if (!ctx.autoTagId) return;
@@ -685,23 +677,6 @@ export class InboxAutomationService extends BaseService {
       });
     ctx.aiCategories.set(key, answer);
     return answer;
-  }
-
-  /**
-   * Run an expense write with the spend's time, and again without it if migration 038 has not
-   * been applied — the time is worth having, never worth losing the expense over.
-   */
-  private async writeExpense<T>(
-    write: (fields: Partial<{ spent_time: string; spent_time_approx: boolean }>) => Promise<T>,
-    when: { spent_time: string; spent_time_approx: boolean } | null
-  ): Promise<T> {
-    if (!when) return write({});
-    try {
-      return await write(when);
-    } catch (error) {
-      if (!isSpendTimeColumnMissing(error)) throw error;
-      return write({});
-    }
   }
 
 

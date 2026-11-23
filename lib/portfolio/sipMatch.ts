@@ -56,9 +56,6 @@ export interface SipInstalmentMatch {
   daysFromDue: number;
 }
 
-/** The claim key a transfer holds: one instalment of one fund in one month. */
-export const sipClaimKeyFor = (accountId: string, fund: string, month: string) => `${accountId}|${fund}|${month}`;
-
 /** "11th" → 11, 2 → 2, "" / null / "last" → null. */
 export function sipDueDay(value: unknown): number | null {
   const day = typeof value === 'number' ? value : parseInt(String(value ?? '').trim(), 10);

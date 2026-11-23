@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { PageContainer } from '@/components/PageContainer';
 import { PageHeader } from '@/components/PageHeader';
@@ -14,8 +13,14 @@ import { useCommitments } from '@/lib/hooks/useCashFlow';
 import { COMMITMENT_KIND_LABEL, COMMITMENT_KINDS, FREQUENCY_LABEL, FREQUENCY_MONTHS, instalments, type DueInstalment } from '@/lib/cashflow/commitments';
 import { formatters, getTodayAppDate, monthKeys } from '@/lib/utils/dateUtils';
 import type { Commitment, CommitmentFrequency, CommitmentKind, CommitmentPayment } from '@/types';
+import { Shield, House, Pin, type LucideIcon } from 'lucide-react';
 
-const KIND_ICON: Record<CommitmentKind, string> = { insurance: '🛡️', loan: '🏠', other: '📌' };
+const KIND_ICON: Record<CommitmentKind, LucideIcon> = { insurance: Shield, loan: House, other: Pin };
+function KindIcon({ kind }: { kind: CommitmentKind }) {
+  const Icon = KIND_ICON[kind];
+  return <Icon size={18} aria-hidden />;
+}
+
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const RUPEES = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
 const rupees = (amount: number) => RUPEES.format(Math.round(amount));
@@ -120,7 +125,7 @@ interface PaymentForm {
 
 /**
  * Insurance premiums and EMIs (migration 037), declared once like a SIP. Each is shown on
- * /cash-flow in the months it falls due; a bank statement line, card line or Madal alert whose
+ * /cash-flow in the months it falls due; a bank statement line, card line or inbox alert whose
  * text contains "How the bank prints it" is recorded as its payment and never becomes an expense.
  */
 export default function CommitmentsPage() {
@@ -237,17 +242,12 @@ export default function CommitmentsPage() {
           </button>
         }
       />
-      <p className="mb-4 text-sm">
-        <Link href="/cash-flow" className="text-blue-700">
-          ← Cash flow
-        </Link>
-      </p>
 
       {loading && commitments.length === 0 ? (
         <LoadingSpinner message="Loading..." />
       ) : commitments.length === 0 ? (
         <EmptyState
-          icon="🛡️"
+          icon={Shield}
           title="Nothing declared yet"
           description="Add each insurance policy and loan once. Your HDFC statement shows LICPOLICY ₹12,000 on the 8th and a ₹40,000 'Housing loan' transfer on the 5th."
           action={{ label: 'Add one', onClick: () => setForm(blankForm()) }}
@@ -269,8 +269,8 @@ export default function CommitmentsPage() {
                       onClick={() => openEdit(c)}
                       isLast
                       leading={
-                        <span className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-lg flex-shrink-0" aria-hidden>
-                          {KIND_ICON[c.kind]}
+                        <span className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-700 flex-shrink-0" aria-hidden>
+                          <KindIcon kind={c.kind} />
                         </span>
                       }
                       title={c.active ? c.name : `${c.name} (stopped)`}

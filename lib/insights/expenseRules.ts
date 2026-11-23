@@ -55,8 +55,6 @@ export const ONE_TIME_SHARE_THRESHOLD = 0.20;
 export const CONCENTRATION_SHARE_THRESHOLD = 0.30;
 export const CATCH_ALL_SHARE_THRESHOLD = 0.08;
 
-/** Planning groups that represent ongoing household running costs. */
-export const RECURRING_GROUPS = ['Need', 'Want', 'Unplanned'];
 export const ONE_TIME_GROUP = 'One-time';
 
 /**
@@ -311,7 +309,7 @@ const dataQualityRule: Rule = (d) => {
       id: 'data-quality-history',
       type: 'data_quality',
       severity: 'warning',
-      icon: '🩺',
+      icon: 'data-health',
       title: 'Baseline Is Missing Data',
       description:
         `${joinList(names)} logged only ${counts.join(', ')} transactions each — far below your ` +
@@ -338,7 +336,7 @@ const thinMonthRule: Rule = (d) => {
       id: 'data-quality-month',
       type: 'data_quality',
       severity: 'warning',
-      icon: '🕳️',
+      icon: 'gap',
       title: 'This Month Looks Under-Logged',
       description:
         `${d.analysisLabel} has only ${plural(d.month.count, 'transaction')} recorded, ` +
@@ -370,7 +368,7 @@ const oneTimeLoadRule: Rule = (d) => {
       id: 'one-time-load',
       type: 'trend',
       severity: share > 0.5 ? 'warning' : 'info',
-      icon: '🏗️',
+      icon: 'build',
       title: 'One-Time Spend Dominated the Month',
       description:
         `${inr(oneTime)} of ${d.analysisLabel}'s ${inr(total)} was one-time spend (${(share * 100).toFixed(0)}%)` +
@@ -403,7 +401,7 @@ const recurringBaselineRule: Rule = (d) => {
       id: up ? 'high-spending' : 'low-spending',
       type: 'achievement',
       severity: up ? 'warning' : 'success',
-      icon: up ? '📊' : '🌟',
+      icon: up ? 'chart' : 'sparkles',
       title: up ? 'Running Costs Ran Hot' : 'Running Costs Held Down',
       description:
         `${d.analysisLabel} running costs were ${inr(actual)}, ${Math.abs(changePercent).toFixed(0)}% ` +
@@ -459,7 +457,7 @@ const categoryAnomalyRule: Rule = (d) => {
       id: `anomaly-${cat.categoryId}`,
       type: 'anomaly',
       severity: up ? 'warning' : 'success',
-      icon: up ? '⚠️' : '✅',
+      icon: up ? 'warning' : 'check',
       title: `${cat.name} ${up ? 'Spike' : 'Drop'}`,
       description:
         `${cat.name} was ${inr(cat.total)} in ${d.analysisLabel}, ${Math.abs(changePercent).toFixed(0)}% ` +
@@ -493,7 +491,7 @@ const unplannedShareRule: Rule = (d) => {
       id: 'unplanned-share',
       type: 'pattern',
       severity: share > 0.25 ? 'danger' : 'warning',
-      icon: '🎲',
+      icon: 'dice',
       title: 'Unplanned Spending Is High',
       description:
         `${inr(unplanned)} of ${d.analysisLabel}'s ${inr(recurring)} running costs was Unplanned ` +
@@ -527,7 +525,7 @@ const wantShareRule: Rule = (d) => {
       id: 'want-share',
       type: 'pattern',
       severity: want > need ? 'warning' : 'info',
-      icon: '🛍️',
+      icon: 'shopping',
       title: want > need ? 'Wants Outspent Needs' : 'Discretionary Share Is High',
       description:
         `Want categories took ${inr(want)} of ${inr(recurring)} running costs in ${d.analysisLabel} ` +
@@ -557,7 +555,7 @@ const needCreepRule: Rule = (d) => {
       id: 'need-creep',
       type: 'trend',
       severity: 'warning',
-      icon: '📈',
+      icon: 'trending-up',
       title: 'Essential Costs Are Creeping Up',
       description:
         `Need spending has risen about ${inr(monthlyDrift)} per month across the last ` +
@@ -605,7 +603,7 @@ const catchAllRule: Rule = (d) => {
       id: 'catch-all-rot',
       type: 'data_quality',
       severity: 'warning',
-      icon: '🗂️',
+      icon: 'folders',
       title: 'Too Much Landing in Miscellaneous',
       description:
         `${inr(total)} across ${plural(count, 'transaction')} went to ${joinList(catchAll.map((c) => c.name))} ` +
@@ -634,7 +632,7 @@ const concentrationRule: Rule = (d) => {
       id: 'category-concentration',
       type: 'pattern',
       severity: 'info',
-      icon: '🎯',
+      icon: 'target',
       title: `${top.name} Led the Month`,
       description:
         `${top.name} was ${inr(top.total)} — ${(share * 100).toFixed(0)}% of ${d.analysisLabel}'s ` +
@@ -667,7 +665,7 @@ const weekendRule: Rule = (d) => {
       id: 'weekend-spending',
       type: 'pattern',
       severity: 'info',
-      icon: '📅',
+      icon: 'calendar',
       title: 'Weekends Cost More',
       description:
         `${d.analysisLabel} weekends averaged ${inr(weekendPerDay)} per day against ${inr(weekdayPerDay)} ` +
@@ -694,7 +692,7 @@ const yearOverYearRule: Rule = (d) => {
       // Only a large swing earns a warning. Against a sparsely-logged prior year this
       // rule fired at warning severity in every single month, which is not information.
       severity: Math.abs(changePercent) > 50 ? 'warning' : 'info',
-      icon: changePercent > 0 ? '📈' : '📉',
+      icon: changePercent > 0 ? 'trending-up' : 'trending-down',
       title: 'Year-over-Year',
       description:
         `${d.analysisLabel} running costs (${inr(d.month.recurring)}) were ` +
@@ -725,7 +723,7 @@ const runRateRule: Rule = (d) => {
       id: 'run-rate-projection',
       type: 'prediction',
       severity: baseline > 0 && delta > 0 && isMaterial(delta, baseline) ? 'warning' : 'info',
-      icon: '⏱️',
+      icon: 'timer',
       title: 'Month-End Run Rate',
       description:
         `${inr(d.month.recurring)} of running costs in ${d.daysElapsed} days — ${inr(perDay)} a day. ` +
@@ -753,7 +751,7 @@ const nextMonthForecastRule: Rule = (d) => {
       id: 'next-month-forecast',
       type: 'prediction',
       severity: 'info',
-      icon: '🔮',
+      icon: 'forecast',
       title: 'Next Month, Expected',
       description:
         `On the last ${plural(recent.length, 'month')} of running costs, expect roughly ${inr(centre)} ` +
@@ -790,7 +788,7 @@ const annualForecastRule: Rule = (d) => {
       id: 'annual-forecast',
       type: 'prediction',
       severity: 'info',
-      icon: '🗓️',
+      icon: 'calendar-range',
       title: `FY${String(fyStartYear + 1).slice(2)} Running-Cost Forecast`,
       description:
         `${plural(fyMonths.length, 'month')} into FY${fyStartYear}–${String(fyStartYear + 1).slice(2)} you have spent ` +
@@ -830,7 +828,7 @@ const budgetBreachRule: Rule = (d) => {
       id: 'budget-breach',
       type: d.isOpenMonth ? 'prediction' : 'anomaly',
       severity: 'warning',
-      icon: '🚧',
+      icon: 'construction',
       title: d.isOpenMonth ? 'Budgets on Track to Break' : 'Budgets Exceeded',
       description:
         `${plural(breaches.length, 'category')} ${d.isOpenMonth ? 'projected to end' : 'ended'} ` +

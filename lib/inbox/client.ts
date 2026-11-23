@@ -51,7 +51,7 @@ export const transfersApi = {
     request<TransferCandidates>(`/api/transfers/${id}/candidates${accountId ? `?account_id=${encodeURIComponent(accountId)}` : ''}`),
 };
 
-/** What Madal decided on its own (migration 039), and taking it back. */
+/** What Madal decided on its own, and taking it back. */
 export const madalApi = {
   decisions: (itemIds: readonly string[]) =>
     request<{ decisions: MadalDecision[] }>(`/api/madal/decisions?items=${encodeURIComponent(itemIds.join(','))}`).then((r) => r.decisions),

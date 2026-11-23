@@ -21,6 +21,7 @@ import { useEvents } from '@/lib/hooks/useEvents';
 import { useTags } from '@/lib/hooks/useTags';
 import AutocompleteDropdown from '@/components/AutocompleteDropdown';
 import type { AutocompleteOption } from '@/components/AutocompleteDropdown';
+import { Receipt, Tag as TagIcon, Calendar, Trash2, ListChecks, Download } from 'lucide-react';
 
 type DateRange = 'last-1m' | 'last-3m' | 'current-year' | 'custom';
 type SortBy = 'date-desc' | 'date-asc' | 'amount-desc' | 'amount-asc' | 'category';
@@ -85,7 +86,7 @@ function ExpensesBrowseContent() {
     dateRangeParams.start,
     dateRangeParams.end
   );
-  // Names and colours the payment-source dot from Selvam's cards; empty until it loads.
+  // Names and colours the payment-source dot from the cards under Net worth; empty until it loads.
   const { cards: paymentCards } = usePaymentSources();
 
   const expenses = useMemo(() => {
@@ -384,7 +385,7 @@ function ExpensesBrowseContent() {
   return (
     <PageContainer>
       <PageHeader
-        title="Browse Selavu"
+        title="Browse expenses"
       />
 
       {/* Filter Panel */}
@@ -401,7 +402,7 @@ function ExpensesBrowseContent() {
                 setMinAmount('');
                 setMaxAmount('');
               }}
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              className="text-sm text-primary-600 hover:text-primary-700 font-medium"
             >
               Clear All
             </button>
@@ -412,7 +413,7 @@ function ExpensesBrowseContent() {
           {/* Search */}
           <div className="lg:col-span-3">
             <label className="label mb-2">
-              🔍 Search
+              Search
             </label>
             <input
               type="text"
@@ -426,7 +427,7 @@ function ExpensesBrowseContent() {
           {/* Date Range */}
           <div>
             <label className="label mb-2">
-              📅 Date Range
+              Date Range
             </label>
             <select
               value={dateRange}
@@ -470,7 +471,7 @@ function ExpensesBrowseContent() {
 
           {/* Category */}
           <AutocompleteDropdown
-            label="📂 Category"
+            label="Category"
             options={categoryOptions}
             value={selectedCategory}
             onChange={(value) => setSelectedCategory(value)}
@@ -481,7 +482,7 @@ function ExpensesBrowseContent() {
 
           {/* Event */}
           <AutocompleteDropdown
-            label="🏷️ Event"
+            label="Event"
             options={eventOptions}
             value={selectedEvent}
             onChange={(value) => setSelectedEvent(value)}
@@ -503,7 +504,7 @@ function ExpensesBrowseContent() {
 
           {/* Tag */}
           <AutocompleteDropdown
-            label="🔖 Label"
+            label="Label"
             options={tagOptions}
             value={selectedTag}
             onChange={(value) => setSelectedTag(value)}
@@ -526,7 +527,7 @@ function ExpensesBrowseContent() {
           {/* Min Amount */}
           <div>
             <label className="label mb-2">
-              💰 Min Amount
+              Min Amount
             </label>
             <input
               type="number"
@@ -540,7 +541,7 @@ function ExpensesBrowseContent() {
           {/* Max Amount */}
           <div>
             <label className="label mb-2">
-              💰 Max Amount
+              Max Amount
             </label>
             <input
               type="number"
@@ -554,7 +555,7 @@ function ExpensesBrowseContent() {
           {/* Sort By */}
           <div>
             <label className="label mb-2">
-              🔄 Sort By
+              Sort By
             </label>
             <select
               value={sortBy}
@@ -572,11 +573,11 @@ function ExpensesBrowseContent() {
       </div>
 
       {/* Results Summary */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 mb-4">
+      <div className="bg-primary-50 border border-primary-200 rounded-lg p-4 mb-4">
         <div className="grid grid-cols-3 gap-3 sm:gap-4">
           <div className="min-w-0">
             <p className="text-xs text-gray-600 mb-1">Total</p>
-            <p className="text-base sm:text-xl font-bold text-blue-900 truncate">{formatCurrency(totalAmount)}</p>
+            <p className="text-base sm:text-xl font-bold text-primary-900 truncate">{formatCurrency(totalAmount)}</p>
           </div>
           <div className="min-w-0">
             <p className="text-xs text-gray-600 mb-1">Count</p>
@@ -607,13 +608,16 @@ function ExpensesBrowseContent() {
               {selectedExpenses.size > 0 && (
                 <>
                   <button onClick={() => setShowBulkLabelModal(true)} className="btn btn-primary text-sm">
-                    🏷️ Labels ({selectedExpenses.size})
+                    <TagIcon size={16} aria-hidden />
+                    Labels ({selectedExpenses.size})
                   </button>
                   <button onClick={() => setShowBulkEventModal(true)} className="btn btn-primary text-sm">
-                    📅 Event ({selectedExpenses.size})
+                    <Calendar size={16} aria-hidden />
+                    Event ({selectedExpenses.size})
                   </button>
                   <button onClick={() => setConfirmBulkDeleteOpen(true)} className="btn btn-danger text-sm">
-                    🗑️ Delete ({selectedExpenses.size})
+                    <Trash2 size={16} aria-hidden />
+                    Delete ({selectedExpenses.size})
                   </button>
                 </>
               )}
@@ -623,13 +627,15 @@ function ExpensesBrowseContent() {
               onClick={() => setIsMultiSelectMode(true)}
               className="btn btn-secondary text-sm"
             >
-              ✓ Multi-Select
+              <ListChecks size={16} aria-hidden />
+              Multi-Select
             </button>
           )}
         </div>
         
         <button onClick={handleExportCSV} className="btn btn-secondary text-sm">
-          📊 Export CSV
+          <Download size={16} aria-hidden />
+          Export CSV
         </button>
       </div>
 
@@ -708,7 +714,7 @@ function ExpensesBrowseContent() {
                 onClick={() => handleBulkSetEvent('')}
                 className="w-full text-left p-3 hover:bg-gray-50 rounded-lg border border-gray-200 text-sm font-medium"
               >
-                ❌ No Event
+                No Event
               </button>
               {events.map((event) => (
                 <button
@@ -741,7 +747,7 @@ function ExpensesBrowseContent() {
         </div>
       ) : filteredExpenses.length === 0 ? (
         <EmptyState
-          icon="💸"
+          icon={Receipt}
           title="No Expenses Found"
           description="No expenses match your current filters. Try adjusting your filters."
         />

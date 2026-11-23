@@ -54,7 +54,7 @@ export interface Expense {
   event_id: string | null;
   entered_by?: string; // Deprecated, kept for backward compatibility
   receipt_url: string | null;
-  /** 'inbox' when created from a transaction alert (migration 030). */
+  /** 'inbox' when created from a transaction alert. */
   source?: ExpenseSource;
   /** The alert that created or enriched this expense. */
   inbox_item_id?: string | null;
@@ -63,7 +63,7 @@ export interface Expense {
   merchant?: string | null;
   /** Auto-added and not yet confirmed; excluded from totals and insights. */
   needs_review?: boolean;
-  /** HH:mm:ss in Asia/Kolkata, when known (migration 038). */
+  /** HH:mm:ss in Asia/Kolkata, when known. */
   spent_time?: string | null;
   /** spent_time is the alert's arrival time, not a time the bank printed. */
   spent_time_approx?: boolean;
@@ -96,7 +96,7 @@ export interface PortfolioAccount {
   sort_order: number;
   created_at: string;
   /**
-   * Cash, outside the investment boundary (migration 033). NULL/absent = decided by
+   * Cash, outside the investment boundary. NULL/absent = decided by
    * type; read it through `isCashAccount` in `lib/portfolio/cashAccounts.ts`.
    */
   is_cash?: boolean | null;
@@ -111,10 +111,7 @@ export interface PortfolioAccountType {
   /**
    * Money owed rather than held (credit cards, loans). Snapshots for accounts of
    * this type are stored negative so that plain `sum(amount)` net-worth math stays
-   * correct — see lib/portfolio/liabilities.ts and migration 028.
-   *
-   * Optional because the column arrives with migration 028, which is applied by
-   * hand; rows read before that lack it entirely.
+   * correct — see lib/portfolio/liabilities.ts.
    */
   is_liability?: boolean;
 }
@@ -274,10 +271,8 @@ export type ActivityTrackerFormData = {
 // ---------------------------------------------------------------------------
 // Insights (Selavu + Selvam)
 //
-// Single source of truth. This shape used to be redeclared in four places that
-// disagreed with each other — InsightsService, lib/ai/schemas.ts and both
-// insights pages — which is how portfolio insights ended up shipping with no
-// `severity` at all (InsightCard then rendered `class="card undefined"`).
+// Single source of truth for the insight shape: InsightsService, lib/ai/schemas.ts
+// and both insights pages all use it.
 // ---------------------------------------------------------------------------
 
 export type InsightSeverity = 'danger' | 'warning' | 'info' | 'success';
@@ -352,7 +347,7 @@ export interface InboxTransactionData {
   /**
    * Clock time of the spend, HH:mm:ss, when the alert quotes one. It separates two same-day
    * spends at one merchant, and it is the context a person uses to recognise a payment they
-   * half forgot. Absent on every row written before 2026-09-20 and on alerts that quote no time.
+   * half forgot. Absent on alerts that quote no time.
    */
   txnTime?: string | null;
   /** Balance or available card limit — whichever the alert quotes. */
@@ -360,7 +355,7 @@ export interface InboxTransactionData {
   outcome: 'success' | 'declined';
   international: boolean;
   /**
-   * What a credit *is*, when the mail says so outright (migration 035). Only the INDmoney
+   * What a credit *is*, when the mail says so outright. Only the INDmoney
    * dividend mail sets it today, and that is enough to record those without asking. Absent on
    * every row written before 2026-09-19, and on every credit whose purpose has to be guessed —
    * those wait in review instead.
@@ -479,15 +474,15 @@ export interface InboxListResponse {
   items: InboxItem[];
   /**
    * How much is still waiting on a person — the size of the `todo` view, whatever view was
-   * asked for. Named for the flag it used to count; it is now derived, so it also covers
-   * transfers whose alert aged past the ingest-time freshness gate.
+   * asked for. Derived, so it also covers transfers whose alert aged past the ingest-time
+   * freshness gate.
    */
   attentionCount: number;
   nextCursor: string | null;
 }
 
 // ---------------------------------------------------------------------------
-// Madal automation (migration 030): expenses from alerts, transfers, payee rules.
+// Madal automation: expenses from alerts, transfers, payee rules.
 // ---------------------------------------------------------------------------
 
 /** 'inbox': from a transaction alert (030) · 'statement': from a card statement line (032). */
@@ -495,7 +490,7 @@ export type ExpenseSource = 'manual' | 'inbox' | 'statement';
 
 export type StatementTransactionStatus = 'matched' | 'added' | 'unmatched' | 'ignored';
 
-/** One line of a recorded card statement and how it reconciled (migration 032). */
+/** One line of a recorded card statement and how it reconciled. */
 export interface StatementTransaction {
   id: string;
   statement_id: string;
@@ -540,7 +535,7 @@ export interface InboxConsumed {
 export type CategorySource = 'rule' | 'history' | 'keyword' | 'ai' | 'none';
 
 // ---------------------------------------------------------------------------
-// Income (migration 035). Money in, kept out of `expenses` so no expense read
+// Income. Money in, kept out of `expenses` so no expense read
 // has to learn about signs.
 // ---------------------------------------------------------------------------
 
@@ -559,7 +554,7 @@ export interface Income {
   /** Set when the money landed inside a Selvam account rather than a bank account. */
   account_id: string | null;
   inbox_item_id: string | null;
-  /** 'statement' when read off a bank statement line (migration 037). */
+  /** 'statement' when read off a bank statement line. */
   source: 'manual' | 'inbox' | 'statement';
   /** source:last4:date:amount:occurrence of the statement line it was read from; unique. */
   statement_ref?: string | null;
@@ -574,7 +569,7 @@ export interface IncomeWithUser extends Income {
 }
 
 // ---------------------------------------------------------------------------
-// Commitments (migration 037): insurance premiums, loan EMIs — declared once,
+// Commitments: insurance premiums, loan EMIs — declared once,
 // never expenses, shown on /cash-flow in the months they fall due.
 // ---------------------------------------------------------------------------
 
@@ -601,7 +596,7 @@ export interface Commitment {
   updated_at: string;
 }
 
-/** What Madal decided on its own (migration 039). */
+/** What Madal decided on its own. */
 export type MadalDecisionAction = 'classified' | 'refiled' | 'suggested' | 'categorised' | 'committed';
 
 export interface MadalDecision {
@@ -725,7 +720,7 @@ export interface Transfer {
   expense_id: string | null;
   note: string | null;
   status: TransferStatus;
-  /** Set when this debit is a virtual SIP instalment (details.funds[].name); no row is added (migration 034). */
+  /** Set when this debit is a virtual SIP instalment (details.funds[].name); no row is added. */
   sip_fund?: string | null;
   /** yyyy-MM of that instalment. */
   sip_month?: string | null;
@@ -749,7 +744,7 @@ export interface TransactionRule {
 }
 
 // ---------------------------------------------------------------------------
-// Statement attachments (migration 031).
+// Statement attachments.
 // ---------------------------------------------------------------------------
 
 /** A PDF sent with a statement email by the Gmail Apps Script. Processed in memory, never stored. */
@@ -761,7 +756,7 @@ export interface InboxIngestAttachment {
 
 export type StatementSampleStatus = 'captured' | 'locked' | 'failed';
 
-/** TEMPORARY: masked statement text captured to write parsers against (migration 031). */
+/** Masked statement text captured (opt-in, INBOX_CAPTURE_STATEMENT_TEXT=1) to write parsers against. */
 export interface StatementSample {
   id: string;
   owner: InboxOwner;

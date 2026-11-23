@@ -22,7 +22,7 @@ const DECLINED = /\b(?:declined|failed|unsuccessful|could\s+not\s+be\s+processed
 // on every message, which flagged a domestic UPI credit as international.
 const INTERNATIONAL = /\binternational\s+(?:transaction|spend|purchase|payment)/i;
 
-// ICICI card Standing Instructions (seen live 2026-09). The reminder that a debit "is
+// ICICI card Standing Instructions. The reminder that a debit "is
 // due" moves no money but carried "payment of INR X towards M", so it was booked as a
 // debit; the confirmation that did move money has no debit wording ("successfully
 // processed your payment") and read as a notice, or as a credit when its footer said

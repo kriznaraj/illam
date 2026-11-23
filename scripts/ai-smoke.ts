@@ -3,7 +3,7 @@
  * API: the key, the model ids, the per-model parameter rules and the response schemas.
  * Read-only — nothing touches the database.
  *
- *   npx dotenv-cli -e .env.local -- npx tsx scripts/ai-smoke.ts
+ *   npx dotenv-cli -e .env -- npx tsx scripts/ai-smoke.ts
  *   ... --task classify-expense      # just one task
  *
  * Costs a fraction of a cent per run. Exits non-zero if any task fails.

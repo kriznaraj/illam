@@ -1,3 +1,5 @@
+import { validateDate, validatePositiveNumber, validateUUID } from '@/lib/utils/validation';
+
 /**
  * Base Service Pattern
  * Abstract class providing common functionality for all services
@@ -18,10 +20,10 @@ export abstract class BaseService {
   }
 
   /**
-   * Validate required fields
-   * Throws error if validation fails
+   * Validate required fields, throwing on the first one missing. The field validators
+   * below delegate to lib/utils/validation and throw its ValidationError.
    */
-  protected validateRequired(data: Record<string, any>, fields: string[]): void {
+  protected validateRequired(data: Record<string, unknown>, fields: string[]): void {
     for (const field of fields) {
       const value = data[field];
       if (value === null || value === undefined || value === '') {
@@ -30,54 +32,16 @@ export abstract class BaseService {
     }
   }
 
-  /**
-   * Validate positive number
-   */
   protected validatePositiveNumber(value: number, fieldName: string): void {
-    if (typeof value !== 'number' || isNaN(value)) {
-      throw new Error(`${fieldName} must be a valid number`);
-    }
-    if (value <= 0) {
-      throw new Error(`${fieldName} must be greater than 0`);
-    }
+    validatePositiveNumber(value, fieldName);
   }
 
-  /**
-   * Validate non-negative number
-   */
-  protected validateNonNegativeNumber(value: number, fieldName: string): void {
-    if (typeof value !== 'number' || isNaN(value)) {
-      throw new Error(`${fieldName} must be a valid number`);
-    }
-    if (value < 0) {
-      throw new Error(`${fieldName} must be 0 or greater`);
-    }
-  }
-
-  /**
-   * Validate date string
-   */
   protected validateDate(dateString: string, fieldName: string): void {
-    if (!dateString) {
-      throw new Error(`${fieldName} is required`);
-    }
-
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      throw new Error(`${fieldName} must be a valid date`);
-    }
+    validateDate(dateString, fieldName);
   }
 
-  /**
-   * Validate UUID format
-   */
   protected validateUUID(uuid: string, fieldName: string = 'ID'): void {
-    const uuidRegex =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-    if (!uuidRegex.test(uuid)) {
-      throw new Error(`${fieldName} must be a valid UUID`);
-    }
+    validateUUID(uuid, fieldName);
   }
 
   /**

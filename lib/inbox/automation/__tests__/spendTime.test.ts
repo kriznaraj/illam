@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isSpendTimeColumnMissing, spendTime } from '../spendTime';
+import { spendTime } from '../spendTime';
 
 describe('spendTime', () => {
   it('uses the time the bank printed', () => {
@@ -28,16 +28,5 @@ describe('spendTime', () => {
       spent_time: '01:30:00',
       spent_time_approx: true,
     });
-  });
-});
-
-describe('isSpendTimeColumnMissing', () => {
-  it('recognises PostgREST and Postgres missing-column errors', () => {
-    expect(isSpendTimeColumnMissing(new Error("Failed to create expenses: Could not find the 'spent_time' column of 'expenses' in the schema cache"))).toBe(true);
-    expect(isSpendTimeColumnMissing(new Error('column "spent_time_approx" of relation "expenses" does not exist'))).toBe(true);
-  });
-
-  it('does not swallow other failures', () => {
-    expect(isSpendTimeColumnMissing(new Error('duplicate key value violates unique constraint'))).toBe(false);
   });
 });

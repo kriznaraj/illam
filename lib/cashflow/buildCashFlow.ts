@@ -196,7 +196,7 @@ export function buildCashFlow(input: CashFlowInput): CashFlowReport {
       key: 'loan-transfers',
       label: 'Loan payments not declared',
       amount: sum(loanTransfers.map((t) => Number(t.amount))),
-      detail: 'Filed as loan in Madal — declare the loan to see it by name',
+      detail: 'Filed as loan in the inbox: declare the loan to see it by name',
     });
   }
 

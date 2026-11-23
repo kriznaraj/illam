@@ -16,6 +16,7 @@ import EmojiPicker from '@/components/EmojiPicker';
 import { SegmentedControl } from '@/components/SegmentedControl';
 import { ListItemRow } from '@/components/ListItemRow';
 import { ModalRecordActions } from '@/components/ModalRecordActions';
+import { Trash2, Link2, FolderOpen, Wallet, Hash, Calendar, Check, X } from 'lucide-react';
 
 interface Event {
   id: string;
@@ -309,7 +310,6 @@ export default function OrganizePage() {
     id: event.id,
     label: event.title,
     sublabel: event.event_date,
-    icon: '📌',
   }));
 
   // Lock body scroll when modal is open
@@ -695,9 +695,9 @@ export default function OrganizePage() {
             setSearchQuery('');
           }}
           options={[
-            { value: 'events', label: '🏷️ Events' },
-            { value: 'labels', label: '🔖 Labels' },
-            { value: 'categories', label: '📁 Categories' },
+            { value: 'events', label: 'Events' },
+            { value: 'labels', label: 'Labels' },
+            { value: 'categories', label: 'Categories' },
           ]}
         />
       </div>
@@ -742,8 +742,9 @@ export default function OrganizePage() {
                   onClick={handleDeleteUnused} 
                   className="icon-button-sm text-red-600 hover:text-red-700 text-xs"
                   title={`Delete ${unusedCount} unused ${activeTab}`}
+                  aria-label={`Delete ${unusedCount} unused ${activeTab}`}
                 >
-                  🗑️
+                  <Trash2 size={14} aria-hidden />
                 </button>
               </>
             )}
@@ -751,7 +752,7 @@ export default function OrganizePage() {
 
           {/* Create/Edit Form */}
           {showForm && (
-            <div className="bg-white rounded-xl shadow-sm p-4 mb-4 border border-blue-200">
+            <div className="bg-white rounded-xl shadow-sm p-4 mb-4 border border-primary-200">
               <h3 className="text-base font-bold text-gray-900 mb-3">
                 {editingItem ? 'Edit' : 'Create'} {activeTab === 'events' ? 'Event' : activeTab === 'labels' ? 'Label' : 'Category'}
               </h3>
@@ -861,7 +862,7 @@ export default function OrganizePage() {
                       type="checkbox"
                       checked={formIsActive}
                       onChange={(e) => setFormIsActive(e.target.checked)}
-                      className="w-4 h-4 text-blue-600 rounded"
+                      className="w-4 h-4 text-primary-600 rounded"
                     />
                     <span className="text-gray-700">Active</span>
                   </label>
@@ -871,7 +872,7 @@ export default function OrganizePage() {
                       type="checkbox"
                       checked={formIsShared}
                       onChange={(e) => setFormIsShared(e.target.checked)}
-                      className="w-4 h-4 text-blue-600 rounded"
+                      className="w-4 h-4 text-primary-600 rounded"
                     />
                     <span className="text-gray-700">Shared with all users</span>
                   </label>
@@ -952,7 +953,7 @@ export default function OrganizePage() {
                           </span>
                         ) : null}
                         {activeTab === 'labels' && item.is_shared ? (
-                          <span className="px-1.5 py-0.5 text-xs bg-blue-100 text-blue-700 rounded">
+                          <span className="px-1.5 py-0.5 text-xs bg-primary-100 text-primary-700 rounded">
                             shared
                           </span>
                         ) : null}
@@ -993,7 +994,7 @@ export default function OrganizePage() {
               // View Mode
               <>
                 {/* Header */}
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
+                <div className="bg-primary-50 px-6 py-4 border-b border-gray-200">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-gray-900">
                       {activeTab === 'events' ? 'Event' : activeTab === 'labels' ? 'Label' : 'Category'} Details
@@ -1025,10 +1026,10 @@ export default function OrganizePage() {
 
               {/* Linked Activity Tracker Event (for events) */}
               {activeTab === 'events' && (selectedItem as any).family_tracker_event_id && (
-                <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <span className="text-xl">🔗</span>
+                <div className="flex items-center gap-2 p-3 bg-primary-50 border border-primary-200 rounded-lg">
+                  <Link2 size={18} className="flex-shrink-0 text-primary-600" aria-hidden />
                   <div className="flex-1">
-                    <p className="text-xs text-blue-600 font-medium">Linked to Activity Tracker</p>
+                    <p className="text-xs text-primary-600 font-medium">Linked to Activity Tracker</p>
                     <p className="text-sm text-gray-900">
                       {activityTrackerEvents.find(e => e.id === (selectedItem as any).family_tracker_event_id)?.title || 'Loading...'}
                     </p>
@@ -1047,18 +1048,18 @@ export default function OrganizePage() {
                   )}
                   {(selectedItem as any).group_name && (
                     <div className="flex items-center gap-2 text-gray-600">
-                      <span>📂</span>
+                      <FolderOpen size={14} className="flex-shrink-0" aria-hidden />
                       <span>Group: {(selectedItem as any).group_name}</span>
                     </div>
                   )}
                   {(selectedItem as any).budget && (
                     <div className="flex items-center gap-2 text-gray-600">
-                      <span>💰</span>
+                      <Wallet size={14} className="flex-shrink-0" aria-hidden />
                       <span>Budget: {formatCurrency((selectedItem as any).budget)}</span>
                     </div>
                   )}
                   <div className="flex items-center gap-2 text-gray-600">
-                    <span>🔢</span>
+                    <Hash size={14} className="flex-shrink-0" aria-hidden />
                     <span>Sort Order: {(selectedItem as any).sort_order || 0}</span>
                   </div>
                 </div>
@@ -1086,7 +1087,7 @@ export default function OrganizePage() {
                 <div className="space-y-2 text-sm">
                   {(selectedItem.start_date || selectedItem.end_date) && (
                     <div className="flex items-center gap-2 text-gray-600">
-                      <span>📅</span>
+                      <Calendar size={14} className="flex-shrink-0" aria-hidden />
                       <span>
                         {selectedItem.start_date && format(new Date(selectedItem.start_date), 'MMM d, yyyy')}
                         {selectedItem.start_date && selectedItem.end_date && ' - '}
@@ -1096,7 +1097,7 @@ export default function OrganizePage() {
                   )}
                   {selectedItem.budget && (
                     <div className="flex items-center gap-2 text-gray-600">
-                      <span>💰</span>
+                      <Wallet size={14} className="flex-shrink-0" aria-hidden />
                       <span>Budget: {formatCurrency(selectedItem.budget)}</span>
                     </div>
                   )}
@@ -1106,19 +1107,19 @@ export default function OrganizePage() {
                       <>
                         {!selectedItem.end_date || new Date(selectedItem.end_date) >= new Date() ? (
                           <div className="flex items-center gap-2 text-green-600">
-                            <span>✓</span>
+                            <Check size={14} className="flex-shrink-0" aria-hidden />
                             <span>Active • Can be added to expenses</span>
                           </div>
                         ) : (
-                          <div className="flex items-center gap-2 text-blue-600">
-                            <span>✓</span>
+                          <div className="flex items-center gap-2 text-primary-600">
+                            <Check size={14} className="flex-shrink-0" aria-hidden />
                             <span>Active • Completed</span>
                           </div>
                         )}
                       </>
                     ) : (
                       <div className="flex items-center gap-2 text-gray-400">
-                        <span>✕</span>
+                        <X size={14} className="flex-shrink-0" aria-hidden />
                         <span>Inactive • Cannot be added to expenses</span>
                       </div>
                     )}
@@ -1212,7 +1213,7 @@ export default function OrganizePage() {
               // Edit Mode
               <>
                 {/* Header */}
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
+                <div className="bg-primary-50 px-6 py-4 border-b border-gray-200">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-gray-900">
                       Edit {activeTab === 'events' ? 'Event' : activeTab === 'labels' ? 'Label' : 'Category'}

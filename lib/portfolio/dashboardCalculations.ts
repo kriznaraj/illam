@@ -1,6 +1,6 @@
 import { formatMonth } from '@/lib/utils';
 import type { PortfolioAccount, PortfolioSnapshot } from '@/types';
-import { latestPerAccountMonth, monthlyTotals } from './monthlySnapshots';
+import { carriedPerAccountMonth, monthlyTotals } from './monthlySnapshots';
 
 export interface AccountWithLatestBalance extends PortfolioAccount {
   latestBalance: number;
@@ -93,10 +93,11 @@ export const computeScopedPortfolioData = ({
 
   // One balance per (account, month) — see lib/portfolio/monthlySnapshots.ts. Adding
   // up every row double-counts any account that carries both a 1st-of-month and a
-  // mid-month snapshot, inflating that month by the whole of its balance.
+  // mid-month snapshot, inflating that month by the whole of its balance. An account
+  // not yet recorded this month counts at its last balance, not as zero.
   const typeMonthTotals: Record<string, { current: number; prev: number }> = {};
   if (latestMonth) {
-    for (const [accountId, series] of latestPerAccountMonth(filteredSnapshotsData)) {
+    for (const [accountId, series] of carriedPerAccountMonth(filteredSnapshotsData)) {
       const type = accountTypeById[accountId];
       if (!type) continue;
       typeMonthTotals[type] = typeMonthTotals[type] ?? { current: 0, prev: 0 };
@@ -134,8 +135,9 @@ export const computeScopedPortfolioData = ({
     const latestSnapshotMonth = snapshotMonths[0];
     const previousSnapshotMonth = snapshotMonths[1];
     // Deduped too: these feed the MoM / YTD / YoY headline percentages, so a
-    // double-counted month would misstate growth in both directions around it.
-    const totalsByMonth = monthlyTotals(filteredSnapshotsData);
+    // double-counted month would misstate growth in both directions around it. Carried
+    // forward, so a month whose statements are still arriving is not read as a crash.
+    const totalsByMonth = monthlyTotals(filteredSnapshotsData, undefined, { carryForward: true });
     const getSnapshotTotal = (month: string) => totalsByMonth.get(month) ?? 0;
 
     const currentTotal = getSnapshotTotal(latestSnapshotMonth);

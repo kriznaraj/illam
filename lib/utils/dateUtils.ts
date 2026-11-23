@@ -1,4 +1,4 @@
-import { format, parseISO, isValid, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addMonths, subMonths, differenceInDays } from 'date-fns';
+import { format, parseISO, isValid, differenceInDays } from 'date-fns';
 
 /** App calendar timezone — all date-only boundaries (today, month, etc.) use this. */
 export const APP_TIMEZONE = 'Asia/Kolkata';
@@ -130,7 +130,7 @@ export const formatters = {
   },
 
   /**
-   * A stored time of day ("16:50:04", migration 038) as "4:50 PM"; "~4:50 PM" when it is only
+   * A stored time of day ("16:50:04") as "4:50 PM"; "~4:50 PM" when it is only
    * the alert's arrival. Empty for anything unreadable, like every formatter here.
    */
   toClock: (time: string | null | undefined, approx = false): string => {
@@ -180,181 +180,11 @@ export const formatters = {
 };
 
 /**
- * Common date operations
- */
-export const dateOps = {
-  /**
-   * Get current month as YYYY-MM
-   */
-  getCurrentMonth: (): string => {
-    return getAppMonthKey();
-  },
-
-  /**
-   * Get current date as YYYY-MM-DD
-   */
-  getCurrentDate: (): string => {
-    return getTodayAppDate();
-  },
-
-  /**
-   * Get month range (start and end dates)
-   */
-  getMonthRange: (monthString: string): { start: string; end: string } => {
-    try {
-      const date = parseISO(monthString + '-01');
-      return {
-        start: format(startOfMonth(date), 'yyyy-MM-dd'),
-        end: format(endOfMonth(date), 'yyyy-MM-dd'),
-      };
-    } catch {
-      const now = new Date();
-      return {
-        start: format(startOfMonth(now), 'yyyy-MM-dd'),
-        end: format(endOfMonth(now), 'yyyy-MM-dd'),
-      };
-    }
-  },
-
-  /**
-   * Get month boundaries as Date objects
-   */
-  getMonthBoundaries: (date: Date = new Date()): { start: Date; end: Date } => {
-    return {
-      start: startOfMonth(date),
-      end: endOfMonth(date),
-    };
-  },
-
-  /**
-   * Get week range (start and end dates)
-   */
-  getWeekRange: (date: Date = new Date()): { start: string; end: string } => {
-    return {
-      start: format(startOfWeek(date, { weekStartsOn: 1 }), 'yyyy-MM-dd'),
-      end: format(endOfWeek(date, { weekStartsOn: 1 }), 'yyyy-MM-dd'),
-    };
-  },
-
-  /**
-   * Add months to a date
-   */
-  addMonths: (date: Date | string, months: number): string => {
-    try {
-      return format(addMonths(parseDate(date), months), 'yyyy-MM-dd');
-    } catch {
-      return '';
-    }
-  },
-
-  /**
-   * Subtract months from a date
-   */
-  subMonths: (date: Date | string, months: number): string => {
-    try {
-      return format(subMonths(parseDate(date), months), 'yyyy-MM-dd');
-    } catch {
-      return '';
-    }
-  },
-
-  /**
-   * Check if date is valid
-   */
-  isValid: (date: Date | string): boolean => {
-    try {
-      return isValid(parseDate(date));
-    } catch {
-      return false;
-    }
-  },
-
-  /**
-   * Parse date safely
-   */
-  parse: (dateString: string): Date | null => {
-    try {
-      const date = parseISO(dateString);
-      return isValid(date) ? date : null;
-    } catch {
-      return null;
-    }
-  },
-};
-
-function toCalendarDateString(date: Date | string): string | null {
-  try {
-    const d = typeof date === 'string' ? date.slice(0, 10) : formatters.toISODate(date);
-    return /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : null;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Date comparison utilities
- */
-export const dateCompare = {
-  /**
-   * Check if two dates are the same day
-   */
-  isSameDay: (date1: Date | string, date2: Date | string): boolean => {
-    try {
-      const d1 = typeof date1 === 'string' ? date1.slice(0, 10) : formatters.toISODate(date1);
-      const d2 = typeof date2 === 'string' ? date2.slice(0, 10) : formatters.toISODate(date2);
-      return d1 === d2;
-    } catch {
-      return false;
-    }
-  },
-
-  /**
-   * Check if two dates are in the same month
-   */
-  isSameMonth: (date1: Date | string, date2: Date | string): boolean => {
-    try {
-      return formatters.toMonthKey(date1) === formatters.toMonthKey(date2);
-    } catch {
-      return false;
-    }
-  },
-
-  /**
-   * Check if date is in the future
-   */
-  isFuture: (date: Date | string): boolean => {
-    const d = toCalendarDateString(date);
-    if (!d) return false;
-    return d > getTodayAppDate();
-  },
-
-  /**
-   * Check if date is in the past
-   */
-  isPast: (date: Date | string): boolean => {
-    const d = toCalendarDateString(date);
-    if (!d) return false;
-    return d < getTodayAppDate();
-  },
-
-  /**
-   * Check if date is today
-   */
-  isToday: (date: Date | string): boolean => {
-    const d = toCalendarDateString(date);
-    if (!d) return false;
-    return d === getTodayAppDate();
-  },
-};
-
-/**
  * Month-key arithmetic (`yyyy-MM`), done on the string itself.
  *
- * Every month navigator used to do this inline with `parseISO(month + '-01')`
- * and `new Date()`, which meant six pages each had their own idea of what the
- * current month was — and, near midnight IST, a different one from the server.
- * Working on the string keeps it timezone-free; `current()` is the only part
- * that needs a clock, and it goes through `getAppMonthKey()`.
+ * Working on the string keeps it timezone-free (no `parseISO(month + '-01')`
+ * drifting a day near midnight); `current()` is the only part that needs a
+ * clock, and it goes through `getAppMonthKey()`.
  */
 export const monthKeys = {
   /** `true` for a well-formed `yyyy-MM` with a real month number. */
@@ -404,12 +234,3 @@ export const monthKeys = {
   shortLabel: (month: string): string =>
     monthKeys.isValid(month) ? formatters.toMonthYear(`${month}-01`) : '',
 };
-
-const dateUtils = {
-  formatters,
-  dateOps,
-  dateCompare,
-  monthKeys,
-};
-
-export default dateUtils;

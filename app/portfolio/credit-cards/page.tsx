@@ -18,6 +18,7 @@ import {
 } from 'recharts';
 import { ExpandableChart } from '@/components/charts/ExpandableChart';
 import { useToast } from '@/lib/useToast';
+import { CreditCard, TriangleAlert } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -78,7 +79,7 @@ function statusBadge(status: string): string {
   if (status === 'paid') return 'bg-emerald-100 text-emerald-700';
   if (status === 'overdue') return 'bg-red-100 text-red-700';
   if (status === 'due_soon') return 'bg-amber-100 text-amber-700';
-  if (status === 'need_statement') return 'bg-blue-100 text-blue-700';
+  if (status === 'need_statement') return 'bg-primary-100 text-primary-700';
   if (status === 'pending') return 'bg-orange-100 text-orange-700';
   return 'bg-gray-100 text-gray-500';
 }
@@ -479,8 +480,9 @@ function CardDetailPanel({ card, selectedMonth, onRefresh }: {
         <p className="text-xs font-medium text-gray-500 mb-3">Statement history</p>
 
         {hasDuplicates && (
-          <div className="mb-3 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-700">
-            ⚠️ Duplicate statements detected for one or more months. Delete the extras below.
+          <div className="mb-3 flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-700">
+            <TriangleAlert size={14} className="flex-shrink-0" aria-hidden />
+            Duplicate statements detected for one or more months. Delete the extras below.
           </div>
         )}
 
@@ -602,11 +604,11 @@ export default function CreditCardsPage() {
   if (cards.length === 0) {
     return (
       <PageContainer maxWidth="4xl">
-        <PageHeader title="Credit Cards" description="Monthly statements · due reminders" />
+        <PageHeader title="Credit cards" description="Monthly statements · due reminders" />
         <EmptyState
-          icon="💳"
+          icon={CreditCard}
           title="No credit cards yet"
-          description='Create a Selvam account with type "Credit Card" to see it here.'
+          description='Add an account of type "Credit Card" in Net worth settings to see it here.'
         />
         <div className="text-center mt-4">
           <Link href="/portfolio/accounts" className="btn btn-link btn-sm">
@@ -621,7 +623,7 @@ export default function CreditCardsPage() {
   return (
     <PageContainer maxWidth="5xl">
       <PageHeader
-        title="Credit Cards"
+        title="Credit cards"
         description="Monthly statements · due reminders"
         action={
           <button
@@ -658,7 +660,7 @@ export default function CreditCardsPage() {
 
       {/* Month summary banner */}
       {(data?.totals.statement_total ?? 0) > 0 && (
-        <div className="rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100 p-5 mb-6">
+        <div className="rounded-2xl bg-primary-50 p-5 mb-6">
           <p className="text-xs font-medium text-indigo-400 uppercase tracking-wider mb-1">
             {fmtMonth(selectedMonth)} total
           </p>

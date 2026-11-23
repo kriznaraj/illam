@@ -3,56 +3,50 @@
 import Link from 'next/link';
 import { PageHeader } from '@/components/PageHeader';
 import { PageContainer } from '@/components/PageContainer';
+import { Download, Landmark, Tag, Coins, ChartCandlestick, TrendingUp, CreditCard, type LucideIcon } from 'lucide-react';
 
-const SECTIONS = [
+const SECTIONS: { href: string; title: string; description: string; icon: LucideIcon }[] = [
   {
     href: '/portfolio/import',
     title: 'Import (CDSL)',
     description: 'Convert CDSL monthly report to CSV, review, then import holdings and snapshots.',
-    icon: '📥',
-    bgClass: 'bg-emerald-50',
+    icon: Download,
   },
   {
     href: '/portfolio/settings/accounts',
     title: 'Accounts',
     description: 'Manage portfolio accounts (stocks, MF, gold, etc.) and add instruments.',
-    icon: '🏦',
-    bgClass: 'bg-blue-50',
+    icon: Landmark,
   },
   {
     href: '/portfolio/settings/account-types',
     title: 'Account types',
     description: 'Types and colors for accounts (Stocks, Mutual Funds, GOLD, etc.).',
-    icon: '🏷️',
-    bgClass: 'bg-gray-50',
+    icon: Tag,
   },
   {
     href: '/portfolio/settings/gold',
     title: 'Gold register',
     description: 'Physical gold & sovereign gold bonds.',
-    icon: '🥇',
-    bgClass: 'bg-yellow-50',
+    icon: Coins,
   },
   {
     href: '/portfolio/investments',
     title: 'Investments',
     description: 'Track monthly investments, SIP-derived contributions, and allocation splits.',
-    icon: '💹',
-    bgClass: 'bg-teal-50',
+    icon: ChartCandlestick,
   },
   {
     href: '/portfolio/settings/sip',
     title: 'SIP schedule',
     description: 'Systematic investment plans by platform.',
-    icon: '📈',
-    bgClass: 'bg-indigo-50',
+    icon: TrendingUp,
   },
   {
     href: '/portfolio/settings/credit-cards',
     title: 'Credit cards',
     description: 'Track statements, due dates, payments, and pending bills.',
-    icon: '💳',
-    bgClass: 'bg-rose-50',
+    icon: CreditCard,
   },
 ];
 
@@ -69,10 +63,10 @@ export default function SettingsIndexPage() {
           <Link
             key={section.href}
             href={section.href}
-            className={`card flex items-center gap-4 hover:shadow-md transition-shadow group ${section.bgClass}`}
+            className="card card-hover flex items-center gap-4 group"
           >
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0">
-              {section.icon}
+            <div className="w-12 h-12 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center flex-shrink-0">
+              <section.icon size={20} aria-hidden />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-gray-900 group-hover:text-gray-700">

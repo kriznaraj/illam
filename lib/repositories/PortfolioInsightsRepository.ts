@@ -7,14 +7,6 @@ const MAX_PAGES = 50;
 export class PortfolioInsightsRepository {
   constructor(private supabase: SupabaseClient) {}
 
-  async listCurrentSnapshots(monthIsoDate: string) {
-    return await this.supabase
-      .from('portfolio_snapshots')
-      .select('*, portfolio_accounts(name, type)')
-      .eq('snapshot_date', monthIsoDate)
-      .order('amount', { ascending: false });
-  }
-
   async listSnapshots(monthIsoDate: string) {
     return await this.supabase.from('portfolio_snapshots').select('*').eq('snapshot_date', monthIsoDate);
   }
@@ -46,8 +38,6 @@ export class PortfolioInsightsRepository {
 
   /**
    * All accounts, inactive included — a stale inactive account should not be nagged about.
-   * `*` rather than a column list so `is_cash` is read once migration 033 exists and
-   * the query still works before it does.
    */
   async listAccounts() {
     return await this.supabase

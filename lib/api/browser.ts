@@ -1,11 +1,7 @@
 import { createBrowserClient } from '@supabase/ssr';
-import { SESSION_COOKIE_NAME, SUPABASE_ANON_KEY as supabaseAnonKey, SUPABASE_PUBLIC_URL as supabaseUrl } from './supabase-config';
+import { SESSION_COOKIE_NAME, browserApiConfig, serverApiConfig } from './config';
 
 const cookieOptions = { name: SESSION_COOKIE_NAME };
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
 
 // Single browser client singleton shared across auth and data operations.
 // Uses @supabase/ssr's createBrowserClient so the session is read from cookies
@@ -19,11 +15,16 @@ export function createSupabaseBrowserClient() {
   // across server requests, but we never throw during SSR.
   if (typeof window !== 'undefined') {
     if (!browserClient) {
-      browserClient = createBrowserClient(supabaseUrl, supabaseAnonKey, { cookieOptions });
+      // Values from /api/runtime-config, loaded before the app (app/layout.tsx).
+      const { apiUrl, anonKey } = browserApiConfig(window.__ILLAM_CONFIG__, window.location.origin);
+      browserClient = createBrowserClient(apiUrl, anonKey, { cookieOptions });
     }
     return browserClient;
   }
 
-  // SSR path: return a fresh instance (not cached, safe per-request)
-  return createBrowserClient(supabaseUrl, supabaseAnonKey, { cookieOptions });
+  // SSR path: return a fresh instance (not cached, safe per-request). At build time, when pages
+  // are prerendered, there is no config yet; components only fetch in effects, which never run
+  // there, so a placeholder client is never used to make a request.
+  const { serverApiUrl, anonKey } = serverApiConfig();
+  return createBrowserClient(serverApiUrl || 'http://prerender.invalid', anonKey || 'prerender', { cookieOptions });
 }

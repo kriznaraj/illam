@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClientFromRequest } from '@/lib/supabase-server';
+import { createServerClientFromRequest } from '@/lib/api/server';
 import { InboxService } from '@/lib/services/InboxService';
 import { parseOwner } from '@/lib/inbox/signature';
 import type { InboxView } from '@/types';

@@ -12,6 +12,7 @@ import { PageContainer } from '@/components/PageContainer';
 import { ExpandableChart } from '@/components/charts/ExpandableChart';
 import { EmptyState } from '@/components/EmptyState';
 import { MetricCard, MetricGrid } from '@/components/MetricCard';
+import { TriangleAlert, X, Lightbulb } from 'lucide-react';
 
 interface CategoryMonthlyData {
   category: Category;
@@ -103,7 +104,7 @@ export default function CategoryMonthlyReport() {
     return (
       <PageContainer maxWidth="full">
         <EmptyState
-          icon="⚠️"
+          icon={TriangleAlert}
           title="Failed to load report"
           description="Try reloading this page in a moment."
         />
@@ -124,13 +125,13 @@ export default function CategoryMonthlyReport() {
   return (
     <PageContainer maxWidth="full">
       <PageHeader
-        title="Category Report"
+        title="Category report"
         description="Monthly breakdown by category"
       />
 
       {/* Summary Cards */}
       <MetricGrid className="grid-cols-2 lg:grid-cols-4">
-        <MetricCard tone="blue" label="Total Spending" value={formatCurrency(data.grandTotal)} />
+        <MetricCard tone="primary" label="Total Spending" value={formatCurrency(data.grandTotal)} />
         <MetricCard tone="green" label="Categories" value={Object.values(data.groupedData).flat().length} />
         <MetricCard
           tone="purple"
@@ -167,10 +168,10 @@ export default function CategoryMonthlyReport() {
               onChange={(e) => setSelectedUser(e.target.value)}
               className="select"
             >
-              <option value="">👥 All Users</option>
+              <option value="">All Users</option>
               {users.map((user) => (
                 <option key={user.id} value={user.id}>
-                  {getUserIcon(user)} {user.full_name}
+                  {[getUserIcon(user), user.full_name].filter(Boolean).join(' ')}
                 </option>
               ))}
             </select>
@@ -192,7 +193,7 @@ export default function CategoryMonthlyReport() {
               <p className="text-xs sm:text-sm text-gray-600">
                 {selectedCategoryData.category.group_name}
               </p>
-              <p className="text-sm sm:text-base font-semibold text-blue-600 mt-1">
+              <p className="text-sm sm:text-base font-semibold text-primary-600 mt-1">
                 Total: {formatCurrency(selectedCategoryData.total)}
               </p>
               {selectedCategoryData.total > 0 && data.months.length > 0 && (
@@ -207,8 +208,9 @@ export default function CategoryMonthlyReport() {
                 setSelectedCategory(null);
               }}
               className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors"
+              aria-label="Close trend chart"
             >
-              <span className="text-lg">✕</span>
+              <X size={18} aria-hidden />
             </button>
           </div>
           <ExpandableChart
@@ -274,9 +276,9 @@ export default function CategoryMonthlyReport() {
         </div>
 
         {isMobile && (
-          <div className="mx-4 mb-3 p-2 bg-blue-50 border border-blue-200 rounded text-center">
-            <p className="text-xs text-blue-800">
-              👆 Tap category for trend • 👈 Swipe to see months
+          <div className="mx-4 mb-3 p-2 bg-primary-50 border border-primary-200 rounded text-center">
+            <p className="text-xs text-primary-800">
+              Tap category for trend • Swipe to see months
             </p>
           </div>
         )}
@@ -307,7 +309,7 @@ export default function CategoryMonthlyReport() {
             {Object.entries(data.groupedData).map(([groupName, categories]) => (
               <Fragment key={groupName}>
                 {/* Group Header */}
-                <tr className="bg-gradient-to-r from-gray-100 to-gray-50">
+                <tr className="bg-gray-50">
                   <td colSpan={isMobile ? data.months.length + 2 : data.months.length + 3} className={`${isMobile ? 'px-2 py-1.5 text-xs' : 'px-4 py-2.5 text-sm'} font-bold text-gray-900`}>
                     {groupName}
                   </td>
@@ -316,8 +318,8 @@ export default function CategoryMonthlyReport() {
                 {categories.map((catData) => (
                   <tr
                     key={catData.category.id}
-                    className={`hover:bg-blue-50 cursor-pointer active:bg-blue-100 transition-colors ${
-                      selectedCategory === catData.category.id ? 'bg-blue-50 ring-2 ring-blue-400 ring-inset' : ''
+                    className={`hover:bg-primary-50 cursor-pointer active:bg-primary-100 transition-colors ${
+                      selectedCategory === catData.category.id ? 'bg-primary-50 ring-2 ring-primary-400 ring-inset' : ''
                     }`}
                     onClick={() => {
                       if (selectedCategory === catData.category.id) {
@@ -331,8 +333,8 @@ export default function CategoryMonthlyReport() {
                       }
                     }}
                   >
-                    <td className={`${isMobile ? 'px-2 py-2 text-xs' : 'px-4 py-3 text-sm'} text-gray-900 sticky left-0 bg-white hover:bg-blue-50 border-r border-gray-200 ${
-                      selectedCategory === catData.category.id ? 'bg-blue-50' : ''
+                    <td className={`${isMobile ? 'px-2 py-2 text-xs' : 'px-4 py-3 text-sm'} text-gray-900 sticky left-0 bg-white hover:bg-primary-50 border-r border-gray-200 ${
+                      selectedCategory === catData.category.id ? 'bg-primary-50' : ''
                     }`}>
                       <div className="flex items-center gap-1.5">
                         <span className={isMobile ? 'text-base' : 'text-lg'}>{getCategoryIcon(catData.category)}</span>
@@ -357,8 +359,8 @@ export default function CategoryMonthlyReport() {
                           : '-'}
                       </td>
                     ))}
-                    <td className={`${isMobile ? 'px-2 py-2 text-[11px]' : 'px-4 py-3 text-sm'} text-right font-semibold text-gray-900 sticky right-0 bg-white hover:bg-blue-50 border-l border-gray-200 ${
-                      selectedCategory === catData.category.id ? 'bg-blue-50' : ''
+                    <td className={`${isMobile ? 'px-2 py-2 text-[11px]' : 'px-4 py-3 text-sm'} text-right font-semibold text-gray-900 sticky right-0 bg-white hover:bg-primary-50 border-l border-gray-200 ${
+                      selectedCategory === catData.category.id ? 'bg-primary-50' : ''
                     }`}>
                       {isMobile
                         ? catData.total >= 1000
@@ -371,13 +373,13 @@ export default function CategoryMonthlyReport() {
               </Fragment>
             ))}
             {/* Monthly Totals Row */}
-            <tr className="bg-gradient-to-r from-blue-100 to-blue-50 font-bold border-t-2 border-blue-300">
-              <td className={`${isMobile ? 'px-2 py-2 text-xs' : 'px-4 py-3 text-sm'} text-blue-900 sticky left-0 bg-blue-100 z-10 border-r border-blue-300`}>
+            <tr className="bg-primary-50 font-bold border-t-2 border-primary-300">
+              <td className={`${isMobile ? 'px-2 py-2 text-xs' : 'px-4 py-3 text-sm'} text-primary-900 sticky left-0 bg-primary-100 z-10 border-r border-primary-300`}>
                 {isMobile ? 'TOT' : 'TOTAL'}
               </td>
               {!isMobile && <td className="px-4 py-3"></td>}
               {data.months.map((month) => (
-                <td key={month} className={`${isMobile ? 'px-1.5 py-2 text-[11px]' : 'px-3 py-3 text-sm'} text-right text-blue-900 whitespace-nowrap`}>
+                <td key={month} className={`${isMobile ? 'px-1.5 py-2 text-[11px]' : 'px-3 py-3 text-sm'} text-right text-primary-900 whitespace-nowrap`}>
                   {isMobile
                     ? data.monthlyTotals[month] >= 1000
                       ? `${(data.monthlyTotals[month] / 1000).toFixed(0)}k`
@@ -385,7 +387,7 @@ export default function CategoryMonthlyReport() {
                     : formatCurrency(data.monthlyTotals[month])}
                 </td>
               ))}
-              <td className={`${isMobile ? 'px-2 py-2 text-xs' : 'px-4 py-3 text-sm'} text-right text-blue-900 sticky right-0 bg-blue-100 z-10 border-l border-blue-300`}>
+              <td className={`${isMobile ? 'px-2 py-2 text-xs' : 'px-4 py-3 text-sm'} text-right text-primary-900 sticky right-0 bg-primary-100 z-10 border-l border-primary-300`}>
                 {isMobile
                   ? data.grandTotal >= 1000
                     ? `${(data.grandTotal / 1000).toFixed(0)}k`
@@ -398,7 +400,10 @@ export default function CategoryMonthlyReport() {
         </div>
 
         <div className={`${isMobile ? 'mx-4' : ''} mt-4 text-xs text-gray-500 text-center sm:text-left`}>
-          <p>💡 {isMobile ? 'Tap' : 'Click'} any category to {selectedCategory ? 'close or switch' : 'view'} trend chart</p>
+          <p className="inline-flex items-center gap-1.5">
+            <Lightbulb size={14} className="flex-shrink-0" aria-hidden />
+            <span>{isMobile ? 'Tap' : 'Click'} any category to {selectedCategory ? 'close or switch' : 'view'} trend chart</span>
+          </p>
         </div>
       </div>
 
@@ -419,7 +424,7 @@ export default function CategoryMonthlyReport() {
                 key={`trend-${catData.category.id}`}
                 type="button"
                 onClick={() => setSelectedCategory(catData.category.id)}
-                className="text-left rounded-lg border border-gray-200 p-3 hover:border-blue-300 hover:bg-blue-50/40 transition-colors"
+                className="text-left rounded-lg border border-gray-200 p-3 hover:border-primary-300 hover:bg-primary-50/40 transition-colors"
               >
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <div className="min-w-0">

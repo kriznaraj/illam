@@ -1,5 +1,5 @@
 import { normalizeEmail } from './email';
-import { createSupabaseBrowserClient } from './supabase';
+import { createSupabaseBrowserClient } from './api/browser';
 
 // Supabase Auth functions — returns the app-wide singleton so auth and data
 // operations share the same session state.

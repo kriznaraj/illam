@@ -69,32 +69,60 @@ export function latestPerAccountMonth(snapshots: DatedSnapshot[]): Map<string, M
 }
 
 /**
+ * Like `latestPerAccountMonth`, but every account also has a balance in each of `months`
+ * after its first snapshot: a month without a row holds the last known balance. A month's
+ * statements arrive over several days, so on the 10th most accounts have no row yet;
+ * reading them as zero makes net worth look like it collapsed. This is the rule
+ * `preparePortfolioData` (lib/insights/portfolioRules.ts) and PortfolioReportService use.
+ */
+export function carriedPerAccountMonth(
+  snapshots: DatedSnapshot[],
+  months?: string[]
+): Map<string, Map<string, number>> {
+  const byAccount = latestPerAccountMonth(snapshots);
+  const allMonths =
+    months ?? Array.from(new Set(Array.from(byAccount.values()).flatMap((series) => Array.from(series.keys())))).sort();
+  const carried = new Map<string, Map<string, number>>();
+
+  for (const [accountId, series] of byAccount) {
+    const filled = new Map<string, number>();
+    let last: number | undefined;
+    for (const month of allMonths) {
+      const value = series.get(month);
+      if (value !== undefined) last = value;
+      if (last !== undefined) filled.set(month, last);
+    }
+    carried.set(accountId, filled);
+  }
+
+  return carried;
+}
+
+/**
  * yyyy-MM → total across accounts, deduped. `accountIds` narrows to a subset
- * (one account type, say); omit it to total everything.
+ * (one account type, say); omit it to total everything. With `carryForward`, an account
+ * with no row in a month counts at its last known balance (see `carriedPerAccountMonth`).
  */
 export function monthlyTotals(
   snapshots: DatedSnapshot[],
-  accountIds?: Iterable<string>
+  accountIds?: Iterable<string>,
+  options: { carryForward?: boolean } = {}
 ): Map<string, number> {
   const only = accountIds ? new Set(accountIds) : null;
-  const byAccount = latestPerAccountMonth(snapshots);
+  const included = only ? snapshots.filter((s) => only.has(s.account_id)) : snapshots;
+  // Carried over every month in the data, not just the subset's: a type whose accounts
+  // are all still unrecorded this month still has a this-month value.
+  const allMonths = Array.from(new Set(snapshots.map((s) => monthOf(s.snapshot_date)))).sort();
+  const byAccount = options.carryForward
+    ? carriedPerAccountMonth(included, allMonths)
+    : latestPerAccountMonth(included);
   const totals = new Map<string, number>();
 
-  for (const [accountId, series] of byAccount) {
-    if (only && !only.has(accountId)) continue;
+  for (const series of byAccount.values()) {
     for (const [month, amount] of series) {
       totals.set(month, (totals.get(month) ?? 0) + amount);
     }
   }
 
-  return totals;
-}
-
-/** Total across accounts for a single month, deduped. */
-export function totalForMonth(
-  snapshots: DatedSnapshot[],
-  month: string,
-  accountIds?: Iterable<string>
-): number {
-  return monthlyTotals(snapshots, accountIds).get(month) ?? 0;
+  return new Map(Array.from(totals.entries()).sort(([a], [b]) => a.localeCompare(b)));
 }

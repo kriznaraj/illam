@@ -31,15 +31,6 @@ export class EventService extends BaseService {
     }
   }
 
-  async getEventById(id: string): Promise<Event | null> {
-    try {
-      this.validateUUID(id, 'Event ID');
-      return await this.eventRepo.findById(id);
-    } catch (error) {
-      this.handleError(error, 'get event by ID');
-    }
-  }
-
   async createEvent(data: Partial<Event>): Promise<Event> {
     try {
       this.validateRequired(data, ['name']);
@@ -77,31 +68,11 @@ export class EventService extends BaseService {
   async deleteEvent(id: string): Promise<void> {
     try {
       this.validateUUID(id, 'Event ID');
-      // TODO: Handle expenses associated with this event
-      // Options: delete them, set event_id to null, or prevent deletion
+      // Its expenses stay, with event_id cleared (ON DELETE SET NULL).
       await this.eventRepo.delete(id);
     } catch (error) {
       this.handleError(error, 'delete event');
     }
   }
 
-  async searchEvents(searchTerm: string, limit: number = 20): Promise<Event[]> {
-    try {
-      if (!searchTerm || searchTerm.trim().length === 0) {
-        throw new Error('Search term is required');
-      }
-
-      return await this.eventRepo.searchByName(searchTerm, limit);
-    } catch (error) {
-      this.handleError(error, 'search events');
-    }
-  }
-
-  async getActiveEvents(): Promise<Event[]> {
-    try {
-      return await this.eventRepo.findActive();
-    } catch (error) {
-      this.handleError(error, 'get active events');
-    }
-  }
 }

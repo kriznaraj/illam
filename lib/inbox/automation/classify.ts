@@ -48,7 +48,7 @@ export type Classification =
   | { kind: 'card_bill'; statementId: string; alreadyPaid: boolean }
   | { kind: 'transfer'; suggestedKind: TransferKind; reason: string; accountId: string | null; ruleId: string | null }
   | { kind: 'expense'; categoryId: string | null; ruleId: string | null }
-  /** Money earned, and the mail said so — recorded without review (migration 035). */
+  /** Money earned, and the mail said so — recorded without review. */
   | { kind: 'income'; incomeKind: IncomeKind; sourceName: string | null; reason: string };
 
 /**
@@ -157,7 +157,7 @@ const transfer = (
 ): Classification => ({ kind: 'transfer', suggestedKind, reason, accountId, ruleId });
 
 /**
- * Money arriving (migration 035). Before this every credit was dropped on the floor, so
+ * Money arriving. Before this every credit was dropped on the floor, so
  * INDmoney dividends were never recorded and neither was anything else that came in.
  *
  * Credits are not one thing, which is why only a dividend is booked outright: many credits

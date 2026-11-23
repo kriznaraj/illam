@@ -15,19 +15,25 @@ import { useUsers } from '@/lib/hooks/useUsers';
 import { INCOME_KIND_LABEL, INCOME_KINDS } from '@/lib/services/IncomeService';
 import { formatMoney } from '@/lib/inbox/display';
 import { formatters, getTodayAppDate, monthKeys } from '@/lib/utils/dateUtils';
-import { getUserIcon } from '@/lib/userUtils';
+import { UserIcon } from '@/components/UserIcon';
 import type { IncomeKind, IncomeWithUser } from '@/types';
+import { Wallet, Briefcase, TrendingUp, Landmark, Undo2, Receipt, House, Gift, type LucideIcon } from 'lucide-react';
 
-const KIND_ICON: Record<IncomeKind, string> = {
-  salary: '💼',
-  dividend: '📈',
-  interest: '🏦',
-  refund: '↩️',
-  reimbursement: '🧾',
-  rent: '🏠',
-  gift: '🎁',
-  other: '💰',
+const KIND_ICON: Record<IncomeKind, LucideIcon> = {
+  salary: Briefcase,
+  dividend: TrendingUp,
+  interest: Landmark,
+  refund: Undo2,
+  reimbursement: Receipt,
+  rent: House,
+  gift: Gift,
+  other: Wallet,
 };
+
+function KindIcon({ kind }: { kind: IncomeKind }) {
+  const Icon = KIND_ICON[kind];
+  return <Icon size={18} aria-hidden />;
+}
 
 interface FormState {
   id: string | null;
@@ -50,9 +56,9 @@ const blankForm = (userId: string): FormState => ({
 });
 
 /**
- * Selavu · Income (migration 035).
+ * Expenses · Income.
  *
- * Totals are shown per currency and never added together: the dividends Madal records arrive
+ * Totals are shown per currency and never added together: the dividends the inbox records arrive
  * in USD inside the INDmoney wallet, and this app holds no exchange rate to turn them into
  * rupees with — a converted figure here would be invented.
  */
@@ -157,7 +163,7 @@ export default function IncomePage() {
                 key={`${row.kind}-${row.currency}`}
                 className="px-2 py-1 rounded-full bg-green-50 text-green-800 text-xs font-medium"
               >
-                {KIND_ICON[row.kind]} {INCOME_KIND_LABEL[row.kind]} · {formatMoney(row.amount, row.currency)}
+                {INCOME_KIND_LABEL[row.kind]} · {formatMoney(row.amount, row.currency)}
               </span>
             ))}
           </div>
@@ -168,9 +174,9 @@ export default function IncomePage() {
         <LoadingSpinner message="Loading income..." />
       ) : income.length === 0 ? (
         <EmptyState
-          icon="💰"
+          icon={Wallet}
           title="Nothing recorded this month"
-          description="Income you add here, and credits you classify in Madal, both land in this list."
+          description="Income you add here, and credits you classify in the inbox, both land in this list."
           action={{ label: 'Add income', onClick: openAdd }}
         />
       ) : (
@@ -181,18 +187,18 @@ export default function IncomePage() {
               onClick={() => openEdit(row)}
               isLast={index === income.length - 1}
               leading={
-                <span className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-lg flex-shrink-0" aria-hidden>
-                  {KIND_ICON[row.kind]}
+                <span className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-green-700 flex-shrink-0" aria-hidden>
+                  <KindIcon kind={row.kind} />
                 </span>
               }
               title={row.source_name || INCOME_KIND_LABEL[row.kind]}
               subtitle={`${formatters.toFullDate(row.date)} · ${INCOME_KIND_LABEL[row.kind]}${
-                row.source === 'inbox' ? ' · from Madal' : ''
+                row.source === 'inbox' ? ' · from inbox' : ''
               }`}
               meta={
                 row.user ? (
                   <span className="text-[11px] text-gray-500">
-                    {getUserIcon(row.user)} {row.user.full_name}
+                    <UserIcon user={row.user} size={12} /> {row.user.full_name}
                   </span>
                 ) : null
               }

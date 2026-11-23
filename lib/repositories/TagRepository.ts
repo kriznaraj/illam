@@ -48,30 +48,6 @@ export class TagRepository extends BaseRepository<Tag> {
   }
 
   /**
-   * Find tags by type (shared or personal)
-   */
-  async findByType(type: 'shared' | 'personal', userId?: string): Promise<Tag[]> {
-    const isShared = type === 'shared';
-
-    let query = this.supabase
-      .from(this.tableName)
-      .select(this.getSelectQuery())
-      .eq('is_shared', isShared);
-
-    if (type === 'personal' && userId) {
-      query = query.eq('user_id', userId);
-    }
-
-    const { data, error } = await query.order('name');
-
-    if (error) {
-      throw new Error(`Failed to fetch tags by type: ${error.message}`);
-    }
-
-    return (data as unknown as Tag[]) || [];
-  }
-
-  /**
    * Find tags for a specific user (personal + shared)
    */
   async findForUser(userId: string): Promise<Tag[]> {
@@ -88,41 +64,4 @@ export class TagRepository extends BaseRepository<Tag> {
     return (data as unknown as Tag[]) || [];
   }
 
-  /**
-   * Search tags by name
-   */
-  async searchByName(searchTerm: string, limit: number = 20): Promise<Tag[]> {
-    const { data, error } = await this.supabase
-      .from(this.tableName)
-      .select(this.getSelectQuery())
-      .ilike('name', `%${searchTerm}%`)
-      .order('name')
-      .limit(limit);
-
-    if (error) {
-      throw new Error(`Failed to search tags: ${error.message}`);
-    }
-
-    return (data as unknown as Tag[]) || [];
-  }
-
-  /**
-   * Get popular tags (used most frequently)
-   */
-  async getPopular(limit: number = 10): Promise<Tag[]> {
-    // This would require joining with expense_tags and counting
-    // For now, return all tags sorted by name
-    // TODO: Implement proper popularity counting
-    const { data, error } = await this.supabase
-      .from(this.tableName)
-      .select(this.getSelectQuery())
-      .order('name')
-      .limit(limit);
-
-    if (error) {
-      throw new Error(`Failed to fetch popular tags: ${error.message}`);
-    }
-
-    return (data as unknown as Tag[]) || [];
-  }
 }

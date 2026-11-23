@@ -1,8 +1,8 @@
 import type { InboxItem, InboxTransactionData } from '@/types';
 
 /**
- * Banks sometimes send one alert twice, as two Gmail messages seconds apart — seen
- * live for both ICICI and HDFC. Acting on both adds the spend twice.
+ * Banks sometimes send one alert twice, as two Gmail messages seconds apart (ICICI and
+ * HDFC both do). Acting on both adds the spend twice.
  */
 export const DUPLICATE_ALERT_WINDOW_MS = 120_000;
 

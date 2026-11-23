@@ -14,9 +14,6 @@ class TestService extends BaseService {
   positive(value: number, field: string) {
     return this.validatePositiveNumber(value, field);
   }
-  nonNegative(value: number, field: string) {
-    return this.validateNonNegativeNumber(value, field);
-  }
   date(value: string, field: string) {
     return this.validateDate(value, field);
   }
@@ -82,24 +79,6 @@ describe('validatePositiveNumber', () => {
     expect(() => service.positive('12' as unknown as number, 'Amount')).toThrow(
       'Amount must be a valid number'
     );
-  });
-});
-
-describe('validateNonNegativeNumber', () => {
-  it('accepts zero', () => {
-    expect(() => service.nonNegative(0, 'Balance')).not.toThrow();
-  });
-
-  it('accepts a positive number', () => {
-    expect(() => service.nonNegative(10, 'Balance')).not.toThrow();
-  });
-
-  it('rejects a negative number', () => {
-    expect(() => service.nonNegative(-0.01, 'Balance')).toThrow('Balance must be 0 or greater');
-  });
-
-  it('rejects NaN', () => {
-    expect(() => service.nonNegative(NaN, 'Balance')).toThrow('Balance must be a valid number');
   });
 });
 

@@ -41,7 +41,7 @@ export class CreditCardStatementService extends BaseService {
    * A statement total is money owed and `statement_amount` is always positive, so
    * this goes through PortfolioSnapshotService rather than the repository, keeping
    * the liability sign normalised in exactly one place. See
-   * lib/portfolio/liabilities.ts and migration 028.
+   * lib/portfolio/liabilities.ts.
    */
   private async syncSnapshot(accountId: string, snapshotMonth: string, statementAmount: number) {
     await this.snapshots.upsert({
@@ -55,12 +55,10 @@ export class CreditCardStatementService extends BaseService {
   /**
    * Set an account's snapshot for `month` from the best statement available.
    *
-   * A card's statement for the month being viewed usually does not exist yet —
-   * billing cycles land mid-month and September's statements had not been issued at
-   * all — so requiring an exact month match made the Sync button on
-   * /portfolio/snapshots fail with "No statement found for this month" for every
-   * card, every time, on the month the page opens to. The newest statement at or
-   * before the end of `month` is the best balance there is for that month.
+   * A card's statement for the month being viewed usually does not exist yet
+   * (billing cycles land mid-month), so an exact month match would fail on the
+   * current month. The newest statement at or before the end of `month` is the
+   * best balance there is for that month.
    */
   async syncSnapshotForMonth(accountId: string, month: string) {
     try {
@@ -160,8 +158,6 @@ export class CreditCardStatementService extends BaseService {
   async list(accountId: string, month?: string | null) {
     try {
       this.validateUUID(accountId, 'accountId');
-      // `month` used to set a row limit and never actually filter, so callers asking
-      // for one month silently received the three most recent statements instead.
       const { data: statements, error } = await this.repo.listForAccount(
         accountId,
         month ? { month } : {}
@@ -186,13 +182,18 @@ export class CreditCardStatementService extends BaseService {
         return { status: 400 as const, body: { error: 'Missing required fields' } };
       }
 
+      // Queried by month, not among the latest few: a back-dated statement must still find
+      // the one already recorded for its month.
       const billingMonthStr = String(statement_date).slice(0, 7);
-      const { data: recentStmts } = await this.repo.listForAccount(String(account_id), { limit: 3 });
-      const existing = (recentStmts ?? []).find((s: any) => String(s.statement_date).slice(0, 7) === billingMonthStr) ?? null;
-      if (existing) {
+      const { data: sameMonth, error: lookupError } = await this.repo.listForAccount(String(account_id), {
+        month: billingMonthStr,
+        limit: 1,
+      });
+      if (lookupError) throw new Error(lookupError.message);
+      if ((sameMonth ?? []).length > 0) {
         return {
           status: 409 as const,
-          body: { error: `A statement already exists for this billing month (${String(statement_date).slice(0, 7)}). Edit the existing statement instead.` },
+          body: { error: `A statement already exists for this billing month (${billingMonthStr}). Edit the existing statement instead.` },
         };
       }
 

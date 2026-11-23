@@ -7,11 +7,11 @@
  *
  * - `"all times. If you have not done above transaction, please i…"` — extractor v4's
  *   `at (.+?) on \d` had the whole mail to roam over, and with no real "at MERCHANT on
- *   DATE" in an HDFC NEFT/IMPS alert it latched onto the safety footer. 9 inbox items
- *   and 7 transfers carry it. Nothing is recoverable: it degrades to null.
+ *   DATE" in an HDFC NEFT/IMPS alert it latched onto the safety footer. Nothing is
+ *   recoverable: it degrades to null.
  * - `"11:46:22. Info: AMAZON PAY IN E COMMERCE. The Available Cre…"` — the same pattern
  *   on an ICICI card alert, which starts at the clock time. The payee *is* in there,
- *   after `Info:`, which is where ICICI puts it. 11 rows, all salvageable.
+ *   after `Info:`, which is where ICICI puts it, so it is salvageable.
  * - `"Microsoft Corporation Common Stock | Check Now View dividen…"` — an INDmoney
  *   subject that ran into the body through a layout pipe. Cut at the pipe and the
  *   payer is intact.

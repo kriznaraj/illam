@@ -98,9 +98,8 @@ export class PortfolioInsightsService extends BaseService {
             insightCount: insights.length,
           },
           insights,
-          // The page reads this and previously always got '' — the API never sent it.
           analysisMonth: analysisMonthKey,
-          // Nothing here has ever called lib/ai. The page used to claim "AI-powered".
+          // Rule-based only; lib/ai is not used for portfolio insights.
           generatedBy: 'rules' as const,
           hasData,
         },

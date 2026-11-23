@@ -7,19 +7,13 @@ import Link from 'next/link';
 import { PageContainer } from '@/components/PageContainer';
 import Toast from '@/components/Toast';
 import { useCachedFetch, invalidateCache } from '@/lib/useClientCache';
-import { Receipt, TrendingUp, FileText, CheckSquare, CalendarClock, Mail } from 'lucide-react';
-
-/** The module tiles under the dashboard. Tamil names, with what each one is for. */
-const MODULE_TILES = [
-  { href: '/expenses', name: 'Selavu', hint: 'Spending', Icon: Receipt, tone: 'bg-blue-50 text-blue-600' },
-  { href: '/portfolio', name: 'Selvam', hint: 'Wealth & net worth', Icon: TrendingUp, tone: 'bg-emerald-50 text-emerald-600' },
-  { href: '/inbox', name: 'Madal', hint: 'Bank mail inbox', Icon: Mail, tone: 'bg-amber-50 text-amber-600' },
-  { href: '/activity-tracker', name: 'Activity', hint: 'Dates & habits', Icon: CalendarClock, tone: 'bg-indigo-50 text-indigo-600' },
-  { href: '/notes', name: 'Kurippu', hint: 'Notes', Icon: FileText, tone: 'bg-purple-50 text-purple-600' },
-  { href: '/todos', name: 'Seyal', hint: 'To-dos', Icon: CheckSquare, tone: 'bg-orange-50 text-orange-600' },
-] as const;
 import { useInboxAttention } from '@/lib/hooks/useInbox';
+import { useAuth } from '@/lib/AuthContext';
 import { describeActionBy, itemIdentity, KIND_META, ownerLabel } from '@/lib/inbox/display';
+import { CASH_FLOW, EXPENSES, INBOX, MORE_ITEMS, NET_WORTH } from '@/lib/navigation';
+
+/** Shortcuts to every section, under the dashboard. */
+const SECTION_TILES = [EXPENSES, NET_WORTH, INBOX, CASH_FLOW, ...MORE_ITEMS];
 
 interface HomeStats {
   monthlyExpenses: number;
@@ -39,6 +33,11 @@ interface HomeStats {
 
 const fetchStats = () => fetch(`/api/home-stats?t=${Date.now()}`).then(r => r.json()) as Promise<HomeStats>;
 
+function KindIcon({ kind }: { kind: keyof typeof KIND_META }) {
+  const Icon = KIND_META[kind].icon;
+  return <Icon size={16} className="flex-shrink-0 text-gray-500" aria-hidden />;
+}
+
 export default function HomePage() {
   const { data: stats, loading, refresh } = useCachedFetch<HomeStats>(
     'home-stats',
@@ -47,17 +46,16 @@ export default function HomePage() {
   );
   const [showToast, setShowToast] = useState(false);
   const inbox = useInboxAttention(3);
+  const { currentUser } = useAuth();
 
-  // Memoize personalized greeting to avoid recalculating on every render
-  const personalizedGreeting = useMemo(() => {
+  // Worked out once per page load.
+  const greeting = useMemo(() => {
     const hour = new Date().getHours();
-    const day = new Date().getDay();
-    if (day === 0 || day === 6) return '🌟 Happy Weekend!';
-    if (hour < 12) return '☀️ Good Morning!';
-    if (hour < 17) return '🌤️ Good Afternoon!';
-    if (hour < 21) return '🌆 Good Evening!';
-    return '🌙 Good Night!';
-  }, []); // Empty deps - greeting only calculated once per page load
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  }, []);
+  const firstName = currentUser?.full_name?.split(' ')[0];
 
   useEffect(() => {
     const handleExpenseAdded = () => {
@@ -87,23 +85,22 @@ export default function HomePage() {
 
   return (
     <PageContainer maxWidth="7xl">
-      {/* Hero Section */}
       <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">
-          {personalizedGreeting}
+        <h1 className="text-2xl md:text-[1.75rem] font-semibold text-gray-900">
+          {greeting}{firstName ? `, ${firstName}` : ''}
         </h1>
-        <p className="text-gray-600 text-sm">{getCurrentMonthString()}</p>
+        <p className="text-sm text-gray-500 mt-1">{getCurrentMonthString()}</p>
       </div>
 
-      {/* Madal: what is still waiting on someone */}
+      {/* Inbox: what is still waiting on someone */}
       {inbox.count > 0 && (
-        <div className="card mb-6 border border-amber-100 bg-amber-50/40">
+        <div className="card mb-6 border-amber-200 bg-amber-50">
           <div className="flex justify-between items-center gap-3">
-            <h2 className="text-base font-bold text-gray-900 min-w-0">
+            <h2 className="text-base font-semibold text-gray-900 min-w-0">
               {inbox.count} thing{inbox.count === 1 ? '' : 's'} waiting on you
             </h2>
-            <Link href="/inbox?view=todo" className="text-sm text-blue-600 hover:text-blue-800 whitespace-nowrap">
-              Open Madal →
+            <Link href="/inbox?view=todo" className="text-sm font-medium text-primary-700 hover:underline whitespace-nowrap">
+              Open inbox →
             </Link>
           </div>
           <div className="mt-3 space-y-2">
@@ -113,9 +110,9 @@ export default function HomePage() {
                 <Link
                   key={item.id}
                   href="/inbox?view=todo"
-                  className="flex items-center gap-2 rounded-lg bg-white/80 border border-amber-100 px-3 py-2"
+                  className="flex items-center gap-2 rounded-lg bg-white border border-amber-100 px-3 py-2"
                 >
-                  <span aria-hidden>{KIND_META[item.kind].icon}</span>
+                  <KindIcon kind={item.kind} />
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-gray-900 truncate">{itemIdentity(item).headline}</p>
                     <p className="text-xs text-gray-500 mt-0.5 truncate">
@@ -131,19 +128,18 @@ export default function HomePage() {
 
       {/* Today's Todos */}
       {!loading && (stats?.todayTodoCount || 0) > 0 && (
-        <div className="card mb-6 border border-orange-100 bg-orange-50/40">
+        <div className="card mb-6">
           <div className="flex justify-between items-center gap-3">
             <div className="min-w-0">
-              <h2 className="text-base font-bold text-gray-900">{stats?.todayTodoCount} task{stats?.todayTodoCount === 1 ? '' : 's'} due today</h2>
-
+              <h2 className="text-base font-semibold text-gray-900">{stats?.todayTodoCount} task{stats?.todayTodoCount === 1 ? '' : 's'} due today</h2>
             </div>
-            <Link href="/todos" className="text-sm text-blue-600 hover:text-blue-800 whitespace-nowrap">
-              View All →
+            <Link href="/todos" className="text-sm font-medium text-primary-700 hover:underline whitespace-nowrap">
+              View all →
             </Link>
           </div>
           <div className="mt-3 space-y-2">
             {stats?.todayTodos?.slice(0, 3).map((todo) => (
-              <div key={todo.id} className="rounded-lg bg-white/80 border border-orange-100 px-3 py-2">
+              <div key={todo.id} className="rounded-lg border border-gray-100 px-3 py-2">
                 <p className="text-sm font-medium text-gray-900 truncate">{todo.title}</p>
                 <p className="text-xs text-gray-500 mt-0.5">
                   {todo.status === 'in_progress' ? 'In progress' : 'Pending'}
@@ -156,8 +152,8 @@ export default function HomePage() {
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-        <Link href="/expenses" className="card hover:shadow-md transition-shadow">
-          <div className="text-xs text-gray-600 mb-1">This Month</div>
+        <Link href="/expenses" className="card card-hover">
+          <div className="text-xs text-gray-500 mb-1">Spent this month</div>
           {loading ? (
             <div className="animate-pulse space-y-1.5">
               <div className="h-7 bg-gray-200 rounded w-32" />
@@ -165,7 +161,7 @@ export default function HomePage() {
             </div>
           ) : (
             <>
-              <div className="text-xl font-bold text-gray-900">
+              <div className="text-xl font-semibold text-gray-900 tabular-nums">
                 {formatCurrency(stats?.monthlyExpenses || 0)}
               </div>
               <div className="text-xs text-gray-500 mt-1">{stats?.expenseCount || 0} {stats?.expenseCount === 1 ? 'expense' : 'expenses'}</div>
@@ -173,8 +169,8 @@ export default function HomePage() {
           )}
         </Link>
 
-        <Link href="/portfolio" className="card hover:shadow-md transition-shadow">
-          <div className="text-xs text-gray-600 mb-1">Net Worth</div>
+        <Link href="/portfolio" className="card card-hover">
+          <div className="text-xs text-gray-500 mb-1">Net worth</div>
           {loading ? (
             <div className="animate-pulse space-y-1.5">
               <div className="h-7 bg-gray-200 rounded w-36" />
@@ -182,7 +178,7 @@ export default function HomePage() {
             </div>
           ) : (
             <>
-              <div className="text-xl font-bold text-gray-900">
+              <div className="text-xl font-semibold text-gray-900 tabular-nums">
                 {formatCurrency(stats?.netWorth || 0)}
               </div>
               <div className={`text-xs mt-1 ${(stats?.netWorthGrowth || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
@@ -196,9 +192,9 @@ export default function HomePage() {
       {/* Recent Expenses */}
       <div className="card">
         <div className="flex justify-between items-center mb-3">
-          <h2 className="text-base font-bold text-gray-900">Recent Expenses</h2>
-          <Link href="/expenses" className="text-sm text-blue-600 hover:text-blue-800">
-            View All →
+          <h2 className="text-base font-semibold text-gray-900">Recent expenses</h2>
+          <Link href="/expenses" className="text-sm font-medium text-primary-700 hover:underline">
+            View all →
           </Link>
         </div>
         {loading ? (
@@ -235,7 +231,7 @@ export default function HomePage() {
                     <p className="text-xs text-gray-500">{formatDate(expense.date)}</p>
                   </div>
                 </div>
-                <span className="font-bold text-gray-900 text-sm ml-3">
+                <span className="font-semibold text-gray-900 text-sm ml-3 tabular-nums">
                   {formatCurrency(parseFloat(expense.amount.toString()))}
                 </span>
               </div>
@@ -246,19 +242,14 @@ export default function HomePage() {
         )}
       </div>
 
-      {/* Modules */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mt-6">
-        {MODULE_TILES.map(({ href, name, hint, Icon, tone }) => (
-          <Link
-            key={href}
-            href={href}
-            className="card flex items-center gap-3 py-3.5 px-4 hover:shadow-md hover:-translate-y-px transition-all"
-          >
-            <span className={`flex h-10 w-10 flex-none items-center justify-center rounded-xl ${tone}`}>
-              <Icon size={20} />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
+        {SECTION_TILES.map(({ href, label, hint, icon: Icon }) => (
+          <Link key={href} href={href} className="card card-hover flex items-center gap-3 !p-3.5">
+            <span className="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-primary-50 text-primary-700">
+              <Icon size={18} aria-hidden />
             </span>
             <span className="min-w-0">
-              <span className="block text-sm font-semibold text-gray-900">{name}</span>
+              <span className="block text-sm font-medium text-gray-900">{label}</span>
               <span className="block text-xs text-gray-500 truncate">{hint}</span>
             </span>
           </Link>
@@ -268,7 +259,7 @@ export default function HomePage() {
       {/* Toast Notification */}
       {showToast && (
         <Toast
-          message="✓ Expense added successfully!"
+          message="Expense added"
           type="success"
           onClose={() => setShowToast(false)}
         />

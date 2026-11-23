@@ -37,7 +37,7 @@ export interface IncomeSummary {
 }
 
 /**
- * Income (migration 035).
+ * Income.
  *
  * Totals are grouped by currency and never converted. The six live dividends are USD paid
  * inside the INDmoney wallet; turning them into rupees here would need a rate this app does
@@ -58,12 +58,6 @@ export class IncomeService extends BaseService {
     const [year, m] = month.split('-').map(Number);
     const lastDay = new Date(Date.UTC(year, m, 0)).getUTCDate();
     return this.income.findByDateRange(`${month}-01`, `${month}-${String(lastDay).padStart(2, '0')}`);
-  }
-
-  async listRange(startDate: string, endDate: string): Promise<IncomeWithUser[]> {
-    this.validateDate(startDate, 'startDate');
-    this.validateDate(endDate, 'endDate');
-    return this.income.findByDateRange(startDate, endDate);
   }
 
   summarise(rows: IncomeWithUser[], month: string): IncomeSummary {
@@ -114,7 +108,6 @@ export class IncomeService extends BaseService {
       user_id: input.user_id,
       account_id: input.account_id ?? null,
       inbox_item_id: input.inbox_item_id ?? null,
-      // Only when set: before migration 037 the column does not exist, and a hand entry must still save.
       ...(input.statement_ref ? { statement_ref: input.statement_ref } : {}),
       source: input.source ?? 'manual',
       needs_review: input.needs_review ?? false,

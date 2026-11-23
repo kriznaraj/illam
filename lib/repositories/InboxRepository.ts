@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { BaseRepository } from './BaseRepository';
 import type { InboxConsumed, InboxItem, InboxKind, InboxOwner, InboxView } from '@/types';
+import { parseTodoFrom } from '@/lib/inbox/todoFrom';
 
 /** Everything ingestion writes. `status` and `consumed` belong to the user and to follow-ups. */
 export type InboxItemWrite = Omit<InboxItem, 'id' | 'status' | 'consumed' | 'created_at' | 'updated_at'>;
@@ -35,22 +36,17 @@ export interface InboxListFilter {
  */
 const MAX_OPEN_IDS = 200;
 
-/**
- * The To-do view starts here: anything older is ignored.
- * Whatever was left open before it is history nobody will act on, and it was burying the
- * handful of things that are current. The rows are untouched and still in Money and All.
- */
-export const TODO_FROM = '2026-09-01T00:00:00+05:30';
+/** The To-do view starts here (`ILLAM_TODO_FROM`, see lib/inbox/todoFrom.ts). Older rows stay in Money and All. */
+export const TODO_FROM = parseTodoFrom(process.env.ILLAM_TODO_FROM);
 
-/**
+/*
  * Only decisions belong in the To-do (the rule: no manual action item unless Claude couldn't
  * resolve it). A card bill is not one — paying it is detected — until its due
  * date passes with no payment seen. A notice (KYC, a limit change) is not one either: it is an
  * errand outside the app, so it is listed under Heads-up and never counted. A transaction's
  * ingest flag ("Large debit") is not work; what automation could not settle arrives through
- * `openItemIds`.
+ * `openItemIds`. See `applyView`'s 'todo' case.
  */
-export const TODO_FLAGGED_KINDS: readonly InboxKind[] = ['card_statement'];
 
 /** How a statement's contradiction flag starts (StatementCaptureService) — that one is work, not news. */
 export const CONTRADICTION_PREFIX = 'Statement says';

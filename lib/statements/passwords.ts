@@ -35,8 +35,7 @@ export function configuredPasswordSources(
     const parsed = JSON.parse(raw) as Record<string, unknown>;
     const sources = Object.keys(parsed).filter((key) => asList(parsed[key]).length > 0);
     // Length and character classes only: enough to tell whether the deployed value is
-    // the one someone typed, without the value itself. The first live mismatch (a
-    // Production value differing from the edited one) was invisible without it.
+    // the one someone typed, without the value itself.
     const shapes = Object.fromEntries(sources.map((key) => [key, asList(parsed[key]).map(passwordShape)]));
     return { configured: true, valid: true, sources, shapes };
   } catch {

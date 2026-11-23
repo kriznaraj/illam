@@ -4,13 +4,13 @@ import pdfjsModule from 'pdf-parse/lib/pdf.js/v1.10.100/build/pdf.js';
  * Text out of a statement PDF, unlocking it when it is password-protected.
  *
  * Two readers, tried in order:
- *  1. the pdf.js 1.10 build bundled inside pdf-parse — already in production for
+ *  1. the pdf.js 1.10 build bundled inside pdf-parse — also used by
  *     /api/portfolio/convert-cdsl-pdf, and enough for many files;
  *  2. a current pdf.js via unpdf, whenever the first reports locked or fails.
  *
- * The fallback exists because the first live capture (2026-09-14) could not open
- * the CDSL CAS (AES, R4/R5) with the PAN the email names as its password, while
- * generated RC4 and AES-256 files opened fine. Each candidate is also tried in
+ * The fallback exists because the bundled build cannot open some AES (R4/R5)
+ * files, such as the CDSL CAS, even with the right password, while RC4 and
+ * AES-256 files open fine. Each candidate is also tried in
  * upper and lower case, since "PAN" rules rarely say which.
  */
 

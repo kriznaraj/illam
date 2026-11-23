@@ -17,6 +17,7 @@ import { SegmentedControl } from '@/components/SegmentedControl';
 import { findStaleAccounts } from '@/lib/portfolio/staleness';
 import { latestRowPerAccountMonth } from '@/lib/portfolio/monthlySnapshots';
 import { statementLabel, type LateStatement } from '@/lib/inbox/statementCadence';
+import { MailX, Snowflake, Landmark, CircleCheck } from 'lucide-react';
 
 /** recorded = a value saved for this month; carried = last known value shown in its place. */
 type RowStatus = 'recorded' | 'carried' | 'missing';
@@ -511,7 +512,7 @@ export default function PortfolioSnapshotsPage() {
           <div className="min-w-0">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
               Net worth
-              {refreshing && <span className="ml-2 normal-case tracking-normal text-blue-600">Updating…</span>}
+              {refreshing && <span className="ml-2 normal-case tracking-normal text-primary-600">Updating…</span>}
             </p>
             <p className="text-2xl sm:text-3xl font-bold text-gray-900 tabular-nums">
               {formatCurrency(totalValue)}
@@ -560,7 +561,7 @@ export default function PortfolioSnapshotsPage() {
       {lateStatements.length > 0 && (
         <div className="mb-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3">
           <p className="flex items-center gap-2 text-xs text-rose-900">
-            <span aria-hidden className="text-base">📭</span>
+            <MailX size={16} className="flex-shrink-0" aria-hidden />
             <span>
               <span className="font-semibold">
                 {lateStatements.length} statement{lateStatements.length === 1 ? '' : 's'} not received
@@ -594,7 +595,7 @@ export default function PortfolioSnapshotsPage() {
             aria-expanded={showStale}
             className="flex w-full items-center gap-3 px-4 py-3 text-left"
           >
-            <span aria-hidden className="text-base">🧊</span>
+            <Snowflake size={16} className="flex-shrink-0 text-amber-900" aria-hidden />
             <span className="min-w-0 flex-1 text-xs text-amber-900">
               <span className="font-semibold">{staleAccounts.length} accounts</span> unchanged for 3+ months ·{' '}
               {formatCompactCurrency(staleAccounts.reduce((sum, a) => sum + Math.abs(a.amount), 0))}
@@ -620,7 +621,7 @@ export default function PortfolioSnapshotsPage() {
 
       {accounts.length === 0 ? (
         <div className="card py-16 text-center">
-          <p className="mb-3 text-4xl">🏦</p>
+          <Landmark size={20} className="mx-auto mb-3 text-gray-400" aria-hidden />
           <p className="mb-1 font-semibold text-gray-900">No accounts yet</p>
           <p className="mb-5 text-sm text-gray-500">Create accounts before recording snapshots.</p>
           <a href="/portfolio/settings" className="btn btn-primary btn-sm">Go to Settings</a>
@@ -645,7 +646,7 @@ export default function PortfolioSnapshotsPage() {
 
           {groups.length === 0 ? (
             <div className="card py-12 text-center">
-              <p className="mb-2 text-3xl">✅</p>
+              <CircleCheck size={20} className="mx-auto mb-2 text-green-600" aria-hidden />
               <p className="font-semibold text-gray-900">
                 {filter === 'todo' ? 'Nothing left for this month' : 'Nothing recorded yet'}
               </p>
@@ -737,7 +738,7 @@ export default function PortfolioSnapshotsPage() {
                               tabIndex={isSyncOnly ? undefined : 0}
                               aria-label={isSyncOnly ? undefined : `Record ${account.name} for this month`}
                               className={`flex items-center gap-3 px-4 py-2.5 transition ${
-                                isSyncOnly ? '' : 'cursor-pointer hover:bg-blue-50/50'
+                                isSyncOnly ? '' : 'cursor-pointer hover:bg-primary-50/50'
                               }`}
                             >
                               <span
@@ -908,9 +909,9 @@ export default function PortfolioSnapshotsPage() {
 
                 {/* Computed Total */}
                 {units && price && !isNaN(parseFloat(units)) && !isNaN(parseFloat(price)) && (
-                  <div className="rounded-xl bg-blue-50 p-4">
-                    <p className="text-xs font-medium text-blue-600 mb-1">Total Value</p>
-                    <p className="text-xl font-bold text-blue-900">
+                  <div className="rounded-xl bg-primary-50 p-4">
+                    <p className="text-xs font-medium text-primary-600 mb-1">Total Value</p>
+                    <p className="text-xl font-bold text-primary-900">
                       {formatCurrency(parseFloat(units) * parseFloat(price))}
                     </p>
                   </div>

@@ -3,7 +3,7 @@ import { isUndecidedCategory } from './merchantHistory';
 
 /**
  * The shared label stamped on every expense the app created for you rather than one you
- * typed — a bank alert through Madal, or a line off a card statement (migration 036).
+ * typed — a bank alert through Madal, or a line off a card statement.
  *
  * It is provenance, not a to-do: it stays on the row after you confirm it, so months later
  * "where did this come from?" is answerable, and so the list can be filtered down to
@@ -11,9 +11,6 @@ import { isUndecidedCategory } from './merchantHistory';
  * to-do, and that one clears.
  */
 export const AUTO_TAG_NAME = 'auto';
-
-/** Amber, matching the review chip — the two always appear together on a fresh row. */
-export const AUTO_TAG_COLOR = '#f59e0b';
 
 export function isAutoTag(tag: Pick<Tag, 'name'>): boolean {
   return tag.name.toLowerCase() === AUTO_TAG_NAME;

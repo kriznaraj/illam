@@ -15,7 +15,7 @@ function appTime(at: Date): string {
 }
 
 /**
- * When a spend happened, for the expense row (migration 038).
+ * When a spend happened, for the expense row.
  *
  * The time the bank printed, when it printed one (card alerts do). Otherwise the alert's arrival,
  * marked approximate: UPI alerts print no time but arrive within seconds of the debit. Only
@@ -28,10 +28,4 @@ export function spendTime(data: Pick<InboxTransactionData, 'txnDate' | 'txnTime'
   if (Number.isNaN(arrived.getTime())) return null;
   if (data.txnDate && toAppTimezoneDate(arrived) !== data.txnDate) return null;
   return { spent_time: appTime(arrived), spent_time_approx: true };
-}
-
-/** Whether a write failed only because migration 038 has not run yet. */
-export function isSpendTimeColumnMissing(error: unknown): boolean {
-  const message = error instanceof Error ? error.message : String(error ?? '');
-  return /spent_time/.test(message) && /could not find|does not exist|schema cache/i.test(message);
 }

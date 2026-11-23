@@ -117,7 +117,7 @@ const getInvestmentBadge = (kind: InvestmentListRow['kind']): { label: 'Recurrin
   if (kind === 'sip_auto' || kind === 'auto_recurring' || kind === 'recurring') {
     return { label: 'Recurring', className: 'text-purple-600' };
   }
-  return { label: 'Adhoc', className: 'text-blue-600' };
+  return { label: 'Adhoc', className: 'text-primary-600' };
 };
 
 const TREND_CATEGORY_COLORS = [
@@ -581,7 +581,7 @@ export default function PortfolioInvestmentsPage() {
   return (
     <PageContainer maxWidth="7xl">
       <PageHeader
-        title="Investment Tracker"
+        title="Investments"
         description={toMonthLabel(selectedMonth)}
         action={
           <button
@@ -599,12 +599,12 @@ export default function PortfolioInvestmentsPage() {
         </div>
       )}
       {loading && !isInitialLoading && (
-        <div className="mb-4 rounded-lg border border-blue-100 bg-blue-50 px-4 py-2 text-xs text-blue-700">
+        <div className="mb-4 rounded-lg border border-primary-100 bg-primary-50 px-4 py-2 text-xs text-primary-700">
           Updating investments...
         </div>
       )}
       {!loading && visibleRows.length === 0 && previousActiveMonth && (
-        <div className="mb-4 flex items-center justify-between gap-2 rounded-lg border border-blue-100 bg-blue-50 px-4 py-2.5 text-sm text-blue-700">
+        <div className="mb-4 flex items-center justify-between gap-2 rounded-lg border border-primary-100 bg-primary-50 px-4 py-2.5 text-sm text-primary-700">
           <span>No investments in {toMonthLabel(selectedMonth)}.</span>
           <button
             type="button"
@@ -796,7 +796,7 @@ export default function PortfolioInvestmentsPage() {
                             {dayRows.length} investment{dayRows.length !== 1 ? 's' : ''}
                           </p>
                         </div>
-                        <p className="text-base font-bold text-blue-900">{formatCurrency(dayTotal)}</p>
+                        <p className="text-base font-bold text-primary-900">{formatCurrency(dayTotal)}</p>
                       </div>
                       <div className="space-y-2">
                         {dayRows.map((row) => (
@@ -1038,7 +1038,7 @@ export default function PortfolioInvestmentsPage() {
                           {dayRows.length} investment{dayRows.length !== 1 ? 's' : ''}
                         </p>
                       </div>
-                      <p className="text-base font-bold text-blue-900">{formatCurrency(dayTotal)}</p>
+                      <p className="text-base font-bold text-primary-900">{formatCurrency(dayTotal)}</p>
                     </div>
                     <div className="space-y-2">
                       {dayRows.map((row) => (

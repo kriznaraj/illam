@@ -112,7 +112,7 @@ const isPdf = (a: InboxIngestAttachment) => a.contentType === 'application/pdf' 
 /**
  * Statement PDFs that arrive with an email: unlocked in memory, then
  *  - recorded, when the source has a reader (card statements → credit_card_statements);
- *  - sampled (TEMPORARY, migration 031), while INBOX_CAPTURE_STATEMENT_TEXT=1, so
+ *  - sampled, while INBOX_CAPTURE_STATEMENT_TEXT=1, so
  *    readers for the other sources can be written against their real layout.
  * A locked PDF is sampled without text, with the email's password hint.
  */
@@ -344,7 +344,7 @@ export class StatementCaptureService extends BaseService {
   }
 
   /**
-   * Money in and commitments, read off the statement's lines (migration 037): salary, interest
+   * Money in and commitments, read off the statement's lines: salary, interest
    * and dividends become income; a premium or EMI is recorded against its commitment. Returns
    * what to say on the Madal item. Best-effort: the balances are already applied.
    */

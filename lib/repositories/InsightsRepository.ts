@@ -37,9 +37,8 @@ export class InsightsRepository {
   }
 
   /**
-   * Every expense in the window, auto-added ones included (migration 036). They used to be
-   * filtered out until confirmed, which meant a month whose review queue was never worked
-   * read as a cheap month and dragged the baseline down with it.
+   * Every expense in the window, auto-added ones included: leaving out unconfirmed ones
+   * would make a month whose review queue was never worked read as a cheap month.
    */
   async listExpensesWithCategory(startDate: string, endDate: string) {
     return await this.supabase

@@ -32,17 +32,6 @@ export class CategoryService extends BaseService {
     }
   }
 
-  async getCategoriesByGroup(groupName: string): Promise<Category[]> {
-    try {
-      if (!groupName) {
-        throw new Error('Group name is required');
-      }
-      return await this.categoryRepo.findByGroup(groupName);
-    } catch (error) {
-      this.handleError(error, 'get categories by group');
-    }
-  }
-
   async createCategory(data: Partial<Category>): Promise<Category> {
     try {
       this.validateRequired(data, ['name', 'group_name', 'color']);

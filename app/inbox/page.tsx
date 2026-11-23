@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, CircleCheck, Inbox } from 'lucide-react';
 import { PageContainer } from '@/components/PageContainer';
 import { PageHeader } from '@/components/PageHeader';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
@@ -51,7 +51,7 @@ const VIEWS: { value: InboxView; label: string }[] = [
 const TONE_CLASS: Record<UrgencyTone, string> = {
   danger: 'bg-red-50 text-red-700 ring-red-100',
   warning: 'bg-amber-50 text-amber-700 ring-amber-100',
-  info: 'bg-blue-50 text-blue-700 ring-blue-100',
+  info: 'bg-primary-50 text-primary-700 ring-primary-100',
 };
 
 const PROVIDER_LABEL = { cdsl: 'CDSL', nsdl: 'NSDL', nps: 'NPS', indmoney: 'INDmoney', groww: 'Groww', zerodha: 'Zerodha' } as const;
@@ -188,7 +188,7 @@ function InboxRow({
         title={identity.method ?? KIND_META[item.kind].label}
         aria-hidden
       >
-        {KIND_META[item.kind].icon}
+        <KindIcon kind={item.kind} />
       </span>
 
       <span className="flex-1 min-w-0">
@@ -252,6 +252,11 @@ function InboxRow({
   );
 }
 
+function KindIcon({ kind }: { kind: keyof typeof KIND_META }) {
+  const Icon = KIND_META[kind].icon;
+  return <Icon size={18} className="text-gray-500" aria-hidden />;
+}
+
 export default function InboxPage() {
   const [view, setView] = useState<InboxView>('todo');
   const [owner, setOwner] = useState<InboxOwnerFilter>('both');
@@ -274,7 +279,7 @@ export default function InboxPage() {
   );
 
   // Read ?view= once on mount; useSearchParams would force a Suspense boundary for no benefit.
-  // The four names Madal had before 2026-09-27 still resolve, so an old link keeps working.
+  // Older tab names still resolve, so an old link keeps working.
   useEffect(() => {
     const requested = new URLSearchParams(window.location.search).get('view');
     const legacy: Record<string, InboxView> = {
@@ -357,7 +362,7 @@ export default function InboxPage() {
   const selectedIdentity = selected ? itemIdentity(selected, cards) : null;
   const selectedAmount = selected ? itemAmount(selected) : null;
   /*
-   * The alert has no money record and none is pending, so it can still be moved into Selavu.
+   * The alert has no money record and none is pending, so it can still be moved into Expenses.
    * That is the state most of the backlog is in: automation acts once and its answer sticks,
    * so every credit it threw away, every spend dated before the go-live cut and everything it
    * could not read ended up here with nothing to press.
@@ -377,7 +382,7 @@ export default function InboxPage() {
     setSelected(null);
     showToast({
       message:
-        result.expenseId ? 'Added to Selavu' : result.incomeId ? 'Recorded as income' : 'Set aside',
+        result.expenseId ? 'Added to expenses' : result.incomeId ? 'Recorded as income' : 'Set aside',
       type: 'success',
     });
   };
@@ -385,7 +390,7 @@ export default function InboxPage() {
   return (
     <PageContainer maxWidth="4xl">
       <PageHeader
-        title="Madal"
+        title="Inbox"
         description={
           attentionCount > 0
             ? `${attentionCount} thing${attentionCount === 1 ? '' : 's'} waiting on you`
@@ -406,7 +411,7 @@ export default function InboxPage() {
                 option.value === 'todo' && attentionCount > 0 ? (
                   <>
                     {option.label}
-                    <span className="ml-1.5 px-1.5 py-0.5 text-xs rounded-full bg-white/80 text-blue-700">
+                    <span className="ml-1.5 px-1.5 py-0.5 text-xs rounded-full bg-white/80 text-primary-700">
                       {attentionCount}
                     </span>
                   </>
@@ -424,14 +429,14 @@ export default function InboxPage() {
       ) : items.length === 0 ? (
         view === 'todo' ? (
           <EmptyState
-            icon="✅"
+            icon={CircleCheck}
             title="Nothing waiting"
             description="Everything that arrived has been settled, by the rules or by Claude."
             action={{ label: 'Show all mail', onClick: () => setView('all') }}
           />
         ) : (
           <EmptyState
-            icon="📭"
+            icon={Inbox}
             title="No mail here yet"
             description="Messages appear once the Gmail sync script has run in each account."
           />
@@ -587,17 +592,17 @@ export default function InboxPage() {
                   await confirmTransfer(selectedTransfer.id, decision);
                   await refresh();
                   setSelected(null);
-                  showToast({ message: decision.kind === 'expense' ? 'Added to Selavu' : 'Transfer recorded', type: 'success' });
+                  showToast({ message: decision.kind === 'expense' ? 'Added to expenses' : 'Transfer recorded', type: 'success' });
                 }}
               />
             ) : canRecord && selectedTxn ? (
               <InboxRecordSheet item={selected} data={selectedTxn} onRecord={recordSelected} />
             ) : selected.consumed?.expense_id ? (
               <p className="text-sm text-gray-600">
-                {selected.consumed.action === 'created' ? 'Added to Selavu from this alert.' : 'Linked to an expense in Selavu.'}
+                {selected.consumed.action === 'created' ? 'Added to expenses from this alert.' : 'Linked to an existing expense.'}
               </p>
             ) : selected.consumed?.income_id ? (
-              <p className="text-sm text-gray-600">Recorded under Income in Selavu.</p>
+              <p className="text-sm text-gray-600">Recorded as income.</p>
             ) : null}
 
             {selected.summary ? <p className="text-sm text-gray-700">{selected.summary}</p> : null}

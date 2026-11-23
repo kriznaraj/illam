@@ -1,6 +1,6 @@
 /**
- * Readers for credit-card statement PDFs, written against the real HDFC and Axis
- * layouts captured on 2026-09-14 (statement_samples). pdf.js flattens each page
+ * Readers for credit-card statement PDFs, written against real HDFC and Axis
+ * layouts (captured via statement_samples). pdf.js flattens each page
  * into lines, often gluing neighbouring cells together, so these match the order
  * values appear in rather than column positions.
  *

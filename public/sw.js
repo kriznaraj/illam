@@ -1,5 +1,5 @@
 // Keep in sync with lib/pwa/version.ts (PWA_CACHE_NAME)
-const CACHE_NAME = 'illam-v12';
+const CACHE_NAME = 'illam-v13';
 const OFFLINE_URL = '/offline.html';
 
 // Only cache static, auth-independent assets.

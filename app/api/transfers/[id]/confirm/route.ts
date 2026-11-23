@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClientFromRequest } from '@/lib/supabase-server';
+import { createServerClientFromRequest } from '@/lib/api/server';
 import { TransferService, type TransferDecision } from '@/lib/services/TransferService';
 
 export const dynamic = 'force-dynamic';

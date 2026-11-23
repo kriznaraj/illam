@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Tag } from '@/types';
 import { TagService } from '@/lib/services/TagService';
-import { createSupabaseBrowserClient } from '@/lib/supabase';
+import { createSupabaseBrowserClient } from '@/lib/api/browser';
 import { useCachedFetch, invalidateCache } from '@/lib/useClientCache';
 
 /**

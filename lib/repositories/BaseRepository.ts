@@ -1,22 +1,9 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 
-/**
- * Migrations are applied by hand in the Supabase SQL editor, so the code ships first and the
- * table appears later. Reads of a table that is not there yet may answer empty; writes must not.
- */
-export function isTableMissing(error: { code?: string; message?: string } | null): boolean {
-  if (!error) return false;
-  return error.code === 'PGRST205' || error.code === '42P01' || /could not find the table|does not exist/i.test(error.message ?? '');
-}
-
-/**
- * Base Repository Pattern
- * Abstract class providing common CRUD operations for all repositories
- * Implements the Repository pattern for data access layer
- */
 /** An untyped row: the client has no generated database types. */
 type Row = Record<string, unknown>;
 
+/** Common CRUD operations over one table; subclasses add the table's own queries. */
 export abstract class BaseRepository<T> {
   protected supabase: SupabaseClient;
   protected tableName: string;
@@ -201,91 +188,9 @@ export abstract class BaseRepository<T> {
   }
 
   /**
-   * Count total entities
-   */
-  async count(): Promise<number> {
-    const { count, error } = await this.withRetry(
-      async () => {
-        const res = await this.supabase
-          .from(this.tableName)
-          .select('*', { count: 'exact', head: true });
-        if (res.error && this.isTransientSupabaseError(res.error)) {
-          throw res.error;
-        }
-        return res;
-      },
-      { shouldRetry: (e) => this.isTransientSupabaseError(e) }
-    );
-
-    if (error) {
-      throw new Error(`Failed to count ${this.tableName}: ${error.message}`);
-    }
-
-    return count || 0;
-  }
-
-  /**
-   * Check if entity exists by ID
-   */
-  async exists(id: string): Promise<boolean> {
-    const entity = await this.findById(id);
-    return entity !== null;
-  }
-
-  /**
-   * Find entities with pagination
-   */
-  async findWithPagination(
-    page: number = 1,
-    pageSize: number = 50
-  ): Promise<{ data: T[]; total: number; page: number; pageSize: number }> {
-    const from = (page - 1) * pageSize;
-    const to = from + pageSize - 1;
-
-    const { data, error, count } = await this.withRetry(
-      async () => {
-        const res = await this.supabase
-          .from(this.tableName)
-          .select(this.getSelectQuery(), { count: 'exact' })
-          .range(from, to);
-        if (res.error && this.isTransientSupabaseError(res.error)) {
-          throw res.error;
-        }
-        return res;
-      },
-      { shouldRetry: (e) => this.isTransientSupabaseError(e) }
-    );
-
-    if (error) {
-      throw new Error(`Failed to fetch ${this.tableName} with pagination: ${error.message}`);
-    }
-
-    return {
-      data: (data as T[]) || [],
-      total: count || 0,
-      page,
-      pageSize,
-    };
-  }
-
-  /**
    * Abstract method to be implemented by subclasses
    * Defines the select query for this repository
    * Can include joins, nested selects, etc.
    */
   protected abstract getSelectQuery(): string;
-
-  /**
-   * Execute raw query
-   * Use with caution - prefer using specific methods
-   */
-  protected async executeRawQuery(query: string): Promise<any> {
-    const { data, error } = await this.supabase.rpc(query);
-
-    if (error) {
-      throw new Error(`Failed to execute raw query: ${error.message}`);
-    }
-
-    return data;
-  }
 }

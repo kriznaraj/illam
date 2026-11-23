@@ -3,8 +3,8 @@
 // that the server answers a request signed with that member's secret, the same way the script
 // will sign it. See docs/gmail-sync.md.
 //
-//   node scripts/gmail-setup.mjs --member priya
-//   node scripts/gmail-setup.mjs --member priya --mailbox priya@gmail.com
+//   node scripts/gmail-setup.mjs --member alice
+//   node scripts/gmail-setup.mjs --member alice --mailbox alice@example.com
 import crypto from 'node:crypto';
 import { readEnv } from './env-file.mjs';
 

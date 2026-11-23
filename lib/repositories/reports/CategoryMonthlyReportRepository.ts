@@ -17,7 +17,7 @@ export class CategoryMonthlyReportRepository {
       )
       .gte('date', startDate)
       .lte('date', endDate)
-      // Auto-added rows count too (migration 036); rejecting one deletes it.
+      // Auto-added rows count too; rejecting one deletes it.
       .order('date', { ascending: true });
   }
 

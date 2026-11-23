@@ -4,7 +4,7 @@ import type { StatementTransaction } from '@/types';
 
 export type StatementTransactionWrite = Omit<StatementTransaction, 'id' | 'created_at' | 'updated_at'>;
 
-/** Card statement lines and their reconciliation (migration 032). */
+/** Card statement lines and their reconciliation. */
 export class StatementTransactionRepository extends BaseRepository<StatementTransaction> {
   constructor(supabase: SupabaseClient) {
     super(supabase, 'statement_transactions');
@@ -17,21 +17,6 @@ export class StatementTransactionRepository extends BaseRepository<StatementTran
   async listForStatement(statementId: string): Promise<StatementTransaction[]> {
     const { data, error } = await this.withRetry(async () => {
       const res = await this.supabase.from(this.tableName).select('*').eq('statement_id', statementId).order('line_no');
-      if (res.error && this.isTransientSupabaseError(res.error)) throw res.error;
-      return res;
-    });
-    if (error) throw new Error(`Failed to load statement lines: ${error.message}`);
-    return (data ?? []) as unknown as StatementTransaction[];
-  }
-
-  async listForStatements(statementIds: string[]): Promise<StatementTransaction[]> {
-    if (statementIds.length === 0) return [];
-    const { data, error } = await this.withRetry(async () => {
-      const res = await this.supabase
-        .from(this.tableName)
-        .select('*')
-        .in('statement_id', statementIds)
-        .order('line_no');
       if (res.error && this.isTransientSupabaseError(res.error)) throw res.error;
       return res;
     });

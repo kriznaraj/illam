@@ -27,7 +27,7 @@ export class PortfolioSnapshotService extends BaseService {
    * is always positive, and that is exactly how every card balance from 2026-01
    * onwards ended up adding its debt to net worth instead of subtracting it.
    *
-   * See lib/portfolio/liabilities.ts and migration 028.
+   * See lib/portfolio/liabilities.ts.
    */
   private async normalizeAmountForAccount(accountId: string, amount: number): Promise<number> {
     const { data, error } = await this.supabase

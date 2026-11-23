@@ -7,6 +7,7 @@ import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { EmptyState } from '@/components/EmptyState';
 import Modal from '@/components/Modal';
 import { ModalRecordActions } from '@/components/ModalRecordActions';
+import { Coins, Trash2, X, Pencil, FileText } from 'lucide-react';
 
 interface GoldItem {
   id: string;
@@ -241,17 +242,17 @@ export default function GoldRegisterPage() {
           className="w-20 text-xs font-mono outline-none"
           placeholder="per gram"
         />
-        <button onClick={saveRate} disabled={savingRate} className="text-xs text-blue-600 font-semibold">
+        <button onClick={saveRate} disabled={savingRate} className="text-xs text-primary-600 font-semibold">
           {savingRate ? '…' : 'Save'}
         </button>
-        <button onClick={() => setEditingKarat(null)} className="text-xs text-gray-400">✕</button>
+        <button onClick={() => setEditingKarat(null)} className="text-xs text-gray-400" aria-label="Cancel"><X size={14} aria-hidden /></button>
       </div>
     ) : (
       <button
         onClick={() => { setRateInput(rate.toString()); setEditingKarat(karat); }}
-        className="text-xs bg-yellow-50 text-yellow-700 hover:bg-yellow-100 border border-yellow-200 rounded-lg px-3 py-1.5 font-medium transition-colors"
+        className="inline-flex items-center gap-1 text-xs bg-yellow-50 text-yellow-700 hover:bg-yellow-100 border border-yellow-200 rounded-lg px-3 py-1.5 font-medium transition-colors"
       >
-        {karat} · ₹{fmt(rate)}/g ✎
+        {karat} · ₹{fmt(rate)}/g <Pencil size={12} aria-hidden />
       </button>
     );
   };
@@ -315,7 +316,7 @@ export default function GoldRegisterPage() {
   return (
     <PageContainer maxWidth="7xl">
       <PageHeader
-        title="Gold Register"
+        title="Gold register"
         description="Track your gold holdings"
         action={<button onClick={openCreate} className="btn btn-primary">+ Add Item</button>}
       />
@@ -331,7 +332,7 @@ export default function GoldRegisterPage() {
         </div>
 
         {loading ? <LoadingSpinner message="Loading…" /> : physicalItems.length === 0 ? (
-          <EmptyState icon="🥇" title="No physical gold" description="Add jewellery, coins or bars." action={{ label: '+ Add Item', onClick: openCreate }} />
+          <EmptyState icon={Coins} title="No physical gold" description="Add jewellery, coins or bars." action={{ label: '+ Add Item', onClick: openCreate }} />
         ) : (
           <ItemTable list={physicalItems} rate={rate22k} />
         )}
@@ -376,8 +377,9 @@ export default function GoldRegisterPage() {
               </div>
 
               {item.item_type === 'sgb' && (
-                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
-                  📄 Sovereign Gold Bond
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-primary-100 text-primary-700">
+                  <FileText size={14} className="mr-1" aria-hidden />
+                  Sovereign Gold Bond
                 </span>
               )}
 
@@ -430,7 +432,9 @@ export default function GoldRegisterPage() {
         {/* ── Delete confirm ── */}
         {showDeleteConfirm && (
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <div className="text-4xl mb-3">🗑️</div>
+            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">
+                <Trash2 size={20} aria-hidden />
+              </div>
             <h3 className="text-base font-semibold text-gray-900 mb-1">Delete this item?</h3>
             <p className="text-sm text-gray-500 mb-6">This action cannot be undone.</p>
             <div className="flex gap-3 w-full">
@@ -454,7 +458,7 @@ export default function GoldRegisterPage() {
                   form.item_type === t ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
-                {t === 'physical' ? '🥇 Physical' : '📄 SGB'}
+                {t === 'physical' ? 'Physical' : 'SGB'}
               </button>
             ))}
           </div>

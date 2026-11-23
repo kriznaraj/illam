@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { PageContainer } from '@/components/PageContainer';
 import Modal from '@/components/Modal';
 import { ModalRecordActions } from '@/components/ModalRecordActions';
+import { Tag } from 'lucide-react';
 
 interface AccountType {
   id: string;
@@ -181,7 +182,7 @@ export default function SettingsAccountTypesPage() {
 
           {types.length === 0 ? (
             <EmptyState
-              icon="🏷️"
+              icon={Tag}
               title="No account types yet"
               description="Add your first account type to get started."
               action={{ label: '+ New Type', onClick: openNewType }}
@@ -208,7 +209,7 @@ export default function SettingsAccountTypesPage() {
                           </span>
                         )}
                         {t.is_equity && (
-                          <span className="text-[11px] font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full">
+                          <span className="text-[11px] font-semibold text-primary-700 bg-primary-50 border border-primary-200 px-2 py-0.5 rounded-full">
                             Equity
                           </span>
                         )}
@@ -306,7 +307,7 @@ export default function SettingsAccountTypesPage() {
                 setTypeForm({ ...typeForm, is_equity: !typeForm.is_equity })
               }
               className={`relative w-11 h-6 rounded-full transition-colors ${
-                typeForm.is_equity ? 'bg-blue-600' : 'bg-gray-200'
+                typeForm.is_equity ? 'bg-primary-600' : 'bg-gray-200'
               }`}
             >
               <span

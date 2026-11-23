@@ -41,7 +41,7 @@ function snapshot(transfer: Transfer): TransferSnapshot {
 }
 
 /**
- * Decisions Madal takes on its own, each recorded with what it takes to undo it (migration 039).
+ * Decisions Madal takes on its own, each recorded with what it takes to undo it.
  *
  * The rule: no To-do item unless the Claude API couldn't resolve it. That makes
  * two kinds of change automatic — Claude classifying a waiting transfer from quoted evidence, and

@@ -25,7 +25,7 @@ export interface ContributionRow {
   investment_date: string;
   amount: number;
   note: string | null;
-  /** Set once a transfer created or claimed the row (migration 034, or transfers.portfolio_investment_id). */
+  /** Set once a transfer created or claimed the row (or via transfers.portfolio_investment_id). */
   transfer_id: string | null;
 }
 

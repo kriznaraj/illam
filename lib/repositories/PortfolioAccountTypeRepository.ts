@@ -18,12 +18,7 @@ export class PortfolioAccountTypeRepository extends BaseRepository<PortfolioAcco
     return (data as unknown as PortfolioAccountType[]) || [];
   }
 
-  /**
-   * Names of the account types that represent money owed. `select('*')` means the
-   * `is_liability` column flows through the moment migration 028 is applied, and is
-   * simply absent before it — `liabilityTypeNames` covers both, so the sign fix does
-   * not depend on the migration having been run by hand yet.
-   */
+  /** Names of the account types that represent money owed (see `liabilityTypeNames`). */
   async findLiabilityTypeNames(): Promise<Set<string>> {
     const { data, error } = await this.supabase.from(this.tableName).select('*');
     if (error) throw new Error(`Failed to fetch account types: ${error.message}`);

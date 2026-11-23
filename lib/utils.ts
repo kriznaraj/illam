@@ -1,11 +1,11 @@
-import { format, parseISO, startOfMonth, endOfMonth } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { NextResponse } from 'next/server';
 
 /**
  * Wrap a JSON response with a Cache-Control header.
  * Use on GET API routes so the browser can serve repeated requests from cache.
  *
- * Presets (chosen for a low-traffic 2-user app):
+ * Presets (chosen for a low-traffic, single-household app):
  *  'static'    — nearly immutable data (categories, account types)  → 10 min / revalidate 1 h
  *  'portfolio' — monthly-updated data                               → 5 min  / revalidate 1 h
  *  'expenses'  — a few writes per day                               → 1 min  / revalidate 5 min

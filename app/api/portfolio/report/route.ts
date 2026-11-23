@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClientFromRequest } from '@/lib/supabase-server';
+import { createServerClientFromRequest } from '@/lib/api/server';
 import { PortfolioReportService } from '@/lib/services/PortfolioReportService';
 
 export const dynamic = 'force-dynamic';

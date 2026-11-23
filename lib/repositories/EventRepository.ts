@@ -65,30 +65,4 @@ export class EventRepository extends BaseRepository<Event> {
     return (data as unknown as Event[]) || [];
   }
 
-  /**
-   * Search events by name
-   */
-  async searchByName(searchTerm: string, limit: number = 20): Promise<Event[]> {
-    const { data, error } = await this.supabase
-      .from(this.tableName)
-      .select(this.getSelectQuery())
-      .ilike('name', `%${searchTerm}%`)
-      .order('name')
-      .limit(limit);
-
-    if (error) {
-      throw new Error(`Failed to search events: ${error.message}`);
-    }
-
-    return (data as unknown as Event[]) || [];
-  }
-
-  /**
-   * Find active events (if you add an active/inactive flag later)
-   */
-  async findActive(): Promise<Event[]> {
-    // For now, return all events
-    // TODO: Add active/inactive flag to events table
-    return this.findAllSorted();
-  }
 }

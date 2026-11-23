@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, BookOpen } from 'lucide-react';
 import { PageContainer } from '@/components/PageContainer';
 import { PageHeader } from '@/components/PageHeader';
 import { MonthNavigator } from '@/components/MonthNavigator';
@@ -25,7 +25,7 @@ const fyStartYear = (month: string) => (Number(month.slice(5)) >= 4 ? Number(mon
 const fyLabel = (startYear: number) => `FY ${startYear}–${String(startYear + 1).slice(2)}`;
 
 const SECTION_COLOUR: Record<CashFlowSectionKey, string> = {
-  spending: 'bg-blue-500',
+  spending: 'bg-primary-500',
   commitments: 'bg-orange-500',
   investments: 'bg-green-500',
   tax: 'bg-purple-500',
@@ -79,11 +79,6 @@ export default function CashFlowPage() {
       <PageHeader
         title="Cash flow"
         description="Money in against everything that went out"
-        action={
-          <Link href="/cash-flow/commitments" className="btn btn-secondary btn-sm">
-            Insurance &amp; EMIs
-          </Link>
-        }
       />
 
       <div className="mb-6 space-y-3">
@@ -120,7 +115,7 @@ export default function CashFlowPage() {
       {loading && !report ? (
         <LoadingSpinner message="Adding it up..." />
       ) : !report ? (
-        <EmptyState icon="📒" title="Could not load the cash flow" description="Use the refresh button at the top, or try again in a moment." />
+        <EmptyState icon={BookOpen} title="Could not load the cash flow" description="Use the refresh button at the top, or try again in a moment." />
       ) : (
         <div className="space-y-4">
           {missingSalary.length > 0 || (waiting && waiting.count > 0) ? (
@@ -134,7 +129,7 @@ export default function CashFlowPage() {
               {waiting && waiting.count > 0 ? (
                 <p>
                   <Link href="/inbox?view=todo" className="font-semibold underline">
-                    {waiting.count} transfer{waiting.count === 1 ? '' : 's'} waiting in Madal
+                    {waiting.count} transfer{waiting.count === 1 ? '' : 's'} waiting in the inbox
                   </Link>{' '}
                   ({rupees(waiting.debit)} out{waiting.credit > 0 ? `, ${rupees(waiting.credit)} in` : ''}) — not counted until classified.
                 </p>
@@ -237,7 +232,7 @@ export default function CashFlowPage() {
                   {report.monthly.map((row) => (
                     <tr key={row.month} className="border-t border-gray-100">
                       <td className="py-2">
-                        <button type="button" className="text-left text-blue-700" onClick={() => { setMonth(row.month); setPeriod('month'); }}>
+                        <button type="button" className="text-left text-primary-700" onClick={() => { setMonth(row.month); setPeriod('month'); }}>
                           {monthKeys.shortLabel(row.month)}
                         </button>
                         {missingSalary.includes(row.month) ? <span className="ml-1 text-[11px] text-amber-700">no salary</span> : null}
@@ -272,10 +267,10 @@ export default function CashFlowPage() {
               <li>Money in is read from bank statements (salary, interest, dividends), plus EPF and NPS that payroll pays before salary reaches the bank.</li>
               <li>Spending is every expense — card spends included, so card bills are not counted again.</li>
               <li>Insurance and EMIs come from what you declared; a due date that passed with no payment seen is counted at the declared amount.</li>
-              <li>Investments are Selvam&apos;s contributions: entered, automatic and SIP instalments.</li>
+              <li>Investments are contributions recorded under Net worth: entered, automatic and SIP instalments.</li>
               <li>
                 Not counted: transfers between the two of you, moves between your own accounts, cash withdrawn
-                {report.gaps.cashWithdrawn > 0 ? ` (${rupees(report.gaps.cashWithdrawn)} this period)` : ''}, and anything still waiting in Madal.
+                {report.gaps.cashWithdrawn > 0 ? ` (${rupees(report.gaps.cashWithdrawn)} this period)` : ''}, and anything still waiting in the inbox.
               </li>
             </ul>
           </details>

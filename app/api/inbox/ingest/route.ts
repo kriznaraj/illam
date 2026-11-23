@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServiceClient } from '@/lib/supabase-server';
+import { createServiceClient } from '@/lib/api/server';
 import { InboxService } from '@/lib/services/InboxService';
 import { attachmentSenders, buildGmailQuery } from '@/lib/inbox/sources';
 import { authenticateScriptRequest } from '@/lib/inbox/requestAuth';
@@ -10,9 +10,9 @@ import type { InboxIngestMessage } from '@/types';
 /**
  * Called by the Gmail Apps Script in each account, never by the browser.
  *
- * This is the only /api route without a session (middleware.ts exempts this
- * exact path), so it authenticates itself: an HMAC signature with a per-owner
- * secret over `${timestamp}.${body}`. See lib/inbox/signature.ts.
+ * One of the two /api routes without a session (middleware.ts SESSIONLESS_API_PATHS),
+ * so it authenticates itself: an HMAC signature with a per-owner secret over
+ * `${timestamp}.${body}`. See lib/inbox/signature.ts.
  */
 
 export const dynamic = 'force-dynamic';
@@ -20,22 +20,22 @@ export const runtime = 'nodejs';
 // Statement emails carry their PDFs, which are unlocked and read in the request.
 export const maxDuration = 60;
 
-// Vercel rejects request bodies over 4.5 MB; the script caps PDFs at 2.5 MB raw (~3.4 MB as base64).
+// Kept under the 4.5 MB body limit common to serverless hosts; the script caps PDFs at 2.5 MB raw (~3.4 MB as base64).
 const MAX_BODY_BYTES = 4_000_000;
 const BACKFILL_DAYS = 90;
-// The first live run pushed 40 messages in ~63 s; Apps Script allows 6 minutes per run.
+// Roughly 40 messages take a minute to push; Apps Script allows 6 minutes per run.
 const MAX_PER_RUN = 150;
 
 const authenticate = authenticateScriptRequest;
 
-/** Configuration for the script, so the sender list lives in code rather than in two Gmail accounts. */
+/** Configuration for the script, so the sender list lives in code rather than in each member's Gmail account. */
 export async function GET(request: NextRequest) {
   const auth = authenticate(request, '');
   if (auth instanceof NextResponse) return auth;
 
   return NextResponse.json({
     owner: auth.owner,
-    // Which commit is serving, so a run can be matched to the deploy that handled it.
+    // Which commit is serving, where the host exposes it (Vercel does); 'local' otherwise.
     version: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? 'local',
     query: buildGmailQuery(),
     attachmentSenders: attachmentSenders(),

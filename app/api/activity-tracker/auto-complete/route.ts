@@ -1,12 +1,12 @@
-import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase-server';
+import { NextRequest, NextResponse } from 'next/server';
+import { createServerClientFromRequest } from '@/lib/api/server';
 import { ActivityTrackerService } from '@/lib/services/ActivityTrackerService';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = createServerClientFromRequest(request);
     const service = new ActivityTrackerService(supabase);
     await service.advanceAnnualEvents();
     return NextResponse.json({ success: true });

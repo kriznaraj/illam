@@ -1,9 +1,8 @@
 /**
  * Why a statement will not open, without revealing anything secret.
  *
- * The first live capture came back locked for every statement — including the
- * CDSL CAS, whose password is the PAN that was configured. That leaves two
- * explanations: the configured value does not match (case, spacing), or the
+ * A statement can come back locked even with its password configured. That
+ * leaves two explanations: the configured value does not match (case, spacing), or the
  * PDF uses an encryption handler the reader cannot open. These helpers record
  * enough to tell them apart: the PDF's encryption dictionary (algorithm and
  * revision, never the O/U hashes) and the shape of each candidate password

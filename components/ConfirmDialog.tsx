@@ -56,8 +56,8 @@ export default function ConfirmDialog({
       default:
         return {
           icon: Info,
-          iconColor: 'text-blue-600',
-          iconBg: 'bg-blue-100',
+          iconColor: 'text-primary-600',
+          iconBg: 'bg-primary-100',
         };
     }
   };

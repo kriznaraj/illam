@@ -42,4 +42,4 @@ test: ## Run the test suite once
 	@$(PM) run test:ci
 
 typecheck: ## next.config.js ignores build errors, so check types explicitly
-	@npx tsc --noEmit
+	@$(PM) exec tsc --noEmit

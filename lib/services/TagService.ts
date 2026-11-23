@@ -35,38 +35,12 @@ export class TagService extends BaseService {
     }
   }
 
-  async getTagById(id: string): Promise<Tag | null> {
-    try {
-      this.validateUUID(id, 'Tag ID');
-      return await this.tagRepo.findById(id);
-    } catch (error) {
-      this.handleError(error, 'get tag by ID');
-    }
-  }
-
   async getTagsForUser(userId: string): Promise<Tag[]> {
     try {
       this.validateUUID(userId, 'User ID');
       return await this.tagRepo.findForUser(userId);
     } catch (error) {
       this.handleError(error, 'get tags for user');
-    }
-  }
-
-  async getSharedTags(): Promise<Tag[]> {
-    try {
-      return await this.tagRepo.findByType('shared');
-    } catch (error) {
-      this.handleError(error, 'get shared tags');
-    }
-  }
-
-  async getPersonalTags(userId: string): Promise<Tag[]> {
-    try {
-      this.validateUUID(userId, 'User ID');
-      return await this.tagRepo.findByType('personal', userId);
-    } catch (error) {
-      this.handleError(error, 'get personal tags');
     }
   }
 
@@ -130,31 +104,10 @@ export class TagService extends BaseService {
   async deleteTag(id: string): Promise<void> {
     try {
       this.validateUUID(id, 'Tag ID');
-      // TODO: Also delete tag associations in expense_tags table
+      // expense_tags rows go with it (ON DELETE CASCADE).
       await this.tagRepo.delete(id);
     } catch (error) {
       this.handleError(error, 'delete tag');
-    }
-  }
-
-  async searchTags(searchTerm: string, limit: number = 20): Promise<Tag[]> {
-    try {
-      if (!searchTerm || searchTerm.trim().length === 0) {
-        throw new Error('Search term is required');
-      }
-
-      return await this.tagRepo.searchByName(searchTerm, limit);
-    } catch (error) {
-      this.handleError(error, 'search tags');
-    }
-  }
-
-  async getPopularTags(limit: number = 10): Promise<Tag[]> {
-    try {
-      this.validatePositiveNumber(limit, 'Limit');
-      return await this.tagRepo.getPopular(limit);
-    } catch (error) {
-      this.handleError(error, 'get popular tags');
     }
   }
 

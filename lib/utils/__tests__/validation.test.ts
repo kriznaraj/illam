@@ -1,16 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import {
   sanitizeTagName,
-  sanitizeString,
-  validateRequired,
   validatePositiveNumber,
-  validateNonNegativeNumber,
-  validateNumberRange,
   validateDate,
-  validateEmail,
   validateLength,
   validateUUID,
-  validateEnum,
   validateExpenseData,
   ValidationError,
 } from '../validation';
@@ -59,71 +53,6 @@ describe('Tag Sanitization', () => {
       expect(sanitizeTagName('café')).toBe('caf');
     });
   });
-
-  describe('sanitizeString (XSS Prevention)', () => {
-    it('should escape HTML tags', () => {
-      expect(sanitizeString('<script>alert("xss")</script>')).toBe(
-        '&lt;script&gt;alert(&quot;xss&quot;)&lt;&#x2F;script&gt;'
-      );
-    });
-
-    it('should escape quotes', () => {
-      expect(sanitizeString('Test "quote"')).toBe('Test &quot;quote&quot;');
-      expect(sanitizeString("Test 'quote'")).toBe('Test &#x27;quote&#x27;');
-    });
-
-    it('should escape slashes', () => {
-      expect(sanitizeString('path/to/file')).toBe('path&#x2F;to&#x2F;file');
-    });
-
-    it('should handle complex XSS attempts', () => {
-      const xss = '<img src=x onerror="alert(1)">';
-      const sanitized = sanitizeString(xss);
-      expect(sanitized).not.toContain('<');
-      expect(sanitized).not.toContain('>');
-      expect(sanitized).not.toContain('"');
-    });
-  });
-});
-
-describe('Validation - Required Fields', () => {
-  it('should pass when all required fields are present', () => {
-    const result = validateRequired(
-      { name: 'Test', email: 'test@example.com', age: 25 },
-      ['name', 'email', 'age']
-    );
-    expect(result.valid).toBe(true);
-    expect(result.errors).toHaveLength(0);
-  });
-
-  it('should fail when required fields are missing', () => {
-    const result = validateRequired(
-      { name: 'Test' },
-      ['name', 'email', 'age']
-    );
-    expect(result.valid).toBe(false);
-    expect(result.errors).toHaveLength(2);
-    expect(result.errors).toContain('email is required');
-    expect(result.errors).toContain('age is required');
-  });
-
-  it('should treat empty string as missing', () => {
-    const result = validateRequired(
-      { name: '' },
-      ['name']
-    );
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContain('name is required');
-  });
-
-  it('should allow 0 and false as valid values', () => {
-    const result = validateRequired(
-      { count: 0, active: false },
-      ['count', 'active']
-    );
-    expect(result.valid).toBe(true);
-    expect(result.errors).toHaveLength(0);
-  });
 });
 
 describe('Validation - Numbers', () => {
@@ -148,33 +77,6 @@ describe('Validation - Numbers', () => {
 
     it('should reject non-numbers', () => {
       expect(() => validatePositiveNumber('100' as any, 'Amount')).toThrow('Amount must be a valid number');
-    });
-  });
-
-  describe('validateNonNegativeNumber', () => {
-    it('should accept zero', () => {
-      expect(() => validateNonNegativeNumber(0, 'Balance')).not.toThrow();
-    });
-
-    it('should accept positive numbers', () => {
-      expect(() => validateNonNegativeNumber(100, 'Balance')).not.toThrow();
-    });
-
-    it('should reject negative numbers', () => {
-      expect(() => validateNonNegativeNumber(-1, 'Balance')).toThrow('Balance must be 0 or greater');
-    });
-  });
-
-  describe('validateNumberRange', () => {
-    it('should accept numbers within range', () => {
-      expect(() => validateNumberRange(5, 'Rating', 1, 10)).not.toThrow();
-      expect(() => validateNumberRange(1, 'Rating', 1, 10)).not.toThrow();
-      expect(() => validateNumberRange(10, 'Rating', 1, 10)).not.toThrow();
-    });
-
-    it('should reject numbers outside range', () => {
-      expect(() => validateNumberRange(0, 'Rating', 1, 10)).toThrow('Rating must be between 1 and 10');
-      expect(() => validateNumberRange(11, 'Rating', 1, 10)).toThrow('Rating must be between 1 and 10');
     });
   });
 });
@@ -206,21 +108,6 @@ describe('Validation - Date', () => {
     // Note: JavaScript Date constructor accepts '2023-02-29' and adjusts to '2023-03-01'
     // The validateDate function doesn't validate strict date logic, only that Date constructor accepts it
     expect(() => validateDate('2023-02-29', 'Date')).not.toThrow();
-  });
-});
-
-describe('Validation - Email', () => {
-  it('should accept valid email formats', () => {
-    expect(validateEmail('user@example.com')).toBe(true);
-    expect(validateEmail('test.user@example.co.uk')).toBe(true);
-    expect(validateEmail('user+tag@example.com')).toBe(true);
-  });
-
-  it('should reject invalid email formats', () => {
-    expect(validateEmail('not-an-email')).toBe(false);
-    expect(validateEmail('@example.com')).toBe(false);
-    expect(validateEmail('user@')).toBe(false);
-    expect(validateEmail('user example.com')).toBe(false);
   });
 });
 
@@ -256,18 +143,6 @@ describe('Validation - UUID', () => {
 
   it('should be case insensitive', () => {
     expect(() => validateUUID('123E4567-E89B-12D3-A456-426614174000', 'ID')).not.toThrow();
-  });
-});
-
-describe('Validation - Enum', () => {
-  it('should accept valid enum values', () => {
-    expect(() => validateEnum('pending', 'Status', ['pending', 'completed'])).not.toThrow();
-  });
-
-  it('should reject invalid enum values', () => {
-    expect(() => validateEnum('invalid', 'Status', ['pending', 'completed'])).toThrow(
-      'Status must be one of: pending, completed'
-    );
   });
 });
 

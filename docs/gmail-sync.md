@@ -31,7 +31,7 @@ your Illam server. Plan on 10 minutes per member.
                                                  │  links, auto-adds, settles     │
                                                  └───────────────┬────────────────┘
                                                                  ▼
-                                                    Madal (/inbox), Selavu, Selvam
+                                                  Inbox, Expenses and Net worth
 ```
 
 1. Each member runs a small **Google Apps Script** inside their own Gmail. It is a script on
@@ -44,7 +44,7 @@ your Illam server. Plan on 10 minutes per member.
    keeps those. **It never stores the email body or the PDF.** OTP mail is dropped.
 5. After each sync, automation links alerts to expenses you already logged, adds the spends
    nobody logged (labelled `auto`), marks card bills paid, and settles transfers it can explain.
-   Anything it can't decide waits for you in **Madal**.
+   Anything it can't decide waits for you in the **Inbox**.
 
 What the script can do in Gmail: **read only**. It never labels, marks read, moves or deletes
 anything. It asks Google for exactly three permissions (`appsscript.json`):
@@ -155,7 +155,7 @@ Signed in **as that member**:
    Automation pass 1: {"linked":12,"created":31,"card_bill":2,"waiting":4,…}, remaining 0
    ```
 
-2. Open Illam → **Madal** → **All**. The imported mail is there, newest first. Backfilled mail
+2. Open Illam → **Inbox** → **All**. The imported mail is there, newest first. Backfilled mail
    is recorded but not flagged as needing attention, so you aren't buried in three months of
    alerts on day one.
 3. Choose **`installTrigger`** and click **Run**. The log says
@@ -185,7 +185,7 @@ STATEMENT_PASSWORDS_PRIYA='{"hdfc_card_statement":["PRIY0101"],"cdsl_cas":["ABCD
   never prints them.
 
 Then, in that member's script, run **`resendStatements`** to send the last 90 days of statements
-again. A statement still marked **locked** in Madal shows the email's password hint. Fix that
+again. A statement still marked **locked** in the Inbox shows the email's password hint. Fix that
 entry in `.env`, apply, and run `resendStatements` again. Duplicates are ignored.
 
 ## What is supported
@@ -209,14 +209,14 @@ script.** Mail from banks not on the list never leaves Gmail. To ask for a bank,
 
 ## Living with it
 
-**How fast.** A new alert reaches Madal within one trigger interval, 15 minutes by default.
+**How fast.** A new alert reaches the Inbox within one trigger interval, 15 minutes by default.
 To change it, edit `TRIGGER_MINUTES` at the top of `Code.gs`. Google allows only 1, 5, 10, 15
 or 30. Save, then run `installTrigger` again. A personal Gmail account gets 90 minutes of
 trigger runtime a day. 15 minutes leaves plenty of room. 5 minutes can run out on a day with
 several statement PDFs.
 
 **Seeing what happened.** **Executions** (the list icon in the script's sidebar) shows each
-run's log. In Illam, **Madal → All** shows everything received.
+run's log. In Illam, **Inbox → All** shows everything received.
 
 **Preview automation.** Run `dryRunAutomation` to list what automation *would* do with the
 alerts not yet processed, without changing anything.
@@ -257,8 +257,8 @@ Check the run's log under **Executions** first. Most problems show up as one of 
 | `Ignored (unknown_sender): …` | Harmless. A sender the app no longer lists |
 | `Automation failed (the sync itself succeeded)` | Mail arrived, but the follow-up step errored. See `docker compose logs app` |
 | `Matching threads … 0` but you have bank mail | That sender isn't supported yet, or it changed its address. Run `findStatements` to list who actually mails this account |
-| A statement shows **locked** in Madal | Missing or wrong password. See [step 5](#step-5-statement-passwords) |
-| Selvam says a statement wasn't received | Run `findStatements`. Listed under its sender: run `resendStatements`. Only under "Other": the bank changed address; open an issue. Not listed: it never reached this mailbox |
+| A statement shows **locked** in the Inbox | Missing or wrong password. See [step 5](#step-5-statement-passwords) |
+| Net worth says a statement wasn't received | Run `findStatements`. Listed under its sender: run `resendStatements`. Only under "Other": the bank changed address; open an issue. Not listed: it never reached this mailbox |
 | Mail missing after an Illam update added a bank | Run `resetWatermark`, then `runOnce`. It re-sends 90 days and duplicates are ignored |
 | An amount or merchant is read wrongly | Run `dumpSamples` and attach the relevant log lines to an issue. PAN, long account numbers and OTP lines are masked, but names, addresses and short numbers are not, so edit those out before posting |
 

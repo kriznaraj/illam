@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClientFromRequest } from '@/lib/supabase-server';
+import { createServerClientFromRequest } from '@/lib/api/server';
 import { ActivityTrackerService } from '@/lib/services/ActivityTrackerService';
 import { mapOccurrenceApiError } from '@/lib/activity-tracker/apiErrors';
 

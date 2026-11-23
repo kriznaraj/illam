@@ -9,6 +9,7 @@ import { LoadingSpinner } from '@/components/LoadingSpinner';
 import type { PortfolioAccount } from '@/types';
 import { deriveSnapshotDate } from '@/lib/utils';
 import type { ImportRow } from '@/lib/services/PortfolioCdslImportService';
+import { Check, TriangleAlert } from 'lucide-react';
 
 const STEP = { CONVERT: 1, REVIEW: 2, IMPORT: 3 } as const;
 
@@ -357,7 +358,7 @@ export default function ImportCdslPage() {
           {parseError && <p className="text-sm text-red-600">{parseError}</p>}
           {formatError && <p className="text-sm text-red-600">{formatError}</p>}
           {headers.length > 0 && rows.length > 0 && !formatError && (
-            <p className="text-sm text-green-600">✓ Parsed: {rows.length} rows across {headers.length} columns.</p>
+            <p className="flex items-center gap-1.5 text-sm text-green-600"><Check size={14} aria-hidden /> Parsed: {rows.length} rows across {headers.length} columns.</p>
           )}
 
           <div className="flex flex-wrap gap-3 pt-2">
@@ -453,8 +454,9 @@ export default function ImportCdslPage() {
             )}
 
             {unknownRows.length > 0 && (
-              <p className="text-xs text-amber-600">
-                ⚠ {unknownRows.length} row(s) have an unrecognised account_type and will be skipped.
+              <p className="flex items-center gap-1.5 text-xs text-amber-600">
+                <TriangleAlert size={14} className="flex-shrink-0" aria-hidden />
+                {unknownRows.length} row(s) have an unrecognised account_type and will be skipped.
               </p>
             )}
 
@@ -480,7 +482,7 @@ export default function ImportCdslPage() {
                             <span className="px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-700 text-[10px] font-medium">stock</span>
                           )}
                           {r.account_type === 'mf' && (
-                            <span className="px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-medium">mf</span>
+                            <span className="px-1.5 py-0.5 rounded-full bg-primary-100 text-primary-700 text-[10px] font-medium">mf</span>
                           )}
                           {r.account_type !== 'stock' && r.account_type !== 'mf' && (
                             <span className="px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 text-[10px]">?</span>
@@ -538,13 +540,13 @@ export default function ImportCdslPage() {
                 )}
                 {mfRows.length > 0 && (
                   <div className="flex items-center gap-2">
-                    <span className="px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">mf</span>
+                    <span className="px-1.5 py-0.5 rounded-full bg-primary-100 text-primary-700 text-xs font-medium">mf</span>
                     <span className="text-gray-600">{mfRows.length} rows →</span>
                     <span className="font-medium">{accounts.find((a) => a.id === mfAccountId)?.name}</span>
                   </div>
                 )}
                 {unknownRows.length > 0 && (
-                  <p className="text-xs text-amber-600">⚠ {unknownRows.length} row(s) will be skipped (unknown type)</p>
+                  <p className="flex items-center gap-1.5 text-xs text-amber-600"><TriangleAlert size={14} className="flex-shrink-0" aria-hidden /> {unknownRows.length} row(s) will be skipped (unknown type)</p>
                 )}
               </div>
               <div className="flex gap-3">
@@ -591,7 +593,7 @@ export default function ImportCdslPage() {
                     {importResult.mf && (
                       <div className="bg-white rounded-lg px-4 py-3 border border-green-200 text-sm">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">mf</span>
+                          <span className="px-1.5 py-0.5 rounded-full bg-primary-100 text-primary-700 text-xs font-medium">mf</span>
                           <span className="font-medium text-gray-900">
                             {accounts.find((a) => a.id === importResult.mf?.account_id)?.name}
                           </span>

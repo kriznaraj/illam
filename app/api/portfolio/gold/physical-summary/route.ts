@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClientFromRequest } from '@/lib/supabase-server';
+import { createServerClientFromRequest } from '@/lib/api/server';
 import { GoldRegisterService } from '@/lib/services/GoldRegisterService';
 
 export const dynamic = 'force-dynamic';
 
-// GET /api/portfolio/gold/physical-summary
-// Returns total gold weight (grams) from physical items only
+/** Total gold weight (grams) of physical items only. */
 export async function GET(req: NextRequest) {
-  const supabase = createServerClientFromRequest(req);
-  const service = new GoldRegisterService(supabase);
-  return NextResponse.json(await service.physicalSummary());
+  try {
+    const service = new GoldRegisterService(createServerClientFromRequest(req));
+    return NextResponse.json(await service.physicalSummary());
+  } catch (error) {
+    console.error('Error fetching physical gold summary:', error);
+    return NextResponse.json({ error: 'Failed to fetch physical gold summary' }, { status: 500 });
+  }
 }

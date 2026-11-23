@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClientFromRequest } from '@/lib/supabase-server';
+import { createServerClientFromRequest } from '@/lib/api/server';
 import { CreditCardStatementService } from '@/lib/services/CreditCardStatementService';
 
 export const dynamic = 'force-dynamic';
 
 /**
  * Set a credit card's snapshot for a month from the newest statement at or before
- * the end of that month. The client used to fetch statements and post the snapshot
- * itself, which meant it both required an exact month match (so the Sync button
- * failed on the current month, where statements do not exist yet) and wrote the
- * amount unnormalised.
+ * the end of that month (statements for the current month usually do not exist yet).
+ * Done server-side so the liability sign is normalised in one place.
  */
 export async function POST(request: NextRequest) {
   try {

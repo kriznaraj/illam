@@ -1,18 +1,11 @@
 /**
- * Spending-insight generation.
+ * Spending-insight generation, through the provider port in `lib/ai`, which enforces
+ * the schema at the API and returns a typed result or a typed error.
  *
- * Previously this POSTed raw `fetch` to OpenCode Zen with `temperature: 0.8`, stripped
- * markdown fences from the reply with a regex, and `JSON.parse`d whatever came out with no
- * schema validation. It now goes through the provider port in `lib/ai`, which enforces the
- * schema at the API and returns a typed result or a typed error.
- *
- * Three behavioural notes:
- *  - It still returns null on any failure, exactly as before, so `InsightsService` keeps
- *    falling back to its rule-based engine unchanged.
- *  - The prompt no longer dumps every raw expense description. It sends the same
- *    precomputed aggregates plus a bounded sample, so token cost scales with the month
- *    rather than with transaction count.
- *  - `temperature` is gone — Sonnet 5 rejects it outright.
+ *  - Returns null on any failure, so `InsightsService` falls back to its rule-based engine.
+ *  - The prompt sends precomputed aggregates plus a bounded sample of descriptions, so
+ *    token cost scales with the month rather than with transaction count.
+ *  - No `temperature`: the current models reject non-default sampling values.
  */
 import { getProvider } from '@/lib/ai';
 import { InsightsSchema } from '@/lib/ai/schemas';
@@ -72,7 +65,7 @@ export async function generateLLMInsights(
   const dayCounts = [0, 0, 0, 0, 0, 0, 0];
   for (const e of expenses) {
     const d = new Date(e.date);
-    // A malformed date used to throw here and take the whole generation down.
+    // Skip a malformed date rather than take the whole generation down.
     if (Number.isNaN(d.getTime())) continue;
     dayTotals[d.getDay()] += e.amount;
     dayCounts[d.getDay()] += 1;

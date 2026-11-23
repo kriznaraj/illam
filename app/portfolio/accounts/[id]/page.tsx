@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 import { PortfolioAccount, PortfolioHolding, PortfolioHoldingSnapshot } from '@/types';
 import { formatCurrency, formatCompactCurrency, formatMonth } from '@/lib/utils';
+import { Check } from 'lucide-react';
 
 const INSTRUMENT_LABEL: Record<string, string> = {
   nse_stock:      'NSE',
@@ -269,7 +270,8 @@ export default function AccountSnapshotPage() {
               <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
               <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Balance</span>
               <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full">
-                ✓ In sync
+                <Check size={12} aria-hidden />
+                In sync
               </span>
             </div>
             <div className="flex items-baseline gap-3">

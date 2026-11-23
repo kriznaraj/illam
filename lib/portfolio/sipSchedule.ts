@@ -4,13 +4,12 @@ import { INVESTMENT_START_MONTH } from './constants';
  * Effective-dated SIP amounts.
  *
  * A SIP row on /portfolio/investments is virtual — it is synthesised for the
- * month being viewed rather than stored. It used to be built from the fund's
- * single `sip_amount`, so raising a SIP from ₹3,000 to ₹5,000 rewrote every
- * past month too: last year's history silently became ₹5,000/month.
+ * month being viewed rather than stored. Built from the fund's single
+ * `sip_amount` alone, raising a SIP from ₹3,000 to ₹5,000 would rewrite every
+ * past month too.
  *
- * `amount_history` fixes that by recording when each amount took effect. It is
- * optional, and a fund without one keeps behaving exactly as before — a flat
- * `sip_amount` across all months — so nothing needs migrating.
+ * `amount_history` records when each amount took effect. It is optional: a fund
+ * without one has a flat `sip_amount` across all months.
  *
  * Invariants when `amount_history` is present:
  *   - it is a complete timeline: the first entry covers everything from the

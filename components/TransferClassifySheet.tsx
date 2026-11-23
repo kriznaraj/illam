@@ -256,7 +256,7 @@ export default function TransferClassifySheet({ transfer, onConfirm }: TransferC
               </option>
             ))}
           </select>
-          <p className="text-xs text-gray-500 mt-1">Recorded in Selavu under Income. It is never counted as spending.</p>
+          <p className="text-xs text-gray-500 mt-1">Recorded as income. It is never counted as spending.</p>
         </div>
       ) : isExpense ? (
         <div>
@@ -324,11 +324,11 @@ export default function TransferClassifySheet({ transfer, onConfirm }: TransferC
             <span>No — it is a new contribution</span>
           </label>
           <p className="text-xs text-gray-500">
-            {selected ? 'Links the entry already on record — nothing is added twice.' : 'Adds a contribution on that account in Selvam.'}
+            {selected ? 'Links the entry already on record — nothing is added twice.' : 'Adds a contribution to that account under Net worth.'}
           </p>
         </fieldset>
       ) : needsAccount ? (
-        <p className="text-xs text-gray-500">Recorded as a contribution on that account in Selvam.</p>
+        <p className="text-xs text-gray-500">Recorded as a contribution to that account under Net worth.</p>
       ) : null}
 
       <div>

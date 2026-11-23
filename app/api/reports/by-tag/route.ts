@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClientFromRequest } from '@/lib/supabase-server';
+import { createServerClientFromRequest } from '@/lib/api/server';
 import { TagReportService } from '@/lib/services/reports/TagReportService';
 
 export const dynamic = 'force-dynamic';

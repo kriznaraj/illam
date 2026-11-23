@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase-server';
+import { createServerClientFromRequest } from '@/lib/api/server';
 import { NoteService } from '@/lib/services/NoteService';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = createServerClientFromRequest(request);
     const noteService = new NoteService(supabase);
     
 
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = createServerClientFromRequest(request);
     const noteService = new NoteService(supabase);
     
 
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = createServerClientFromRequest(request);
     const noteService = new NoteService(supabase);
     
 
@@ -67,7 +67,7 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = createServerClientFromRequest(request);
     const noteService = new NoteService(supabase);
     
 

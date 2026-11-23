@@ -37,8 +37,7 @@ function mockFor(statements: unknown[]) {
 
 describe('syncSnapshotForMonth', () => {
   it('carries the newest earlier statement when the month has none of its own', () => {
-    // The live case: viewing September 2026, whose statements have not been issued.
-    // Requiring an exact month match failed every card on the month the page opens to.
+    // Viewing a month whose statements have not been issued yet.
     const mock = mockFor([statement('2026-08-08', 6968)]);
     const service = new CreditCardStatementService(mock.client);
 
@@ -108,8 +107,6 @@ describe('syncSnapshotForMonth', () => {
 
 describe('list', () => {
   it('actually filters to the requested billing month', async () => {
-    // It used to accept `month` and use it only to cap the row count at 3, so a
-    // caller asking for one month silently received the three most recent statements.
     const mock = createSupabaseMock([{ data: [statement('2026-08-08', 6968)], error: null }]);
     const service = new CreditCardStatementService(mock.client);
 
@@ -126,6 +123,42 @@ describe('list', () => {
     await service.list(ACCOUNT_ID, '2026-12');
 
     expect(mock.argsFor('lt')).toContainEqual(['statement_date', '2027-01-01']);
+  });
+});
+
+describe('create', () => {
+  const input = {
+    account_id: ACCOUNT_ID,
+    period_start: '2026-03-09',
+    period_end: '2026-04-08',
+    statement_date: '2026-04-08',
+    due_date: '2026-04-28',
+    statement_amount: 5000,
+  };
+
+  it('looks for an existing statement in the billing month itself, not among the latest few', async () => {
+    // A back-dated statement: April's is older than the three most recent, so checking
+    // only those would let a second April statement in.
+    const mock = createSupabaseMock([
+      { data: [], error: null },
+      { data: statement('2026-04-08', 5000), error: null },
+    ]);
+    const service = new CreditCardStatementService(mock.client);
+
+    await service.create(input);
+
+    expect(mock.argsFor('gte')).toContainEqual(['statement_date', '2026-04-01']);
+    expect(mock.argsFor('lt')).toContainEqual(['statement_date', '2026-05-01']);
+  });
+
+  it('refuses a second statement for a billing month that already has one', async () => {
+    const mock = createSupabaseMock([{ data: [statement('2026-04-08', 4000)], error: null }]);
+    const service = new CreditCardStatementService(mock.client);
+
+    const result = await service.create(input);
+
+    expect(result.status).toBe(409);
+    expect(mock.calls.filter((c) => c.method === 'insert')).toHaveLength(0);
   });
 });
 

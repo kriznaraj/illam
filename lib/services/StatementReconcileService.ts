@@ -92,7 +92,7 @@ export class StatementReconcileService extends BaseService {
     try {
       existing = await this.lines.listForStatement(input.statementId);
     } catch (error) {
-      // Before migration 032 there is no table; recording the statement must not fail for it.
+      // Best-effort: recording the statement must not fail because reconciliation could not read.
       return { status: 'skipped', reason: error instanceof Error ? error.message : String(error) };
     }
     const settled = new Map(existing.filter((line) => line.status !== 'unmatched').map((line) => [line.line_no, line]));
@@ -108,7 +108,7 @@ export class StatementReconcileService extends BaseService {
       this.categories.findAllSorted(),
       this.appConfig.getKeys([AUTO_ADD_FROM_KEY]),
       this.users.findByUsername(ownerUsername(input.owner)),
-      // Absent until migration 036 is applied; a null simply leaves the row unlabelled.
+      // Best-effort: without the tag the row is simply left unlabelled.
       this.tags.findByName(AUTO_TAG_NAME).catch(() => null),
       // Best-effort: without them a premium paid by card is reconciled as before.
       this.commitmentRepo.listAll().catch(() => []),

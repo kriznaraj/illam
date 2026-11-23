@@ -14,6 +14,7 @@ bank-mail sync.
 - [8. Turn on AI features (optional)](#8-turn-on-ai-features-optional)
 - [9. Day-to-day operations](#9-day-to-day-operations): backups, upgrades, logs, passwords
 - [10. Troubleshooting](#10-troubleshooting)
+- [Reference: household.json and .env](#reference-householdjson-and-env)
 
 ---
 
@@ -63,14 +64,14 @@ Edit `household.json`. To start, keep just the slug, name and payee names:
   Illam recognise money moved between your own accounts and between members.
 
 You can add the account mappings (`cas`, `statementAccounts`, `contributionDestinations`) later,
-once your accounts exist in Selvam. Each is explained in the
-[README](../README.md#the-household-householdjson--illam_household).
+once your accounts exist under **Net worth**. Each is explained in the
+[reference](#householdjson) at the end of this guide.
 
 ## 4. Start it
 
 ```bash
 node scripts/setup.mjs
-docker compose --profile bundled-db up -d --build
+docker compose --profile bundled-db up -d
 ```
 
 `setup.mjs` writes `.env` with these generated values:
@@ -94,7 +95,7 @@ RDS, Supabase or your own server. The user needs to be able to create roles and 
 
 ```bash
 node scripts/setup.mjs --database-url 'postgres://user:pass@host:5432/illam?sslmode=require'
-docker compose up -d --build          # no bundled-db profile
+docker compose up -d                  # no bundled-db profile
 ```
 
 ## 5. Create logins
@@ -137,19 +138,19 @@ then:
 
 ```bash
 node scripts/setup.mjs --public-url https://<your-tunnel-hostname>
-docker compose --profile bundled-db up -d --build
+docker compose --profile bundled-db up -d
 ```
 
 **C. Your home Wi-Fi only.** Use the machine's LAN address:
 
 ```bash
 node scripts/setup.mjs --public-url http://192.168.1.20:8000
-docker compose --profile bundled-db up -d --build
+docker compose --profile bundled-db up -d
 ```
 
 The Gmail sync needs option A or B.
 
-> Changing `--public-url` always needs `--build`. The URL is compiled into the browser bundle.
+> Changed `--public-url` later? Re-run `docker compose up -d` so the services pick up the new `.env`. Nothing needs rebuilding.
 
 Then, on each phone, open the URL and choose **Add to Home Screen** (iOS Safari) or **Install
 app** (Android Chrome).
@@ -218,10 +219,14 @@ file off the machine.
 
 ```bash
 git pull
-docker compose --profile bundled-db up -d --build
+docker compose pull
+docker compose --profile bundled-db up -d     # leave out the profile with your own Postgres
 ```
 
-Database migrations in `db/migrations/` run on their own on every start. Take a backup first.
+`git pull` brings the compose file and migrations; `docker compose pull` brings the matching image
+(`ghcr.io/kriznaraj/illam`). Migrations run on their own on every start. Take a backup first.
+To stay on a release, set `ILLAM_VERSION=0.1.0` in `.env`. To build from source instead of pulling,
+add `--build`.
 
 ### Logs
 
@@ -255,14 +260,85 @@ docker compose --profile bundled-db down -v     # stop and DELETE all data
 
 | Symptom | Fix |
 |---|---|
-| `run pnpm setup first` from compose | `.env` is missing. Run `node scripts/setup.mjs` in the repo folder |
+| `run node scripts/setup.mjs first` from compose | `.env` is missing. Run `node scripts/setup.mjs` in the repo folder |
 | `auth` keeps restarting | Run `docker compose logs auth`. With an external Postgres, the user usually lacks rights to create roles or the `auth` schema |
 | Sign-in says "Invalid login credentials" | Check the email for typos and the password for autofill, or reset it (above) |
-| The page loads but data calls fail after changing the URL | Rebuild with `--build`. The public URL is compiled into the app |
+| The page loads but data calls fail after changing the URL | Run `docker compose up -d` so the app reads the new `PUBLIC_URL` |
 | Port 8000 is taken | Set `ILLAM_PORT=8080` in `.env` and re-run `setup.mjs --public-url http://localhost:8080` |
 | Gmail script gets `HTTP 401 … mismatch` | `ILLAM_SECRET` in the script doesn't match `INBOX_SECRET_<SLUG>` in `.env`, or `ILLAM_OWNER` is wrong |
 | Gmail script gets `HTTP 503 … not configured` | That member has no `INBOX_SECRET_<SLUG>`. Re-run `setup.mjs` and `docker compose up -d` |
-| A statement stays "locked" | Its password is missing from `STATEMENT_PASSWORDS_<SLUG>`. The Madal item shows the bank's password hint |
+| A statement stays "locked" | Its password is missing from `STATEMENT_PASSWORDS_<SLUG>`. The inbox item shows the bank's password hint |
 
 Still stuck? [Open an issue](https://github.com/kriznaraj/illam/issues). Include
 `docker compose ps` and the relevant `docker compose logs` lines, with secrets removed.
+
+## Reference: household.json and .env
+
+### household.json
+
+`node scripts/setup.mjs` copies this file into `.env` as `ILLAM_HOUSEHOLD`. Re-run it after
+every edit. Each member is a person whose mail Illam reads:
+
+```json
+{
+  "members": [
+    {
+      "slug": "alice",
+      "name": "Alice",
+      "payeeNames": ["ALICE"],
+      "cas": { "demat": "<account id>", "folios": "<account id>" },
+      "statementAccounts": { "hdfc_account_statement:1234": "<account id>" },
+      "contributionDestinations": { "5678": { "accountId": "<account id>", "alsoCheck": [] } }
+    }
+  ]
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `slug` | Lower-case id. Used in the Gmail script (`ILLAM_OWNER`) and in env var names |
+| `name` | Display name |
+| `payeeNames` | How banks print this person as a payee. A debit to yourself is an own-account move; a debit to another member is a household transfer |
+| `cas` | Which accounts this member's CDSL CAS updates: a demat account, plus one folio account or a fund-name split (`folioAccounts`) |
+| `statementAccounts` | Which account each emailed balance statement sets, keyed `<source id>:<last 4 digits>` |
+| `contributionDestinations` | Accounts outside the household (a broker wallet, a savings scheme) that statements show money going into, keyed by last 4 digits |
+
+Only `slug` and `name` are required. An account's id is in its page URL under **Net worth**.
+Source ids are listed in `lib/inbox/sources.ts`. A complete example is
+[`household.example.json`](../household.example.json).
+
+### .env
+
+`node scripts/setup.mjs` writes it; you rarely edit it by hand.
+
+| Variable | Required | Purpose |
+|---|---|---|
+| `PUBLIC_URL` | yes | Where people open Illam. The gateway serves the API there too |
+| `DATABASE_URL` | yes | Postgres connection used by migrations, PostgREST and GoTrue |
+| `JWT_SECRET`, `ANON_KEY`, `SERVICE_ROLE_KEY` | yes | Generated. The service key is server-only |
+| `ILLAM_HOUSEHOLD` | yes | Generated from `household.json` |
+| `ILLAM_PORT` | no | Host port for the gateway. Default `8000` |
+| `ILLAM_VERSION` | no | Image tag to run, e.g. `0.1.0`. Default `latest` |
+| `ILLAM_API_URL` | no | The API's address when it is not `PUBLIC_URL` (hosted Supabase) |
+| `INBOX_SECRET_<SLUG>` | for Gmail sync | One per member. Signs the Apps Script's requests |
+| `STATEMENT_PASSWORDS_<SLUG>` | for statement PDFs | JSON map of source id to passwords. Stays in the environment, never in the database |
+| `ANTHROPIC_API_KEY` | no | Turns on the AI features |
+| `INBOX_CAPTURE_STATEMENT_TEXT` | no | `1` saves masked statement text for writing a new reader (see CONTRIBUTING.md) |
+| `ILLAM_TODO_FROM` | no | `yyyy-mm-dd`. Inbox To-do ignores mail received before it (it stays in Money and All). Useful after a long backfill. Default: none |
+| `TZ` | no | Server time zone, e.g. `Asia/Kolkata`, so server-rendered dates and "this month" match your clock. Default: UTC |
+
+### What runs
+
+| Service | Role |
+|---|---|
+| `db` | Postgres 17. Only with `--profile bundled-db`; otherwise bring your own Postgres 15+ |
+| `migrate` | Applies `db/migrations/` with dbmate on every start, then exits |
+| `rest` | PostgREST: the data API the app's supabase-js client talks to |
+| `auth` | GoTrue: email and password sign-in. Sign-up is disabled |
+| `app` | The Next.js app: the published image, or built from this repo's `Dockerfile` with `--build` |
+| `gateway` | Caddy: one origin for `/rest/v1`, `/auth/v1` and the app |
+
+**Already on Supabase?** Illam talks to PostgREST and GoTrue through supabase-js, so a hosted
+Supabase project works too. Apply `db/migrations/*.sql` to it, then run the app image (or
+`pnpm build && pnpm start`) with `PUBLIC_URL` (where Illam is), `ILLAM_API_URL`
+(`https://<project>.supabase.co`), `ANON_KEY`, `SERVICE_ROLE_KEY` and `ILLAM_HOUSEHOLD`.

@@ -32,7 +32,7 @@ export class NoteService extends BaseService {
         tags: data.tags ?? [],
         is_pinned: data.is_pinned ?? false,
         is_archived: false,
-      } as any);
+      });
     } catch (error) {
       this.handleError(error, 'create note');
     }
@@ -44,14 +44,14 @@ export class NoteService extends BaseService {
   ): Promise<Note> {
     try {
       this.validateUUID(id, 'Note ID');
-      const updates: Record<string, unknown> = {};
+      const updates: Partial<Note> = {};
       if (patch.title !== undefined) updates.title = patch.title.trim();
       if (patch.content !== undefined) updates.content = patch.content;
       if (patch.tags !== undefined) updates.tags = patch.tags;
       if (patch.is_pinned !== undefined) updates.is_pinned = patch.is_pinned;
       if (patch.is_archived !== undefined) updates.is_archived = patch.is_archived;
 
-      return await this.noteRepo.update(id, updates as any);
+      return await this.noteRepo.update(id, updates);
     } catch (error) {
       this.handleError(error, 'update note');
     }

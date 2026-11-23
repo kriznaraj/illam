@@ -25,12 +25,12 @@ export interface TransferStatementOutcome {
   recorded: number;
   /**
    * Confirmed transfers the statement proves went to the other person, though filed as something
-   * else, and refiled as household transfers — with an undo record (migration 039). For
+   * else, and refiled as household transfers — with an undo record. For
    * example, a ₹40,000 transfer filed as a brokerage deposit whose statement line prints
-   * "…1303-TPT-…-K BOB". These used to wait for a person; they are now refiled automatically.
+   * "…1303-TPT-…-K BOB".
    */
   refiled: Transfer[];
-  /** Contradicted transfers that could not be refiled (039 unapplied, a write failed): a person looks. */
+  /** Contradicted transfers that could not be refiled (a write failed): a person looks. */
   contradicted: Transfer[];
 }
 

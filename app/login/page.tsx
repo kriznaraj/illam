@@ -102,15 +102,15 @@ export default function LoginPage() {
   // Biometric registration offer screen
   if (showBiometricOffer) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-        <div className="max-w-sm w-full bg-white rounded-3xl border border-gray-100 shadow-[0_12px_40px_-12px_rgba(20,40,126,0.18)] p-8 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-            <svg className="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="max-w-sm w-full bg-white rounded-2xl border border-gray-200 p-8 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4">
+            <svg className="w-8 h-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round"
                 d="M7.864 4.243A7.5 7.5 0 0119.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 004.5 10.5a7.464 7.464 0 01-1.15 3.993m1.989 3.559A11.209 11.209 0 008.25 10.5a3.75 3.75 0 117.5 0c0 .527-.021 1.049-.064 1.565M12 10.5a14.94 14.94 0 01-3.6 9.75m6.633-4.596a18.666 18.666 0 01-2.485 5.33" />
             </svg>
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Enable Biometric Unlock?</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Turn on biometric unlock?</h2>
           <p className="text-sm text-gray-500 mb-8">
             Use Face ID, Touch ID, or fingerprint to unlock the app next time — no password needed.
           </p>
@@ -133,27 +133,15 @@ export default function LoginPage() {
   }
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center px-4 py-10 bg-slate-50"
-      style={{
-        // A faint kolam dot grid, echoing the dots in the mark.
-        backgroundImage:
-          'radial-gradient(circle at 50% -10%, rgba(59,91,253,0.10), transparent 55%), radial-gradient(rgba(36,66,201,0.10) 1.2px, transparent 1.2px)',
-        backgroundSize: '100% 100%, 22px 22px',
-      }}
-    >
+    <div className="min-h-screen flex items-center justify-center px-4 py-10 bg-gray-50">
       <div className="max-w-sm w-full">
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-[0_12px_40px_-12px_rgba(20,40,126,0.18)] px-7 py-8 sm:px-8">
+        <div className="bg-white rounded-2xl border border-gray-200 px-7 py-8 sm:px-8">
           <div className="text-center mb-7">
             <div className="flex justify-center mb-4">
               <IllamLogo size={56} />
             </div>
-            <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">Welcome home</h1>
-            <p className="text-gray-500 mt-1 text-sm">
-              Sign in to <span className="font-medium text-gray-700">Illam</span>
-              <span className="text-gray-300 mx-1.5">·</span>
-              <span lang="ta" className="text-amber-600">இல்லம்</span>
-            </p>
+            <h1 className="text-2xl font-semibold text-gray-900">Sign in to Illam</h1>
+            <p className="text-gray-500 mt-1 text-sm">Your household&apos;s money, in one place.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -208,9 +196,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-5 pt-4 border-t border-gray-100">
-            <PWAInstallMenuItem className="flex items-center justify-center gap-2 w-full py-2 text-sm font-medium text-blue-700 hover:text-blue-800" />
-          </div>
+          <PWAInstallMenuItem className="mt-5 pt-4 border-t border-gray-100 flex items-center justify-center gap-2 w-full py-2 text-sm font-medium text-primary-700 hover:text-primary-800" />
         </div>
       </div>
     </div>

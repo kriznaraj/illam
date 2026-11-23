@@ -17,6 +17,8 @@ import { MetricCard, MetricGrid } from '@/components/MetricCard';
 import Modal from '@/components/Modal';
 import { useAccountTypes } from '@/lib/useAccountTypes';
 import { ExpandableChart } from '@/components/charts/ExpandableChart';
+import { ReportViews } from '@/components/ReportViews';
+import { TriangleAlert } from 'lucide-react';
 
 const PERIOD_OPTIONS = [
   { value: 3, label: '3 months' },
@@ -95,7 +97,7 @@ export default function PortfolioMonthlyReport() {
   if (!data) return (
     <PageContainer maxWidth="full">
       <EmptyState
-        icon="⚠️"
+        icon={TriangleAlert}
         title="Failed to load report"
         description="Try refreshing this page."
       />
@@ -307,7 +309,8 @@ export default function PortfolioMonthlyReport() {
 
   return (
     <PageContainer maxWidth="full">
-      <PageHeader title="Selvam Report" />
+      <PageHeader title="Net worth report" />
+      <ReportViews section="net-worth" current="trends" />
 
       {/* Filters — always on top */}
       <div className="card mb-4 sm:mb-6">
@@ -349,7 +352,7 @@ export default function PortfolioMonthlyReport() {
           subtext={filterType ? `${filterType} only` : undefined}
         />
         <MetricCard
-          tone="blue"
+          tone="primary"
           label={`Growth (${monthsBack}m)`}
           value={`${data.overallGrowth >= 0 ? '↑' : '↓'} ${formatCurrency(Math.abs(data.overallGrowth))}`}
           subtext={`${data.overallGrowthPercent >= 0 ? '+' : ''}${data.overallGrowthPercent.toFixed(2)}%`}
@@ -647,7 +650,7 @@ export default function PortfolioMonthlyReport() {
         <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">Portfolio by Type</h2>
         <p className="text-xs text-gray-400 mb-4">
           Growth-tracked types ·{' '}
-          <span className="inline-block w-2 h-2 rounded-sm bg-blue-500 mr-1" />
+          <span className="inline-block w-2 h-2 rounded-sm bg-primary-500 mr-1" />
           Then ({formatMonth(fromMonth + '-01')})
           <span className="mx-2">→</span>
           <span className="inline-block w-2 h-2 rounded-sm bg-red-400 mr-1" />
@@ -1062,7 +1065,7 @@ export default function PortfolioMonthlyReport() {
                 {/* Total row */}
                 <tr
                   className={`font-bold cursor-pointer transition-colors ${
-                    selectedAccount === TOTAL_TREND_ID ? 'bg-green-100' : 'bg-blue-50 hover:bg-blue-100'
+                    selectedAccount === TOTAL_TREND_ID ? 'bg-green-100' : 'bg-primary-50 hover:bg-primary-100'
                   }`}
                   onClick={() => setSelectedAccount(selectedAccount === TOTAL_TREND_ID ? null : TOTAL_TREND_ID)}
                 >

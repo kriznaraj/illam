@@ -10,7 +10,7 @@
  * keep the old figure until this runs.
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClientFromRequest } from '@/lib/supabase-server';
+import { createServerClientFromRequest } from '@/lib/api/server';
 import { PortfolioInvestmentService } from '@/lib/services/PortfolioInvestmentService';
 
 export const dynamic = 'force-dynamic';

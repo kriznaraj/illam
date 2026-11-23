@@ -117,18 +117,18 @@ export default function ActivityTrackerEventForm({
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">Type</label>
             <div className="grid grid-cols-3 gap-2">
-              {EVENT_TYPE_OPTIONS.map(({ value, label, desc, icon }) => (
+              {EVENT_TYPE_OPTIONS.map(({ value, label, desc, icon: Icon }) => (
                 <button
                   key={value}
                   type="button"
                   onClick={() => setEventType(value)}
                   className={`p-3 rounded-lg border-2 text-left transition-all ${
                     eventType === value
-                      ? 'border-blue-500 bg-blue-50'
+                      ? 'border-primary-500 bg-primary-50'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
-                  <div className="text-lg mb-1">{icon}</div>
+                  <Icon size={18} className="mb-1 text-gray-500" aria-hidden />
                   <div className="text-sm font-medium text-gray-900">{label}</div>
                   <div className="text-xs text-gray-500 mt-0.5 leading-tight">{desc}</div>
                 </button>

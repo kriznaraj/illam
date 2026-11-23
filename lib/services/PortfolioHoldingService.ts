@@ -59,12 +59,12 @@ export class PortfolioHoldingService extends BaseService {
         name: data.name.trim(),
         symbol: data.symbol?.trim() || null,
         identifier: data.identifier.trim(),
-        instrument_type: (data.instrument_type as any) || 'manual',
+        instrument_type: data.instrument_type || 'manual',
         quantity_unit: data.quantity_unit?.trim() || null,
-        sort_order: (data as any).sort_order ?? 0,
+        sort_order: data.sort_order ?? 0,
         details: data.details ?? null,
-        is_active: (data as any).is_active !== false,
-      } as any);
+        is_active: data.is_active !== false,
+      });
     } catch (e) {
       this.handleError(e, 'create portfolio holding');
     }
@@ -77,17 +77,17 @@ export class PortfolioHoldingService extends BaseService {
         throw new Error(`instrument_type must be one of: ${VALID_INSTRUMENT_TYPES.join(', ')}`);
       }
 
-      const updateData: Record<string, unknown> = {};
+      const updateData: Partial<PortfolioHolding> = {};
       if (patch.name !== undefined) updateData.name = patch.name.trim();
       if (patch.symbol !== undefined) updateData.symbol = patch.symbol?.trim() || null;
       if (patch.identifier !== undefined) updateData.identifier = patch.identifier.trim();
       if (patch.instrument_type !== undefined) updateData.instrument_type = patch.instrument_type;
       if (patch.quantity_unit !== undefined) updateData.quantity_unit = patch.quantity_unit?.trim() || null;
-      if ((patch as any).sort_order !== undefined) updateData.sort_order = (patch as any).sort_order;
+      if (patch.sort_order !== undefined) updateData.sort_order = patch.sort_order;
       if (patch.details !== undefined) updateData.details = patch.details;
-      if ((patch as any).is_active !== undefined) updateData.is_active = (patch as any).is_active;
+      if (patch.is_active !== undefined) updateData.is_active = patch.is_active;
 
-      return await this.repo.update(id, updateData as any);
+      return await this.repo.update(id, updateData);
     } catch (e) {
       this.handleError(e, 'update portfolio holding');
     }

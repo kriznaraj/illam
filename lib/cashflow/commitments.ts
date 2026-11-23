@@ -2,7 +2,7 @@ import { monthKeys } from '@/lib/utils/dateUtils';
 import type { Commitment, CommitmentDueStatus, CommitmentFrequency, CommitmentKind, CommitmentPayment } from '@/types';
 
 /**
- * Commitments (migration 037) — insurance premiums, loan EMIs. Declared once, the way a SIP
+ * Commitments — insurance premiums, loan EMIs. Declared once, the way a SIP
  * is, and never expenses: a premium is what the household signed up to pay, not what it
  * chose to spend that month. Pure.
  *

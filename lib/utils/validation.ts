@@ -1,5 +1,3 @@
-import { NextResponse } from 'next/server';
-
 /**
  * Custom validation error class
  */
@@ -19,30 +17,6 @@ export interface ValidationResult {
 }
 
 /**
- * Validate required fields
- * Returns validation result with list of missing fields
- */
-export function validateRequired(
-  fields: Record<string, any>,
-  required: string[]
-): ValidationResult {
-  const errors: string[] = [];
-
-  for (const field of required) {
-    const value = fields[field];
-    // Check for null, undefined, empty string, but allow 0 and false
-    if (value === null || value === undefined || value === '') {
-      errors.push(`${field} is required`);
-    }
-  }
-
-  return {
-    valid: errors.length === 0,
-    errors,
-  };
-}
-
-/**
  * Validate positive number
  * Throws ValidationError if number is not positive
  */
@@ -52,40 +26,6 @@ export function validatePositiveNumber(value: number, fieldName: string): void {
   }
   if (value <= 0) {
     throw new ValidationError(fieldName, `${fieldName} must be greater than 0`);
-  }
-}
-
-/**
- * Validate non-negative number
- * Throws ValidationError if number is negative
- */
-export function validateNonNegativeNumber(value: number, fieldName: string): void {
-  if (typeof value !== 'number' || isNaN(value)) {
-    throw new ValidationError(fieldName, `${fieldName} must be a valid number`);
-  }
-  if (value < 0) {
-    throw new ValidationError(fieldName, `${fieldName} must be 0 or greater`);
-  }
-}
-
-/**
- * Validate number range
- * Throws ValidationError if number is outside range
- */
-export function validateNumberRange(
-  value: number,
-  fieldName: string,
-  min: number,
-  max: number
-): void {
-  if (typeof value !== 'number' || isNaN(value)) {
-    throw new ValidationError(fieldName, `${fieldName} must be a valid number`);
-  }
-  if (value < min || value > max) {
-    throw new ValidationError(
-      fieldName,
-      `${fieldName} must be between ${min} and ${max}`
-    );
   }
 }
 
@@ -102,14 +42,6 @@ export function validateDate(dateString: string, fieldName: string): void {
   if (isNaN(date.getTime())) {
     throw new ValidationError(fieldName, `${fieldName} must be a valid date`);
   }
-}
-
-/**
- * Validate email format
- */
-export function validateEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
 }
 
 /**
@@ -153,22 +85,6 @@ export function validateUUID(uuid: string, fieldName: string = 'ID'): void {
 }
 
 /**
- * Validate enum value
- */
-export function validateEnum<T>(
-  value: T,
-  fieldName: string,
-  allowedValues: T[]
-): void {
-  if (!allowedValues.includes(value)) {
-    throw new ValidationError(
-      fieldName,
-      `${fieldName} must be one of: ${allowedValues.join(', ')}`
-    );
-  }
-}
-
-/**
  * Sanitize tag name
  * Converts to lowercase, replaces spaces with underscores, removes special chars
  */
@@ -181,19 +97,7 @@ export function sanitizeTagName(name: string): string {
 }
 
 /**
- * Sanitize string for display (prevent XSS)
- */
-export function sanitizeString(str: string): string {
-  return str
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-    .replace(/\//g, '&#x2F;');
-}
-
-/**
- * Validate and sanitize expense data
+ * Validate expense data, collecting every problem rather than stopping at the first.
  */
 export function validateExpenseData(data: {
   amount?: number;

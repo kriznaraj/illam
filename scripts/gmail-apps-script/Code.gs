@@ -1,5 +1,5 @@
 /**
- * Illam — Madal (inbox) sync.
+ * Illam: bank-mail inbox sync.
  *
  * Runs inside one Gmail account as a Google Apps Script. Every TRIGGER_MINUTES it
  * finds new mail from the senders Illam cares about and pushes each

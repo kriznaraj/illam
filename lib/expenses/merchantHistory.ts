@@ -1,11 +1,10 @@
 /**
  * What this household has already decided a payee is.
  *
- * An auto-added spend used to get its category from keywords alone, so anything the keyword
- * table did not recognise became Miscellaneous — and the person had to set it again on every
- * repeat visit. A good share of review expenses carrying a payee had an earlier *confirmed*
- * expense from the same payee sitting right there in the table: a snack shop filed under
- * Quick bites several times, a pharmacy under Healthcare.
+ * Keywords alone would file anything the keyword table does not recognise as Miscellaneous,
+ * and the person would set it again on every repeat visit. An earlier *confirmed* expense from
+ * the same payee (a snack shop filed under Quick bites, a pharmacy under Healthcare) is a
+ * better answer.
  *
  * Deterministic, and no AI — this is the household's own past decision read back.
  */

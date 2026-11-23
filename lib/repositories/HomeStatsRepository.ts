@@ -11,7 +11,7 @@ export class HomeStatsRepository {
       )
       .gte('date', startDate)
       .lte('date', endDate)
-      // Every expense counts, auto-added ones included (migration 036): an alert that
+      // Every expense counts, auto-added ones included: an alert that
       // reached Madal is money that already left the account. `needs_review` only marks
       // a row nobody has looked at; rejecting one deletes it, which is what removes it here.
       .order('date', { ascending: false });

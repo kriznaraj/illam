@@ -25,7 +25,7 @@ export interface RecordedCommitmentPayment extends CommitmentMatch {
 }
 
 /**
- * Commitments (migration 037): insurance premiums and loan EMIs, declared once and never
+ * Commitments: insurance premiums and loan EMIs, declared once and never
  * expenses (lib/cashflow/commitments.ts). Besides the CRUD behind /cash-flow/commitments,
  * this is where every place that sees money leave — a bank statement line, a card statement
  * line, a Madal alert — asks "is this a commitment?" before it would make an expense of it.
@@ -50,11 +50,6 @@ export class CommitmentService extends BaseService {
 
   listPayments(fromMonth: string, toMonth: string): Promise<CommitmentPayment[]> {
     return this.payments.listBetween(fromMonth, toMonth);
-  }
-
-  listPaymentsFor(commitmentId: string): Promise<CommitmentPayment[]> {
-    this.validateUUID(commitmentId, 'commitment id');
-    return this.payments.listForCommitment(commitmentId);
   }
 
   async create(input: Partial<Commitment>): Promise<Commitment> {
@@ -126,7 +121,7 @@ export class CommitmentService extends BaseService {
    * health-insurance premium makes its month read as a spike. So every declared commitment also
    * sweeps the expenses since its start month: the same text-and-date match as a debit, each move
    * recorded with Undo (MadalDecisionService.commitExpense). Best-effort per expense; returns how
-   * many moved. Needs migration 040 — before it, the undo record fails and nothing moves.
+   * many moved.
    */
   async claimRecordedExpenses(): Promise<number> {
     const commitments = (await this.commitments.listAll()).filter((c) => c.active && c.match_text);

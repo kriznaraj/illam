@@ -237,7 +237,7 @@ export function MonthNavigator({
                   className={classNames(
                     'rounded-lg px-2 py-2 text-sm font-medium transition-colors',
                     isSelected
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-primary-600 text-white'
                       : disabled
                         ? 'text-gray-300 cursor-not-allowed'
                         : 'text-gray-700 hover:bg-gray-100',

@@ -116,13 +116,4 @@ export class UserRepository extends BaseRepository<User> {
     return (data as unknown as User[]) || [];
   }
 
-  /**
-   * Get active users (users who have created expenses)
-   */
-  async getActiveUsers(): Promise<User[]> {
-    // This would require joining with expenses
-    // For now, return all users
-    // TODO: Implement proper active user detection
-    return this.findAll();
-  }
 }

@@ -67,7 +67,7 @@ export function ExpenseCard({
       }}
       className={`flex items-center py-2 hover:bg-gray-50 rounded-lg transition-colors border-l-4 ${
         onClick && !showCheckbox ? 'cursor-pointer' : ''
-      } ${isSelected ? 'bg-blue-50' : ''}`}
+      } ${isSelected ? 'bg-primary-50' : ''}`}
       style={{
         borderLeftColor: expense.event ? expense.event.color : 'transparent'
       }}
@@ -79,7 +79,7 @@ export function ExpenseCard({
             type="checkbox"
             checked={isSelected}
             onChange={onToggleSelect}
-            className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+            className="w-4 h-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500"
             onClick={(e) => e.stopPropagation()}
           />
         )}
@@ -115,7 +115,7 @@ export function ExpenseCard({
                   e.stopPropagation();
                   onCategoryClick(expense.category!.name);
                 }}
-                className="text-sm font-semibold text-gray-900 hover:text-blue-600 hover:underline transition-colors text-left truncate"
+                className="text-sm font-semibold text-gray-900 hover:text-primary-600 hover:underline transition-colors text-left truncate"
                 title="Filter by category"
               >
                 {expense.category?.name}

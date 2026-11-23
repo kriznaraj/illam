@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { FlaskConical, RefreshCw, Copy, Trash2 } from 'lucide-react';
 
 export default function DebugPage() {
   const [logs, setLogs] = useState<any[]>([]);
@@ -60,10 +61,10 @@ export default function DebugPage() {
       logs.push(testLog);
       localStorage.setItem('expense-debug-logs', JSON.stringify(logs));
 
-      alert(`✅ All caches cleared! Auth session preserved.\n• Cleared: ${clearedKeys.length} cache entries\n• Preserved: ${keys.length - clearedKeys.length} items (including auth)`);
+      alert(`All caches cleared! Auth session preserved.\n• Cleared: ${clearedKeys.length} cache entries\n• Preserved: ${keys.length - clearedKeys.length} items (including auth)`);
       loadLogs();
     } catch (e) {
-      alert('❌ Cache clear failed: ' + (e instanceof Error ? e.message : String(e)));
+      alert('Cache clear failed: ' + (e instanceof Error ? e.message : String(e)));
     }
   };
 
@@ -90,10 +91,10 @@ export default function DebugPage() {
       logs.push(testLog);
       localStorage.setItem('expense-debug-logs', JSON.stringify(logs));
 
-      alert('✅ Test log added! Refresh to see it.');
+      alert('Test log added! Refresh to see it.');
       loadLogs();
     } catch (e) {
-      alert('❌ Logging failed: ' + (e instanceof Error ? e.message : String(e)));
+      alert('Logging failed: ' + (e instanceof Error ? e.message : String(e)));
     }
   };
 
@@ -117,10 +118,10 @@ export default function DebugPage() {
       logs.push(testLog);
       localStorage.setItem('expense-debug-logs', JSON.stringify(logs));
 
-      alert(`✅ Tags API test complete! Found ${Array.isArray(tags) ? tags.length : 0} tags. Refresh to see details.`);
+      alert(`Tags API test complete! Found ${Array.isArray(tags) ? tags.length : 0} tags. Refresh to see details.`);
       loadLogs();
     } catch (e) {
-      alert('❌ Tags API test failed: ' + (e instanceof Error ? e.message : String(e)));
+      alert('Tags API test failed: ' + (e instanceof Error ? e.message : String(e)));
     }
   };
 
@@ -168,10 +169,10 @@ export default function DebugPage() {
       logs.push(testLog);
       localStorage.setItem('expense-debug-logs', JSON.stringify(logs));
 
-      alert(`✅ Test complete!\n• Total expenses: ${Array.isArray(expenses) ? expenses.length : 0}\n• With tags: ${expensesWithTags.length}\n\nRefresh to see details.`);
+      alert(`Test complete!\n• Total expenses: ${Array.isArray(expenses) ? expenses.length : 0}\n• With tags: ${expensesWithTags.length}\n\nRefresh to see details.`);
       loadLogs();
     } catch (e) {
-      alert('❌ Expense test failed: ' + (e instanceof Error ? e.message : String(e)));
+      alert('Expense test failed: ' + (e instanceof Error ? e.message : String(e)));
     }
   };
 
@@ -195,19 +196,22 @@ export default function DebugPage() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-3 sm:mb-4">
-          <h1 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">🐛 Debug Logs</h1>
+          <h1 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">Diagnostics</h1>
 
           {/* System Info */}
           <div className="mb-3 sm:mb-4 text-xs sm:text-sm text-gray-600 space-y-1">
             <p className="break-all"><strong>User Agent:</strong> {userAgent}</p>
             <p><strong>Platform:</strong> {platform}</p>
             <p><strong>Total Logs:</strong> {logs.length}</p>
-            <p><strong>localStorage:</strong> {typeof localStorage !== 'undefined' ? '✅ Yes' : '❌ No'}</p>
+            <p><strong>localStorage:</strong> {typeof localStorage !== 'undefined' ? 'Yes' : 'No'}</p>
           </div>
 
           {/* Test Banner */}
           <div className="mb-3 sm:mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p className="font-semibold text-sm mb-2">🧪 Test Tools</p>
+            <p className="flex items-center gap-1.5 font-semibold text-sm mb-2">
+              <FlaskConical size={16} aria-hidden />
+              Test Tools
+            </p>
             <div className="space-y-2">
               <button
                 onClick={testLogging}
@@ -217,7 +221,7 @@ export default function DebugPage() {
               </button>
               <button
                 onClick={testTagsAPI}
-                className="w-full px-3 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs font-medium"
+                className="w-full px-3 py-1.5 bg-primary-500 text-white rounded hover:bg-primary-600 text-xs font-medium"
               >
                 Test Tags API
               </button>
@@ -248,21 +252,24 @@ export default function DebugPage() {
             <div className="flex flex-col sm:flex-row gap-2">
               <button
                 onClick={loadLogs}
-                className="w-full px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm font-medium"
+                className="inline-flex items-center justify-center gap-2 w-full px-3 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm font-medium"
               >
-                🔄 Refresh
+                <RefreshCw size={16} aria-hidden />
+                Refresh
               </button>
               <button
                 onClick={copyLogs}
-                className="w-full px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm font-medium"
+                className="inline-flex items-center justify-center gap-2 w-full px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm font-medium"
               >
-                📋 Copy
+                <Copy size={16} aria-hidden />
+                Copy
               </button>
               <button
                 onClick={clearLogs}
-                className="w-full px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm font-medium"
+                className="inline-flex items-center justify-center gap-2 w-full px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm font-medium"
               >
-                🗑️ Clear
+                <Trash2 size={16} aria-hidden />
+                Clear
               </button>
             </div>
           </div>

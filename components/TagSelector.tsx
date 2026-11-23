@@ -161,7 +161,7 @@ export default function TagSelector({
     <div className="relative w-full">
       {/* Input Container */}
       <div
-        className="flex flex-wrap gap-1.5 min-h-[40px] p-2 border border-gray-300 rounded-lg bg-white focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400"
+        className="flex flex-wrap gap-1.5 min-h-[40px] p-2 border border-gray-300 rounded-lg bg-white focus-within:border-primary-400 focus-within:ring-1 focus-within:ring-primary-400"
         onClick={() => inputRef.current?.focus()}
         style={{ width: '100%', maxWidth: '100%' }}
       >
@@ -225,7 +225,7 @@ export default function TagSelector({
                     e.preventDefault();
                     handleSuggestionClick(tag);
                   }}
-                  className="w-full text-left px-3 py-2 hover:bg-blue-50 active:bg-blue-100 flex items-center gap-2 text-sm min-w-0"
+                  className="w-full text-left px-3 py-2 hover:bg-primary-50 active:bg-primary-100 flex items-center gap-2 text-sm min-w-0"
                 >
                   <span
                     className="w-2 h-2 rounded-full flex-shrink-0"

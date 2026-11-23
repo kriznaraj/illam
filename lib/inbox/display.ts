@@ -4,13 +4,14 @@ import { describePaymentSource, parsePaymentSource, type CardIndex } from '@/lib
 import { paymentMethodLabel } from '@/lib/inbox/automation/owners';
 import { cleanPayee } from '@/lib/inbox/payee';
 import { formatters, getTodayAppDate, parseAppDate, toAppTimezoneDate } from '@/lib/utils/dateUtils';
+import { CreditCard, Receipt, TrendingUp, ArrowLeftRight, Megaphone, type LucideIcon } from 'lucide-react';
 
-export const KIND_META: Record<InboxKind, { icon: string; label: string }> = {
-  transaction: { icon: '💳', label: 'Transaction' },
-  card_statement: { icon: '🧾', label: 'Card statement' },
-  investment_statement: { icon: '📈', label: 'Investment statement' },
-  trade: { icon: '🔁', label: 'Trade' },
-  notice: { icon: '📣', label: 'Notice' },
+export const KIND_META: Record<InboxKind, { icon: LucideIcon; label: string }> = {
+  transaction: { icon: CreditCard, label: 'Transaction' },
+  card_statement: { icon: Receipt, label: 'Card statement' },
+  investment_statement: { icon: TrendingUp, label: 'Investment statement' },
+  trade: { icon: ArrowLeftRight, label: 'Trade' },
+  notice: { icon: Megaphone, label: 'Notice' },
 };
 
 /** A member's slug as a label: "alice" → "Alice". The full name comes from `/api/household`. */
@@ -117,7 +118,7 @@ export function itemState(item: InboxItem, hasPendingTransfer: boolean): { label
     case 'linked':
       return { label: 'Linked to expense', tone: 'settled' };
     case 'created':
-      return { label: 'Added to Selavu', tone: 'settled' };
+      return { label: 'Added to expenses', tone: 'settled' };
     case 'card_bill':
       return { label: 'Card bill paid', tone: 'settled' };
     case 'transfer':
@@ -127,7 +128,7 @@ export function itemState(item: InboxItem, hasPendingTransfer: boolean): { label
     case 'income':
       return { label: 'Recorded as income', tone: 'settled' };
     case 'statement_recorded':
-      return { label: item.kind === 'investment_statement' ? 'Updated in Selvam' : 'Recorded in Cards', tone: 'settled' };
+      return { label: item.kind === 'investment_statement' ? 'Updated in Net worth' : 'Recorded in Cards', tone: 'settled' };
     case 'statement_unread':
       return { label: 'Statement not read', tone: 'open' };
     case 'history_unmatched':

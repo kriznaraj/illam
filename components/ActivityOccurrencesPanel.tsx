@@ -231,7 +231,7 @@ export default function ActivityOccurrencesPanel({
                   className={`flex flex-col items-center justify-center gap-0.5 px-2 py-2.5 rounded-lg border transition-colors disabled:cursor-not-allowed ${
                     alreadyLogged
                       ? 'border-green-200 bg-green-50 text-green-700'
-                      : 'border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 disabled:opacity-50'
+                      : 'border-primary-200 bg-primary-50 text-primary-700 hover:bg-primary-100 disabled:opacity-50'
                   }`}
                 >
                   <span className="flex items-center gap-1 text-sm font-semibold leading-tight">
@@ -243,7 +243,7 @@ export default function ActivityOccurrencesPanel({
                     <span className="truncate">{label}</span>
                   </span>
                   <span
-                    className={`text-[11px] leading-tight ${alreadyLogged ? 'text-green-600' : 'text-blue-500'}`}
+                    className={`text-[11px] leading-tight ${alreadyLogged ? 'text-green-600' : 'text-primary-500'}`}
                   >
                     {alreadyLogged ? 'Logged' : sub}
                   </span>
@@ -293,7 +293,7 @@ export default function ActivityOccurrencesPanel({
             <button
               onClick={handleLogPrevious}
               disabled={loggingPrevious || !previousDate}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg disabled:opacity-50"
             >
               {loggingPrevious ? 'Adding...' : 'Add'}
             </button>
@@ -385,7 +385,7 @@ export default function ActivityOccurrencesPanel({
                     <button
                       onClick={() => handleSaveEdit(occ.id)}
                       disabled={savingEdit}
-                      className="px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded-md disabled:opacity-50"
+                      className="px-3 py-1 text-xs font-medium text-white bg-primary-600 rounded-md disabled:opacity-50"
                     >
                       Save
                     </button>
@@ -406,7 +406,7 @@ export default function ActivityOccurrencesPanel({
                     <div className="flex items-center gap-1 flex-shrink-0">
                       <button
                         onClick={() => startEdit(occ)}
-                        className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                        className="p-1.5 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors"
                         title="Edit occurrence"
                       >
                         <Pencil className="w-3.5 h-3.5" />

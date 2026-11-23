@@ -15,6 +15,8 @@ import { MetricCard, MetricGrid } from '@/components/MetricCard';
 import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
 import type { Insight, InsightType } from '@/types';
+import { ReportViews } from '@/components/ReportViews';
+import { Search, Compass, RefreshCw, Lightbulb } from 'lucide-react';
 
 interface Summary {
   totalSpent: number;
@@ -33,12 +35,12 @@ interface Summary {
 
 /** Filter tabs are built from the types actually present, not a hardcoded list. */
 const TYPE_LABELS: Partial<Record<InsightType, string>> = {
-  data_quality: '🩺 Data health',
-  anomaly: '⚠️ Anomalies',
-  trend: '📈 Trends',
-  prediction: '🔮 Predictions',
-  pattern: '📊 Patterns',
-  achievement: '🌟 Verdict',
+  data_quality: 'Data health',
+  anomaly: 'Anomalies',
+  trend: 'Trends',
+  prediction: 'Predictions',
+  pattern: 'Patterns',
+  achievement: 'Verdict',
 };
 
 export default function InsightsPage() {
@@ -149,7 +151,7 @@ export default function InsightsPage() {
     return (
       <PageContainer maxWidth="7xl">
         <PageHeader
-          title="Smart Insights"
+          title="Insights"
           description={insightsSourceLabel}
           action={
             <button
@@ -157,14 +159,16 @@ export default function InsightsPage() {
               disabled={regenerating}
               className="btn btn-ghost text-sm"
               title="Regenerate insights"
+              aria-label="Regenerate insights"
             >
-              {regenerating ? '⏳' : '🔄'}
+              <RefreshCw size={16} className={regenerating ? 'animate-spin' : undefined} aria-hidden />
             </button>
           }
         />
+        <ReportViews section="expenses" current="insights" />
         <div className="mb-6">{monthNavigation}</div>
         <EmptyState
-          icon="🔍"
+          icon={Search}
           title="No Data for This Month"
           description="There are no expenses recorded for the selected month. Try selecting a different month or add expenses to generate insights."
         />
@@ -193,7 +197,7 @@ export default function InsightsPage() {
   return (
     <PageContainer maxWidth="7xl">
       <PageHeader
-        title="Smart Insights 💡"
+        title="Insights"
         description={insightsSourceLabel}
         action={
           <button
@@ -201,8 +205,9 @@ export default function InsightsPage() {
             disabled={regenerating}
             className="btn btn-ghost text-sm"
             title="Regenerate insights"
+            aria-label="Regenerate insights"
           >
-            {regenerating ? '⏳' : '🔄'}
+            <RefreshCw size={16} className={regenerating ? 'animate-spin' : undefined} aria-hidden />
           </button>
         }
       />
@@ -212,7 +217,7 @@ export default function InsightsPage() {
       {/* Summary Cards */}
       <MetricGrid className="md:grid-cols-3 mb-4">
         <MetricCard
-          tone="blue"
+          tone="primary"
           label={analysisMonthLabel || 'Selected Month'}
           value={formatCurrency(summary.totalSpent)}
           subtext={`${summary.transactionCount} transactions`}
@@ -238,7 +243,7 @@ export default function InsightsPage() {
       </MetricGrid>
 
       {/* Filter Tabs */}
-      <div className="bg-white rounded-xl shadow-sm p-4 mb-4 bg-gradient-to-r from-gray-50 to-gray-100">
+      <div className="bg-white rounded-xl shadow-sm p-4 mb-4 bg-gray-50">
         <SegmentedControl
           value={filter}
           onChange={setFilter}
@@ -251,7 +256,7 @@ export default function InsightsPage() {
       {/* Insights Grid */}
       {filteredInsights.length === 0 ? (
         <EmptyState
-          icon="🧭"
+          icon={Compass}
           title="No insights in this category"
           description="Try another insight type filter."
         />
@@ -261,6 +266,7 @@ export default function InsightsPage() {
             <InsightCard
               key={insight.id}
               icon={insight.icon}
+              type={insight.type}
               title={insight.title}
               description={insight.description}
               severity={insight.severity}
@@ -273,11 +279,14 @@ export default function InsightsPage() {
       )}
 
       {/* Info Footer */}
-      <div className="bg-white rounded-xl shadow-sm p-4 bg-blue-50 border border-blue-200 mt-4">
-        <p className="text-sm text-blue-800">
-          💡 Running costs (Need, Want, Unplanned) are judged against a trimmed baseline of recent
+      <div className="bg-white rounded-xl shadow-sm p-4 bg-primary-50 border border-primary-200 mt-4">
+        <p className="flex items-start gap-2 text-sm text-primary-800">
+          <Lightbulb size={16} className="mt-0.5 flex-shrink-0" aria-hidden />
+          <span>
+          Running costs (Need, Want, Unplanned) are judged against a trimmed baseline of recent
           complete months; one-time projects are reported separately so a renovation cannot read as
           overspending. Small-rupee moves are suppressed however large the percentage.
+          </span>
         </p>
         <Link href="/annual-review" className="btn btn-link btn-sm mt-2 px-0">
           Open the twelve-month review →

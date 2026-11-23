@@ -57,12 +57,5 @@ export class PortfolioSnapshotRepository extends BaseRepository<PortfolioSnapsho
       .single();
   }
 
-  async deleteByAccountMonth(params: { account_id: string; snapshot_date: string }) {
-    return await this.supabase
-      .from(this.tableName)
-      .delete()
-      .eq('account_id', params.account_id)
-      .eq('snapshot_date', params.snapshot_date);
-  }
 }
 

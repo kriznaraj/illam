@@ -32,23 +32,6 @@ export class CategoryRepository extends BaseRepository<Category> {
   }
 
   /**
-   * Find categories by group name
-   */
-  async findByGroup(groupName: string): Promise<Category[]> {
-    const { data, error } = await this.supabase
-      .from(this.tableName)
-      .select(this.getSelectQuery())
-      .eq('group_name', groupName)
-      .order('sort_order', { ascending: true });
-
-    if (error) {
-      throw new Error(`Failed to fetch categories by group: ${error.message}`);
-    }
-
-    return (data as unknown as Category[]) || [];
-  }
-
-  /**
    * Update sort order for a category
    */
   async updateSortOrder(categoryId: string, newSortOrder: number): Promise<Category> {

@@ -1,15 +1,11 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { BaseRepository, isTableMissing } from './BaseRepository';
+import { BaseRepository } from './BaseRepository';
 import type { Commitment, CommitmentPayment } from '@/types';
 
 const asCommitment = (row: Commitment): Commitment => ({ ...row, amount: Number(row.amount), due_day: Number(row.due_day) });
 const asPayment = (row: CommitmentPayment): CommitmentPayment => ({ ...row, amount: Number(row.amount) });
 
-/**
- * Commitments (migration 037). Reads answer empty until the migration is applied — every
- * caller that matches debits against them runs inside ingest or automation, and must carry
- * on as it did before; writes fail loudly.
- */
+/** Commitments: insurance premiums, loan EMIs and the like, declared once. */
 export class CommitmentRepository extends BaseRepository<Commitment> {
   constructor(supabase: SupabaseClient) {
     super(supabase, 'commitments');
@@ -22,7 +18,6 @@ export class CommitmentRepository extends BaseRepository<Commitment> {
   async listAll(): Promise<Commitment[]> {
     return this.withRetry(async () => {
       const { data, error } = await this.supabase.from(this.tableName).select('*').order('created_at');
-      if (isTableMissing(error)) return [];
       if (error && this.isTransientSupabaseError(error)) throw error;
       if (error) throw new Error(`Failed to fetch commitments: ${error.message}`);
       return ((data ?? []) as unknown as Commitment[]).map(asCommitment);
@@ -47,21 +42,6 @@ export class CommitmentPaymentRepository extends BaseRepository<CommitmentPaymen
         .select('*')
         .gte('due_month', fromMonth)
         .lte('due_month', toMonth);
-      if (isTableMissing(error)) return [];
-      if (error && this.isTransientSupabaseError(error)) throw error;
-      if (error) throw new Error(`Failed to fetch commitment payments: ${error.message}`);
-      return ((data ?? []) as unknown as CommitmentPayment[]).map(asPayment);
-    });
-  }
-
-  async listForCommitment(commitmentId: string): Promise<CommitmentPayment[]> {
-    return this.withRetry(async () => {
-      const { data, error } = await this.supabase
-        .from(this.tableName)
-        .select('*')
-        .eq('commitment_id', commitmentId)
-        .order('due_month', { ascending: false });
-      if (isTableMissing(error)) return [];
       if (error && this.isTransientSupabaseError(error)) throw error;
       if (error) throw new Error(`Failed to fetch commitment payments: ${error.message}`);
       return ((data ?? []) as unknown as CommitmentPayment[]).map(asPayment);

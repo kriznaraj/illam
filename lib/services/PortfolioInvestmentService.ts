@@ -110,10 +110,6 @@ const getActiveSipMonthlyAmount = (details: PortfolioAccount['details'], month: 
   }, 0);
 };
 
-/** A column this code reads or writes but the live database has not got yet (a migration not applied). */
-const isMissingColumn = (message: string, column: string): boolean =>
-  message.includes(column) && /does not exist|could not find|schema cache/i.test(message);
-
 export class PortfolioInvestmentService {
   private supabase: SupabaseClient;
 
@@ -322,7 +318,7 @@ export class PortfolioInvestmentService {
     amount: number;
     kind?: PortfolioInvestmentKind;
     note?: string | null;
-    /** The bank transfer this contribution was recorded from (migration 034). */
+    /** The bank transfer this contribution was recorded from. */
     transfer_id?: string | null;
   }): Promise<PortfolioInvestment> {
     const payload: Record<string, unknown> = {
@@ -334,15 +330,11 @@ export class PortfolioInvestmentService {
     };
     if (input.transfer_id) payload.transfer_id = input.transfer_id;
 
-    const insert = (row: Record<string, unknown>) =>
-      this.supabase.from('portfolio_investments').insert([row]).select('*, account:portfolio_accounts(*)').single();
-
-    let { data, error } = await insert(payload);
-    if (error && input.transfer_id && isMissingColumn(error.message, 'transfer_id')) {
-      // Before migration 034 the link cannot be stored; the contribution still is.
-      delete payload.transfer_id;
-      ({ data, error } = await insert(payload));
-    }
+    const { data, error } = await this.supabase
+      .from('portfolio_investments')
+      .insert([payload])
+      .select('*, account:portfolio_accounts(*)')
+      .single();
 
     if (error) {
       throw new Error(`Failed to create investment: ${error.message}`);
@@ -354,10 +346,7 @@ export class PortfolioInvestmentService {
   /** The contribution a transfer created, if any — so a retried confirm never inserts twice. */
   async findByTransfer(transferId: string): Promise<{ id: string } | null> {
     const { data, error } = await this.supabase.from('portfolio_investments').select('id').eq('transfer_id', transferId).maybeSingle();
-    if (error) {
-      if (isMissingColumn(error.message, 'transfer_id')) return null;
-      throw new Error(`Failed to look up the transfer's contribution: ${error.message}`);
-    }
+    if (error) throw new Error(`Failed to look up the transfer's contribution: ${error.message}`);
     return data ? { id: String((data as { id: string }).id) } : null;
   }
 
@@ -367,11 +356,12 @@ export class PortfolioInvestmentService {
     from: string,
     to: string
   ): Promise<{ id: string; investment_date: string; amount: number; note: string | null; transfer_id: string | null }[]> {
-    const query = (columns: string) =>
-      this.supabase.from('portfolio_investments').select(columns).eq('account_id', accountId).gte('investment_date', from).lte('investment_date', to);
-
-    let { data, error } = await query('id, investment_date, amount, note, transfer_id');
-    if (error && isMissingColumn(error.message, 'transfer_id')) ({ data, error } = await query('id, investment_date, amount, note'));
+    const { data, error } = await this.supabase
+      .from('portfolio_investments')
+      .select('id, investment_date, amount, note, transfer_id')
+      .eq('account_id', accountId)
+      .gte('investment_date', from)
+      .lte('investment_date', to);
     if (error) throw new Error(`Failed to read contributions: ${error.message}`);
 
     return ((data ?? []) as unknown as Array<{ id: string; investment_date: string; amount: number | string; note: string | null; transfer_id?: string | null }>).map(
@@ -398,10 +388,7 @@ export class PortfolioInvestmentService {
       .is('transfer_id', null)
       .select('id');
 
-    if (error) {
-      if (isMissingColumn(error.message, 'transfer_id')) throw new Error('Linking to an existing contribution needs migration 034');
-      throw new Error(`Failed to link contribution: ${error.message}`);
-    }
+    if (error) throw new Error(`Failed to link contribution: ${error.message}`);
     if (!data || data.length === 0) throw new Error('That contribution is already linked to another transfer');
     return { id: String((data[0] as { id: string }).id) };
   }

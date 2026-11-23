@@ -20,7 +20,7 @@ const shiftDays = (date: string, days: number) => format(addDays(parseAppDate(da
  * Either way the alert and statement lines behind it are settled, so nothing adds it
  * back on the next sync or statement.
  *
- * Since migration 036 both of these move real money: an auto-added row counts from the
+ * Both of these move real money: an auto-added row counts from the
  * moment it exists, so merging or rejecting one changes its month's total and insights.
  */
 export class ExpenseReviewService extends BaseService {
@@ -78,7 +78,7 @@ export class ExpenseReviewService extends BaseService {
       );
     }
 
-    // The duplicate was counted from the moment it was created (migration 036), so removing
+    // The duplicate was counted from the moment it was created, so removing
     // it moves both months. Before 036 an unconfirmed row was in no total and this was a no-op.
     await invalidateInsightsCache(this.supabase, duplicate.date);
     if (keep.date !== duplicate.date) await invalidateInsightsCache(this.supabase, keep.date);

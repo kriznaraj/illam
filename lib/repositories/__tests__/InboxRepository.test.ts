@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { createSupabaseMock } from './supabaseMock';
-import { InboxRepository, type InboxItemWrite } from '../InboxRepository';
+import { InboxRepository, TODO_FROM, type InboxItemWrite } from '../InboxRepository';
 
 const row = {
   owner: 'alice',
@@ -44,7 +44,7 @@ describe('InboxRepository.list', () => {
       ],
     ]);
     // Nothing before September (the user, 2026-10-03: "ignore all older").
-    expect(mock.argsFor('gte')).toEqual([['received_at', '2026-09-01T00:00:00+05:30']]);
+    expect(mock.argsFor('gte')).toEqual([['received_at', TODO_FROM]]);
     expect(mock.argsFor('eq')).toEqual([
       ['status', 'new'],
       ['owner', 'bob'],

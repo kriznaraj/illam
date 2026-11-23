@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { TriangleAlert } from 'lucide-react';
 
 interface Props {
   children: React.ReactNode;
@@ -55,7 +56,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
       return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
           <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6">
-            <div className="text-red-600 text-4xl mb-4">⚠️</div>
+            <TriangleAlert size={20} className="text-red-600 mb-4" aria-hidden />
             <h1 className="text-xl font-bold text-gray-900 mb-2">
               Something went wrong
             </h1>

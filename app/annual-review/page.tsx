@@ -24,6 +24,7 @@ import {
   YAxis,
 } from 'recharts';
 import type { Insight } from '@/types';
+import { TrendingDown } from 'lucide-react';
 
 interface MonthlyExpense {
   month: string;
@@ -164,8 +165,8 @@ export default function AnnualReviewPage() {
   if (error || !review) {
     return (
       <PageContainer maxWidth="7xl">
-        <PageHeader title="Annual Review" />
-        <EmptyState icon="📉" title="Could not build the review" description={error ?? 'No data available.'} />
+        <PageHeader title="Annual review" />
+        <EmptyState icon={TrendingDown} title="Could not build the review" description={error ?? 'No data available.'} />
       </PageContainer>
     );
   }
@@ -176,7 +177,7 @@ export default function AnnualReviewPage() {
   return (
     <PageContainer maxWidth="7xl">
       <PageHeader
-        title="Annual Review 📖"
+        title="Annual review"
         description={`${shortMonth(win.startMonth)} – ${shortMonth(win.endMonth)} · every figure computed from the live database, rule-based, no AI`}
       />
 
@@ -192,6 +193,7 @@ export default function AnnualReviewPage() {
               <InsightCard
                 key={insight.id}
                 icon={insight.icon}
+                type={insight.type}
                 title={insight.title}
                 description={insight.description}
                 severity={insight.severity}
@@ -204,14 +206,14 @@ export default function AnnualReviewPage() {
         </section>
       )}
 
-      <div className="card mb-6 bg-gradient-to-r from-gray-50 to-gray-100">
+      <div className="card mb-6 bg-gray-50">
         <SegmentedControl
           value={module}
           onChange={setModule}
           ariaLabel="Module"
           options={[
-            { value: 'selavu', label: '💸 Selavu — spending' },
-            { value: 'selvam', label: '📈 Selvam — net worth' },
+            { value: 'selavu', label: 'Spending' },
+            { value: 'selvam', label: 'Net worth' },
           ]}
         />
       </div>
@@ -220,7 +222,7 @@ export default function AnnualReviewPage() {
         <>
           <MetricGrid className="md:grid-cols-4 mb-4">
             <MetricCard
-              tone="blue"
+              tone="primary"
               label="Running costs (12mo)"
               value={short(selavu.totals.recurring)}
               subtext={`${formatCurrency(selavu.baseline)} a month, typical`}
@@ -358,6 +360,7 @@ export default function AnnualReviewPage() {
               <InsightCard
                 key={insight.id}
                 icon={insight.icon}
+                type={insight.type}
                 title={insight.title}
                 description={insight.description}
                 severity={insight.severity}
@@ -373,7 +376,7 @@ export default function AnnualReviewPage() {
           <MetricGrid className="md:grid-cols-4 mb-4">
             <MetricCard tone="green" label="Net worth" value={short(d.end)} subtext={`from ${short(d.start)} a year ago`} />
             <MetricCard
-              tone="blue"
+              tone="primary"
               label="Put into investments"
               value={short(d.contributed)}
               subtext="contributions and SIPs"
@@ -403,7 +406,7 @@ export default function AnnualReviewPage() {
                 {
                   label: 'Saving',
                   value: d.saved,
-                  tone: 'bg-blue-500',
+                  tone: 'bg-primary-500',
                   note: `${short(d.contributed)} into investments · ${short(d.debtRepaid)} loan repaid · cash the rest`,
                 },
                 ...(d.catchUp !== 0
@@ -459,9 +462,9 @@ export default function AnnualReviewPage() {
             </ExpandableChart>
           </div>
 
-          <div className="card mb-4 bg-blue-50 border border-blue-200">
-            <h3 className="font-bold text-blue-900 mb-1">Twelve months out</h3>
-            <p className="text-sm text-blue-900">
+          <div className="card mb-4 bg-primary-50 border border-primary-200">
+            <h3 className="font-bold text-primary-900 mb-1">Twelve months out</h3>
+            <p className="text-sm text-primary-900">
               {short(selvam.projection.low)} – {short(selvam.projection.high)}. The lower bound is your recent{' '}
               {formatCurrency(selvam.projection.monthlySaved)} a month of new saving with zero market
               return; the upper is a straight-line extension of the last twelve months. Neither is a forecast of
@@ -475,6 +478,7 @@ export default function AnnualReviewPage() {
               <InsightCard
                 key={insight.id}
                 icon={insight.icon}
+                type={insight.type}
                 title={insight.title}
                 description={insight.description}
                 severity={insight.severity}
