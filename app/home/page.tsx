@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { formatCurrency, formatDate, getCurrentMonthString } from '@/lib/utils';
 import { ExpenseWithCategory } from '@/types';
 import Link from 'next/link';
@@ -48,13 +48,11 @@ export default function HomePage() {
   const inbox = useInboxAttention(3);
   const { currentUser } = useAuth();
 
-  // Worked out once per page load.
-  const greeting = useMemo(() => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
-  }, []);
+  // Read the clock in the browser, after the first render: the page is prerendered at build
+  // time, so a greeting or month computed while rendering would be the build's, not now.
+  const [now, setNow] = useState<Date | null>(null);
+  useEffect(() => setNow(new Date()), []);
+  const greeting = !now ? 'Hello' : now.getHours() < 12 ? 'Good morning' : now.getHours() < 17 ? 'Good afternoon' : 'Good evening';
   const firstName = currentUser?.full_name?.split(' ')[0];
 
   useEffect(() => {
@@ -89,7 +87,7 @@ export default function HomePage() {
         <h1 className="text-2xl md:text-[1.75rem] font-semibold text-gray-900">
           {greeting}{firstName ? `, ${firstName}` : ''}
         </h1>
-        <p className="text-sm text-gray-500 mt-1">{getCurrentMonthString()}</p>
+        <p className="text-sm text-gray-500 mt-1 min-h-[1.25rem]">{now ? getCurrentMonthString() : ''}</p>
       </div>
 
       {/* Inbox: what is still waiting on someone */}

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import { THEME_INIT_SCRIPT } from '@/lib/theme';
+import { ThemeSync } from '@/components/ThemeSync';
 import './globals.css';
 import { AuthProvider } from '@/lib/AuthContext';
 import ClientNavigation from '@/components/ClientNavigation';
@@ -52,6 +53,7 @@ export default function RootLayout({
       <body>
         {/* API address and anon key, read at runtime so one build serves any install (lib/api/config.ts). */}
         <Script src="/api/runtime-config" strategy="beforeInteractive" />
+        <ThemeSync />
         <ErrorBoundary>
           <PWARegister />
           <OfflineIndicator />

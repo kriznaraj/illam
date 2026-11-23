@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { ChevronDown, Download, LogOut, MoreHorizontal, Plus, RefreshCw, Settings, User } from 'lucide-react';
+import { ChevronDown, Download, Info, LogOut, MoreHorizontal, Plus, RefreshCw, Settings } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { classNames } from '@/lib/utils';
 import { clearAllCache } from '@/lib/useClientCache';
@@ -14,6 +14,7 @@ import {
   isTabActive, sectionFor, type NavItem, type Section,
 } from '@/lib/navigation';
 import { IllamBrand } from './IllamLogo';
+import { Avatar } from './Avatar';
 import { usePWAInstall } from '@/lib/pwa/usePWAInstall';
 
 const QuickAddExpense = lazy(() => import('./QuickAddExpense'));
@@ -84,7 +85,7 @@ export default function Navigation() {
   const section = sectionFor(pathname);
   const tabs =
     section === 'expenses' ? EXPENSE_TABS : section === 'net-worth' ? NET_WORTH_TABS : section === 'cash-flow' ? CASH_FLOW_TABS : [];
-  const moreActive = MORE_ITEMS.some((item) => pathname.startsWith(item.href)) || pathname.startsWith('/account');
+  const moreActive = MORE_ITEMS.some((item) => pathname.startsWith(item.href)) || pathname.startsWith('/account') || pathname.startsWith('/about');
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -164,9 +165,7 @@ export default function Navigation() {
               {refreshButton}
               <Menu>
                 <MenuButton className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 text-gray-500">
-                    <User size={15} aria-hidden />
-                  </span>
+                  <Avatar name={currentUser?.full_name} email={currentUser?.email} id={currentUser?.id} size={28} />
                   <span className="hidden sm:inline font-medium">{currentUser?.full_name}</span>
                   <ChevronDown size={14} className="hidden sm:inline text-gray-400" aria-hidden />
                 </MenuButton>
@@ -175,6 +174,12 @@ export default function Navigation() {
                     <Link href="/account" className={menuRow}>
                       <Settings size={16} className="text-gray-400" aria-hidden />
                       Account
+                    </Link>
+                  </MenuItem>
+                  <MenuItem>
+                    <Link href="/about" className={menuRow}>
+                      <Info size={16} className="text-gray-400" aria-hidden />
+                      About Illam
                     </Link>
                   </MenuItem>
                   {pwa.canInstall && (
@@ -287,6 +292,12 @@ export default function Navigation() {
                 <Link href="/account" className={classNames(menuRow, 'py-2.5')}>
                   <Settings size={17} className="text-gray-400" aria-hidden />
                   Account
+                </Link>
+              </MenuItem>
+              <MenuItem>
+                <Link href="/about" className={classNames(menuRow, 'py-2.5')}>
+                  <Info size={17} className="text-gray-400" aria-hidden />
+                  About Illam
                 </Link>
               </MenuItem>
             </MenuItems>

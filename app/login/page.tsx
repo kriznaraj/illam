@@ -6,6 +6,7 @@ import { signIn } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 import IllamLogo from '@/components/IllamLogo';
 import { PWAInstallMenuItem } from '@/components/PWAInstallMenuItem';
+import { ABOUT } from '@/lib/about';
 import {
   isBiometricAvailable,
   isBiometricRegistered,
@@ -198,6 +199,14 @@ export default function LoginPage() {
 
           <PWAInstallMenuItem className="mt-5 pt-4 border-t border-gray-100 flex items-center justify-center gap-2 w-full py-2 text-sm font-medium text-primary-700 hover:text-primary-800" />
         </div>
+        {/* AGPL §13: people using a copy over the network can get its source. */}
+        <p className="mt-4 text-center text-xs text-gray-400">
+          Illam {ABOUT.version} is{' '}
+          <a href={ABOUT.repo} target="_blank" rel="noreferrer" className="underline hover:text-gray-600">
+            open source
+          </a>{' '}
+          under the {ABOUT.licence.name}.
+        </p>
       </div>
     </div>
   );

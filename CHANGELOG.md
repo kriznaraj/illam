@@ -19,3 +19,5 @@ First open-source release.
 - Scripts to create users, reset passwords, load demo data and print each member's Gmail script
   settings (`scripts/gmail-setup.mjs`).
 - Step-by-step Gmail sync guide (`docs/gmail-sync.md`).
+- An About page (version, licence, source code, who makes it) and a source link on the sign-in
+  page, as the AGPL asks.

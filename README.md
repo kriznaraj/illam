@@ -100,7 +100,16 @@ Found a vulnerability? Please report it privately: see [SECURITY.md](SECURITY.md
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the development setup, the architecture and how to add
 a bank. Please follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
+## Made by
+
+Illam is an open-source project from [Aatra](https://aatra.ai). Contributions are welcome:
+see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Krishnaraj Venkatesan, founder of Aatra and maintainer ([@kriznaraj](https://github.com/kriznaraj)).
+
 ## License
+
+Copyright © 2026 Aatra and the Illam contributors.
 
 [AGPL-3.0](LICENSE). You can run, modify and self-host Illam freely. If you offer a modified
 version to others over a network, you must publish your changes under the same licence.

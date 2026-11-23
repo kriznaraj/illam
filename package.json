@@ -1,6 +1,16 @@
 {
   "name": "illam",
   "version": "0.1.0",
+  "description": "Self-hostable household finance for Indian families: expenses, bank-mail inbox, statements and net worth.",
+  "author": "Aatra (https://aatra.ai)",
+  "homepage": "https://github.com/kriznaraj/illam#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kriznaraj/illam.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kriznaraj/illam/issues"
+  },
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -51,6 +61,5 @@
     "typescript": "^5",
     "vitest": "^4.1.12"
   },
-  "license": "AGPL-3.0-only",
-  "description": "Self-hostable household finance for Indian families: expenses, bank-mail inbox, statements and net worth."
+  "license": "AGPL-3.0-only"
 }

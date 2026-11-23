@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { verifyBiometric, markSessionUnlocked } from '@/lib/biometric';
 import { useAuth } from '@/lib/AuthContext';
-import IllamLogo from '@/components/IllamLogo';
+import IllamLogo, { IllamWordmark } from '@/components/IllamLogo';
 
 export default function BiometricLockScreen() {
   const { supabaseUser, setBiometricUnlocked, logout } = useAuth();
@@ -36,7 +36,9 @@ export default function BiometricLockScreen() {
         <div className="flex justify-center mb-4">
           <IllamLogo size={56} />
         </div>
-        <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">Illam</h1>
+        <h1 className="flex justify-center text-gray-900">
+          <IllamWordmark height={28} />
+        </h1>
         {supabaseUser?.email && (
           <p className="text-sm text-gray-500 mt-1">{supabaseUser.email}</p>
         )}
