@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0 (unreleased)
+## 0.1.0 (2026-11-24)
 
 First open-source release.
 
@@ -21,3 +21,4 @@ First open-source release.
 - Step-by-step Gmail sync guide (`docs/gmail-sync.md`).
 - An About page (version, licence, source code, who makes it) and a source link on the sign-in
   page, as the AGPL asks.
+- A short launch splash and a quiet "from Aatra" credit on the sign-in page.
