@@ -10,7 +10,7 @@ import type { InboxIngestMessage } from '@/types';
 /**
  * Called by the Gmail Apps Script in each account, never by the browser.
  *
- * One of the two /api routes without a session (middleware.ts SESSIONLESS_API_PATHS),
+ * One of the two /api routes without a session (proxy.ts SESSIONLESS_API_PATHS),
  * so it authenticates itself: an HMAC signature with a per-owner secret over
  * `${timestamp}.${body}`. See lib/inbox/signature.ts.
  */

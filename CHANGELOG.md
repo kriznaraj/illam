@@ -8,6 +8,13 @@
   and which had critical advisories (GHSA-2464-fhr4-w9xw, GHSA-2xp9-vwfh-vxw4). If you run
   your own reverse proxy instead of `docker/Caddyfile`, block `/_next/image` there too.
 
+### Changed
+
+- Next.js 16.4 (from 14.2) and React 19. This clears the Next.js security advisories
+  reported against 14.2, including the critical image-optimizer ones.
+- `middleware.ts` is now `proxy.ts`, Next 16's name for it; it behaves the same.
+- `pnpm lint` runs ESLint 9 directly (`next lint` is gone in Next 16).
+
 ## 0.1.0 (2026-11-24)
 
 First open-source release.

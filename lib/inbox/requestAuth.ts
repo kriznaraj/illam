@@ -4,7 +4,7 @@ import { parseOwner, secretForOwner, verifySignature } from './signature';
 
 /**
  * Authentication for the session-less routes the Gmail Apps Script calls
- * (middleware.ts SESSIONLESS_API_PATHS). Returns the owner, or the response to
+ * (proxy.ts SESSIONLESS_API_PATHS). Returns the owner, or the response to
  * send back.
  */
 export function authenticateScriptRequest(request: NextRequest, body: string): { owner: InboxOwner } | NextResponse {

@@ -11,7 +11,7 @@ import { SESSION_COOKIE_NAME, serverApiConfig } from '@/lib/api/config';
 //   (the login page uses them). Public by nature: the anon key, and the API's address.
 const SESSIONLESS_API_PATHS = new Set(['/api/inbox/ingest', '/api/inbox/process', '/api/runtime-config']);
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   if (SESSIONLESS_API_PATHS.has(request.nextUrl.pathname)) {
     return NextResponse.next();
   }

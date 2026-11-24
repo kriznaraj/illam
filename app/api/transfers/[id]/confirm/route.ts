@@ -5,7 +5,8 @@ import { TransferService, type TransferDecision } from '@/lib/services/TransferS
 export const dynamic = 'force-dynamic';
 
 /** Classify a transfer: what the money was for, and optionally remember the payee. */
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const service = new TransferService(createServerClientFromRequest(request));
     const decision = (await request.json()) as TransferDecision;

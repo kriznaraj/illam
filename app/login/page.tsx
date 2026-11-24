@@ -16,7 +16,7 @@ import {
 } from '@/lib/biometric';
 
 /**
- * Where to go after signing in. middleware.ts puts the originally-requested path
+ * Where to go after signing in. proxy.ts puts the originally-requested path
  * in ?next= when it bounces an unauthenticated request here, so deep links,
  * bookmarks and the PWA shortcuts survive the login round-trip.
  *

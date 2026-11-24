@@ -7,7 +7,7 @@ import { authenticateScriptRequest } from '@/lib/inbox/requestAuth';
  * Runs Madal automation over every unprocessed transaction alert: link to an
  * existing expense, auto-add after the grace period, log transfers, mark card
  * bills paid. Called by the Gmail Apps Script at the end of each run, so it is
- * session-less (middleware.ts SESSIONLESS_API_PATHS) and signature-checked.
+ * session-less (proxy.ts SESSIONLESS_API_PATHS) and signature-checked.
  *
  * Body: `{}` or `{"dryRun": true}` to see what would happen without writing.
  */

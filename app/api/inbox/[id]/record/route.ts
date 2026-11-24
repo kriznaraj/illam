@@ -8,7 +8,8 @@ export const dynamic = 'force-dynamic';
  * Record one alert by hand: as an expense, as income, or as nothing worth keeping.
  * The way back for anything automation left alone — see `InboxService.record`.
  */
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const service = new InboxService(createServerClientFromRequest(request));
     const body = (await request.json()) as RecordRequest;

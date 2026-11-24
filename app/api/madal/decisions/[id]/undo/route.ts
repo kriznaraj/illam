@@ -5,7 +5,8 @@ import { MadalDecisionService } from '@/lib/services/MadalDecisionService';
 export const dynamic = 'force-dynamic';
 
 /** Put back what Madal decided on its own. */
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const decision = await new MadalDecisionService(createServerClientFromRequest(request)).undo(params.id);
     return NextResponse.json({ decision });

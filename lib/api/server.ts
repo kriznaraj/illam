@@ -89,7 +89,7 @@ export function createServerClientFromRequest(request: NextRequest) {
 
 /**
  * Service-role client, for the session-less routes that verify their own HMAC signature
- * (/api/inbox/ingest and /api/inbox/process — see middleware.ts). Never use it in a route a
+ * (/api/inbox/ingest and /api/inbox/process — see proxy.ts). Never use it in a route a
  * browser session reaches, and never expose SERVICE_ROLE_KEY to the client.
  */
 export function createServiceClient() {

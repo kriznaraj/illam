@@ -7,8 +7,9 @@ export const dynamic = 'force-dynamic';
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string; occurrenceId: string } }
+  props: { params: Promise<{ id: string; occurrenceId: string }> }
 ) {
+  const params = await props.params;
   try {
     const supabase = createServerClientFromRequest(request);
     const service = new ActivityTrackerService(supabase);
@@ -29,8 +30,9 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; occurrenceId: string } }
+  props: { params: Promise<{ id: string; occurrenceId: string }> }
 ) {
+  const params = await props.params;
   try {
     const supabase = createServerClientFromRequest(request);
     const service = new ActivityTrackerService(supabase);
