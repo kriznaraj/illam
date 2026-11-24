@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 (2026-11-24)
 
 ### Security
 
@@ -14,6 +14,7 @@
   reported against 14.2, including the critical image-optimizer ones.
 - `middleware.ts` is now `proxy.ts`, Next 16's name for it; it behaves the same.
 - `pnpm lint` runs ESLint 9 directly (`next lint` is gone in Next 16).
+- Dependency updates that clear every open advisory (`pnpm audit` is clean).
 
 ## 0.1.0 (2026-11-24)
 
