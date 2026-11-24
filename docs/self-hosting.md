@@ -229,7 +229,7 @@ docker compose --profile bundled-db up -d     # leave out the profile with your 
 
 `git pull` brings the compose file and migrations; `docker compose pull` brings the matching image
 (`ghcr.io/kriznaraj/illam`). Migrations run on their own on every start. Take a backup first.
-To stay on a release, set `ILLAM_VERSION=0.2.0` in `.env`. To build from source instead of pulling,
+To stay on a release, set `ILLAM_VERSION=0.2.1` in `.env`. To build from source instead of pulling,
 add `--build`.
 
 ### Logs
@@ -322,7 +322,7 @@ Source ids are listed in `lib/inbox/sources.ts`. A complete example is
 | `JWT_SECRET`, `ANON_KEY`, `SERVICE_ROLE_KEY` | yes | Generated. The service key is server-only |
 | `ILLAM_HOUSEHOLD` | yes | Generated from `household.json` |
 | `ILLAM_PORT` | no | Host port for the gateway. Default `8000` |
-| `ILLAM_VERSION` | no | Image tag to run, e.g. `0.2.0`. Default `latest` |
+| `ILLAM_VERSION` | no | Image tag to run, e.g. `0.2.1`. Default `latest` |
 | `ILLAM_API_URL` | no | The API's address when it is not `PUBLIC_URL` (hosted Supabase) |
 | `INBOX_SECRET_<SLUG>` | for Gmail sync | One per member. Signs the Apps Script's requests |
 | `STATEMENT_PASSWORDS_<SLUG>` | for statement PDFs | JSON map of source id to passwords. Stays in the environment, never in the database |
