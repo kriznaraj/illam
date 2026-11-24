@@ -6,6 +6,11 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Illam doesn't use next/image; images are served as they are (the optimizer at
+  // /_next/image is also blocked in docker/Caddyfile).
+  images: {
+    unoptimized: true,
+  },
   // Pages that moved: keep old links and bookmarks working.
   async redirects() {
     return [{ source: '/expenses/income', destination: '/cash-flow/income', permanent: true }];

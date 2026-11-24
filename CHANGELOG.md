@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Security
+
+- The gateway now refuses Next.js's image optimizer (`/_next/image`), which Illam doesn't use
+  and which had critical advisories (GHSA-2464-fhr4-w9xw, GHSA-2xp9-vwfh-vxw4). If you run
+  your own reverse proxy instead of `docker/Caddyfile`, block `/_next/image` there too.
+
 ## 0.1.0 (2026-11-24)
 
 First open-source release.

@@ -150,6 +150,10 @@ docker compose --profile bundled-db up -d
 
 The Gmail sync needs option A or B.
 
+> Already run a reverse proxy (nginx, Traefik, your own Caddy)? Point it at port 8000, the
+> gateway, not at the app's container, and block `/_next/image` in it: Illam doesn't use
+> Next.js's image optimizer, and the gateway keeps it closed for security.
+
 > Changed `--public-url` later? Re-run `docker compose up -d` so the services pick up the new `.env`. Nothing needs rebuilding.
 
 Then, on each phone, open the URL and choose **Add to Home Screen** (iOS Safari) or **Install

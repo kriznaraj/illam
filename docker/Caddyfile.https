@@ -1,6 +1,11 @@
 # Used by docker-compose.https.yml: Caddy gets and renews a Let's Encrypt certificate for
 # $DOMAIN. Port 8000 stays plain HTTP for the app's own server-side calls inside the network.
 (illam) {
+	# Next.js's image optimizer. Illam doesn't use it, and it has had serious security bugs
+	# (e.g. GHSA-2464-fhr4-w9xw), so it stays closed. Put the same rule in your own proxy.
+	handle /_next/image* {
+		respond 404
+	}
 	handle_path /rest/v1/* {
 		reverse_proxy rest:3000
 	}

@@ -2,6 +2,11 @@
 #   /rest/v1/*  PostgREST   /auth/v1/*  GoTrue   everything else  the Next.js app
 # Put TLS in front of this (or replace :8000 with your domain) when exposing it beyond localhost.
 :8000 {
+	# Next.js's image optimizer. Illam doesn't use it, and it has had serious security bugs
+	# (e.g. GHSA-2464-fhr4-w9xw), so it stays closed. Put the same rule in your own proxy.
+	handle /_next/image* {
+		respond 404
+	}
 	handle_path /rest/v1/* {
 		reverse_proxy rest:3000
 	}
