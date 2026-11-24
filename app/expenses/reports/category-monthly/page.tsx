@@ -38,22 +38,6 @@ export default function CategoryMonthlyReport() {
   const [selectedUser, setSelectedUser] = useState('');
   const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => {
-    fetchUsers();
-
-    // Mobile detection
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [monthsBack, selectedUser]);
-
   const fetchUsers = async () => {
     try {
       const response = await fetch('/api/users');
@@ -80,6 +64,23 @@ export default function CategoryMonthlyReport() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time load on mount; state is set after the fetch resolves
+    fetchUsers();
+
+    // Mobile detection
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- refetch (with its spinner) when the period or person changes
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fetchData reads monthsBack and selectedUser, the deps listed
+  }, [monthsBack, selectedUser]);
 
   const getCategoryTrendData = (categoryId: string) => {
     if (!data) return [];

@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/EmptyState';
 import Modal from '@/components/Modal';
 import { PortfolioAccount } from '@/types';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   applySipAmountChange,
   applySipAmountCorrection,
@@ -74,6 +75,7 @@ function activeSip(account: MfAccount, currentMonth: string) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SipPage() {
+  const router = useRouter();
   const [accounts, setAccounts] = useState<MfAccount[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -115,6 +117,7 @@ export default function SipPage() {
     }
   }, []);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch on mount
   useEffect(() => { fetchAccounts(); }, [fetchAccounts]);
 
   // ── Summary ────────────────────────────────────────────────────────────────
@@ -264,7 +267,7 @@ export default function SipPage() {
           icon={TrendingUp}
           title="No MF accounts yet"
           description="Add Mutual Fund accounts in Settings."
-          action={{ label: 'Go to Settings', onClick: () => window.location.href = '/portfolio/settings' }}
+          action={{ label: 'Go to Settings', onClick: () => router.push('/portfolio/settings') }}
         />
       ) : (
         <div className="space-y-4">

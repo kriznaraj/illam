@@ -90,6 +90,7 @@ export default function PortfolioMonthlyReport() {
   }, [monthsBack, filterType]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch when the filters change
     fetchData();
   }, [fetchData]);
 

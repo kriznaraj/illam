@@ -100,6 +100,7 @@ export default function Modal({
   useEffect(() => {
     if (isOpen) {
       lockScroll();
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- mount first, then animate in on the next frames
       setMounted(true);
       // Two rAFs ensure the element is in the DOM before we trigger the transition
       requestAnimationFrame(() => requestAnimationFrame(() => setVisible(true)));

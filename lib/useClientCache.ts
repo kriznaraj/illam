@@ -77,17 +77,20 @@ export function useCachedFetch<T>(
     }
   }, [key]);
 
-  // Separate effect to handle key changes
-  useEffect(() => {
-    // When key changes, reset state to show loading
+  // When the key changes, reset to loading while rendering (not in an effect), so the
+  // previous key's data is never shown for the new one.
+  const [shownKey, setShownKey] = useState(key);
+  if (shownKey !== key) {
+    setShownKey(key);
     setLoading(true);
     setData(null);
-  }, [key]);
+  }
 
   useEffect(() => {
     // Populate from cache immediately (client-only, runs after hydration)
     const cached = readCache<T>(key, ttlMs);
     if (cached !== null) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sessionStorage is read after hydration on purpose (prerendered pages)
       setData(cached);
       setLoading(false);
       // Only revalidate in background if enabled

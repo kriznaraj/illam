@@ -49,10 +49,16 @@ export default function HoldingDetailsPage() {
   const [snapshots, setSnapshots] = useState<SnapshotRow[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Show the spinner again when the holding changes (set during render, not in the effect).
+  const [loadingFor, setLoadingFor] = useState(holdingId);
+  if (holdingId !== loadingFor) {
+    setLoadingFor(holdingId);
+    setLoading(true);
+  }
+
   useEffect(() => {
     if (!holdingId) return;
     let cancelled = false;
-    setLoading(true);
     Promise.all([
       fetch(`/api/portfolio/holdings?id=${holdingId}`).then((r) => r.json()),
       fetch(`/api/portfolio/holding-snapshots?holdingId=${holdingId}&limit=500`).then((r) => r.json()),

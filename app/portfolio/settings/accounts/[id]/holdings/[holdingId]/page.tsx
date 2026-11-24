@@ -63,9 +63,15 @@ export default function SettingsHoldingPage() {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
+  // Show the spinner again when holdingId changes (set during render, not in the effect).
+  const [loadingFor, setLoadingFor] = useState(holdingId);
+  if (holdingId !== loadingFor) {
+    setLoadingFor(holdingId);
+    if (!isNew && holdingId && accountId) setLoading(true);
+  }
+
   useEffect(() => {
     if (isNew || !holdingId || !accountId) return;
-    setLoading(true);
     fetch(`/api/portfolio/holdings?id=${holdingId}`)
       .then((r) => r.json())
       .then((data) => {

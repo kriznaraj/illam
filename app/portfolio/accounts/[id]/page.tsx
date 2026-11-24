@@ -57,10 +57,16 @@ export default function AccountSnapshotPage() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
 
+  // Show the spinner again when the account changes (set during render, not in the effect).
+  const [loadingFor, setLoadingFor] = useState(id);
+  if (id !== loadingFor) {
+    setLoadingFor(id);
+    setLoading(true);
+  }
+
   useEffect(() => {
     if (!id) return;
     let cancelled = false;
-    setLoading(true);
     Promise.all([
       fetch('/api/portfolio/accounts?includeArchived=true').then((r) => r.json()),
       fetch(`/api/portfolio/snapshots?accountId=${id}&limit=60`).then((r) => r.json()),

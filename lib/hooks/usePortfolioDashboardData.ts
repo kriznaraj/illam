@@ -133,6 +133,7 @@ export function usePortfolioDashboardData(): UsePortfolioDashboardDataResult {
   }, [resetData]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch on mount; state is set when the request resolves
     void fetchData();
   }, [fetchData]);
 

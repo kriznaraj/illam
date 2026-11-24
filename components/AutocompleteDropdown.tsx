@@ -50,6 +50,7 @@ export default function AutocompleteDropdown({
   // Sync input value with selected option
   useEffect(() => {
     const selectedOption = options.find(opt => opt.id === value);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the text box follows the selected value; options often arrive as a new array each render
     setInputValue(selectedOption ? selectedOption.label : '');
   }, [value, options]);
 

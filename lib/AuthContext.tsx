@@ -37,6 +37,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
+  const fetchUserProfile = async (userId: string) => {
+    const ttlMs = 5 * 60 * 1000;
+    const last = lastProfileFetchRef.current;
+    if (last?.userId === userId && Date.now() - last.at < ttlMs) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/users?id=${userId}`);
+      if (response.ok) {
+        const users = await response.json();
+        if (users.length > 0) {
+          setCurrentUserState(users[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    } finally {
+      lastProfileFetchRef.current = { userId, at: Date.now() };
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     const supabase = getSupabaseClient();
 
@@ -75,30 +99,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => subscription.unsubscribe();
   }, [pathname, router]);
-
-  const fetchUserProfile = async (userId: string) => {
-    const ttlMs = 5 * 60 * 1000;
-    const last = lastProfileFetchRef.current;
-    if (last?.userId === userId && Date.now() - last.at < ttlMs) {
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/users?id=${userId}`);
-      if (response.ok) {
-        const users = await response.json();
-        if (users.length > 0) {
-          setCurrentUserState(users[0]);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-    } finally {
-      lastProfileFetchRef.current = { userId, at: Date.now() };
-      setIsLoading(false);
-    }
-  };
 
   const login = (user: User) => {
     // This is now handled by Supabase Auth

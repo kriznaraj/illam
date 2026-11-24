@@ -164,12 +164,6 @@ function SettingsAccountsPage() {
   const [recurringMonthTouched, setRecurringMonthTouched] = useState(false);
   const [accountError, setAccountError] = useState('');
 
-  useEffect(() => {
-    fetchAccounts();
-    fetchTypes();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const fetchAccounts = async () => {
     setAccountsLoading(true);
     try {
@@ -210,6 +204,12 @@ function SettingsAccountsPage() {
       setTypes([]);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch on mount
+    fetchAccounts();
+    fetchTypes();
+  }, []);
 
   const openNewAccount = () => {
     setSelectedAccount(null);
@@ -261,6 +261,7 @@ function SettingsAccountsPage() {
     const editId = searchParams.get('edit');
     if (!editId || accounts.length === 0) return;
     const target = accounts.find((a) => a.id === editId);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- opens the modal named in the URL once accounts arrive
     if (target) openEditAccount(target);
   }, [searchParams, accounts, openEditAccount]);
 

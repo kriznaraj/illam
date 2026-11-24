@@ -289,6 +289,7 @@ export default function InboxPage() {
       investments: 'statements',
     };
     const resolved = requested ? legacy[requested] ?? requested : null;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reads the URL after hydration so the prerendered page and first render match
     if (VIEWS.some((v) => v.value === resolved)) setView(resolved as InboxView);
   }, []);
 

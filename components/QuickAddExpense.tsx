@@ -64,10 +64,7 @@ export default function QuickAddExpense({ isOpen, onClose, onSuccess }: QuickAdd
   // Push the panel above the keyboard using the visualViewport API.
   // Works on both iOS (viewport doesn't resize) and Android (viewport shrinks).
   useEffect(() => {
-    if (!isOpen) {
-      setKeyboardOffset(0);
-      return;
-    }
+    if (!isOpen) return;
 
     const vv = window.visualViewport;
     if (!vv) return;
@@ -85,6 +82,8 @@ export default function QuickAddExpense({ isOpen, onClose, onSuccess }: QuickAdd
     return () => {
       vv.removeEventListener('resize', update);
       vv.removeEventListener('scroll', update);
+      // Closing (or unmounting) drops the offset, so the next open starts flush.
+      setKeyboardOffset(0);
     };
   }, [isOpen]);
 
@@ -103,25 +102,28 @@ export default function QuickAddExpense({ isOpen, onClose, onSuccess }: QuickAdd
     }
   }, [isOpen]);
 
-  // Pre-fetch on mount so data is ready before the modal opens (prevents height jump)
-  useEffect(() => {
-    loadFavorites();
-  }, []);
-
-  // Reset form state when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      setSearchQuery('');
-      setShowCategoryDropdown(false);
-    }
-  }, [isOpen]);
-
   const loadFavorites = () => {
     const saved = localStorage.getItem('favoriteCategories');
     if (saved) {
       setFavorites(JSON.parse(saved));
     }
   };
+
+  // Pre-fetch on mount so data is ready before the modal opens (prevents height jump)
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage is read after hydration on purpose (prerendered page)
+    loadFavorites();
+  }, []);
+
+  // Reset form state when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- clear the search each time the sheet opens
+      setSearchQuery('');
+      setShowCategoryDropdown(false);
+    }
+  }, [isOpen]);
+
 
   const toggleFavorite = (categoryId: string) => {
     const newFavorites = favorites.includes(categoryId)

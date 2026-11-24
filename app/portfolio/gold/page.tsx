@@ -45,6 +45,105 @@ function fmtCurrency(n: number) {
 }
 
 
+interface RateEditorProps {
+  karat: '22k' | '24k';
+  rate: number;
+  editingKarat: '22k' | '24k' | null;
+  rateInput: string;
+  savingRate: boolean;
+  onRateInputChange: (value: string) => void;
+  onStartEdit: (karat: '22k' | '24k', rate: number) => void;
+  onSave: () => void;
+  onCancel: () => void;
+}
+
+function RateEditor({
+  karat, rate, editingKarat, rateInput, savingRate, onRateInputChange, onStartEdit, onSave, onCancel,
+}: RateEditorProps) {
+  const isEditing = editingKarat === karat;
+  return isEditing ? (
+    <div className="flex items-center gap-1.5 bg-white border border-gray-200 rounded-lg px-2.5 py-1.5">
+      <span className="text-xs text-gray-400">₹</span>
+      <input
+        type="number" autoFocus value={rateInput}
+        onChange={(e) => onRateInputChange(e.target.value)}
+        onKeyDown={(e) => { if (e.key === 'Enter') onSave(); if (e.key === 'Escape') onCancel(); }}
+        className="w-20 text-xs font-mono outline-none"
+        placeholder="per gram"
+      />
+      <button onClick={onSave} disabled={savingRate} className="text-xs text-primary-600 font-semibold">
+        {savingRate ? '…' : 'Save'}
+      </button>
+      <button onClick={onCancel} className="text-xs text-gray-400" aria-label="Cancel"><X size={14} aria-hidden /></button>
+    </div>
+  ) : (
+    <button
+      onClick={() => onStartEdit(karat, rate)}
+      className="inline-flex items-center gap-1 text-xs bg-yellow-50 text-yellow-700 hover:bg-yellow-100 border border-yellow-200 rounded-lg px-3 py-1.5 font-medium transition-colors"
+    >
+      {karat} · ₹{fmt(rate)}/g <Pencil size={12} aria-hidden />
+    </button>
+  );
+}
+
+function ItemTable({ list, rate, onOpen }: { list: GoldItem[]; rate: number; onOpen: (item: GoldItem) => void }) {
+  return (
+  <div className="card p-0 overflow-hidden">
+    <div className="hidden sm:grid sm:grid-cols-[1fr_1fr_auto_auto_auto] gap-4 px-4 py-2.5 bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+      <span>Name</span><span>From</span>
+      <span className="text-right">Gross (g)</span>
+      <span className="text-right">Gold (g)</span>
+      <span className="text-right">Value</span>
+    </div>
+    <div className="divide-y divide-gray-100">
+      {list.map((item) => {
+        const value = item.gold_weight * rate;
+        return (
+          <button key={item.id} onClick={() => onOpen(item)} className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors">
+            <div className="sm:hidden flex items-center justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-gray-900 truncate">{item.name}</p>
+                {item.purchased_from && <p className="text-xs text-gray-400 mt-0.5 truncate">{item.purchased_from}</p>}
+                <p className="text-xs text-gray-400">
+                  {item.purchased_at && new Date(item.purchased_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}
+                  {item.maturity_date && ` → ${new Date(item.maturity_date).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}`}
+                </p>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <p className="text-sm font-semibold text-yellow-700">{fmtCurrency(value)}</p>
+                <p className="text-xs text-gray-500">{fmt(item.gold_weight)} g</p>
+              </div>
+            </div>
+            <div className="hidden sm:grid sm:grid-cols-[1fr_1fr_auto_auto_auto] gap-4 items-center">
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">{item.name}</p>
+                <p className="text-xs text-gray-400">
+                  {item.purchased_at && new Date(item.purchased_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}
+                  {item.maturity_date && ` → ${new Date(item.maturity_date).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}`}
+                  {!item.maturity_date && item.buy_price != null && ` · ${fmtCurrency(item.buy_price)}`}
+                </p>
+                {item.notes && <p className="text-xs text-gray-400 truncate">{item.notes}</p>}
+              </div>
+              <p className="text-sm text-gray-600 truncate">{item.purchased_from ?? '—'}</p>
+              <p className="text-sm text-gray-700 text-right w-16">{fmt(item.gross_weight)}</p>
+              <p className="text-sm font-medium text-gray-900 text-right w-16">{fmt(item.gold_weight)}</p>
+              <p className="text-sm font-semibold text-yellow-700 text-right w-24">{fmtCurrency(value)}</p>
+            </div>
+          </button>
+        );
+      })}
+    </div>
+    <div className="border-t-2 border-gray-200 bg-gray-50 px-4 py-3 hidden sm:grid sm:grid-cols-[1fr_1fr_auto_auto_auto] sm:gap-4">
+      <span className="text-sm font-semibold text-gray-700">Total</span>
+      <span />
+      <span className="text-sm text-gray-600 text-right w-16">{fmt(list.reduce((s, i) => s + i.gross_weight, 0))}</span>
+      <span className="text-sm font-bold text-gray-900 text-right w-16">{fmt(list.reduce((s, i) => s + i.gold_weight, 0))}</span>
+      <span className="text-sm font-bold text-yellow-700 text-right w-24">{fmtCurrency(list.reduce((s, i) => s + i.gold_weight, 0) * rate)}</span>
+    </div>
+  </div>
+);
+}
+
 export default function GoldRegisterPage() {
   const [items, setItems] = useState<GoldItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,11 +160,6 @@ export default function GoldRegisterPage() {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    fetchRate();
-    fetchItems();
-  }, []);
 
   const fetchRate = async () => {
     try {
@@ -90,6 +184,18 @@ export default function GoldRegisterPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch on mount
+    fetchRate();
+    fetchItems();
+  }, []);
+
+  const startRateEdit = (karat: '22k' | '24k', rate: number) => {
+    setRateInput(rate.toString());
+    setEditingKarat(karat);
+  };
+  const cancelRateEdit = () => setEditingKarat(null);
 
   const saveRate = async () => {
     if (!editingKarat) return;
@@ -230,89 +336,6 @@ export default function GoldRegisterPage() {
     />
   );
 
-  const RateEditor = ({ karat, rate }: { karat: '22k' | '24k'; rate: number }) => {
-    const isEditing = editingKarat === karat;
-    return isEditing ? (
-      <div className="flex items-center gap-1.5 bg-white border border-gray-200 rounded-lg px-2.5 py-1.5">
-        <span className="text-xs text-gray-400">₹</span>
-        <input
-          type="number" autoFocus value={rateInput}
-          onChange={(e) => setRateInput(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') saveRate(); if (e.key === 'Escape') setEditingKarat(null); }}
-          className="w-20 text-xs font-mono outline-none"
-          placeholder="per gram"
-        />
-        <button onClick={saveRate} disabled={savingRate} className="text-xs text-primary-600 font-semibold">
-          {savingRate ? '…' : 'Save'}
-        </button>
-        <button onClick={() => setEditingKarat(null)} className="text-xs text-gray-400" aria-label="Cancel"><X size={14} aria-hidden /></button>
-      </div>
-    ) : (
-      <button
-        onClick={() => { setRateInput(rate.toString()); setEditingKarat(karat); }}
-        className="inline-flex items-center gap-1 text-xs bg-yellow-50 text-yellow-700 hover:bg-yellow-100 border border-yellow-200 rounded-lg px-3 py-1.5 font-medium transition-colors"
-      >
-        {karat} · ₹{fmt(rate)}/g <Pencil size={12} aria-hidden />
-      </button>
-    );
-  };
-
-  const ItemTable = ({ list, rate }: { list: GoldItem[]; rate: number }) => (
-    <div className="card p-0 overflow-hidden">
-      <div className="hidden sm:grid sm:grid-cols-[1fr_1fr_auto_auto_auto] gap-4 px-4 py-2.5 bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-        <span>Name</span><span>From</span>
-        <span className="text-right">Gross (g)</span>
-        <span className="text-right">Gold (g)</span>
-        <span className="text-right">Value</span>
-      </div>
-      <div className="divide-y divide-gray-100">
-        {list.map((item) => {
-          const value = item.gold_weight * rate;
-          return (
-            <button key={item.id} onClick={() => openView(item)} className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors">
-              <div className="sm:hidden flex items-center justify-between gap-3">
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-gray-900 truncate">{item.name}</p>
-                  {item.purchased_from && <p className="text-xs text-gray-400 mt-0.5 truncate">{item.purchased_from}</p>}
-                  <p className="text-xs text-gray-400">
-                    {item.purchased_at && new Date(item.purchased_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}
-                    {item.maturity_date && ` → ${new Date(item.maturity_date).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}`}
-                  </p>
-                </div>
-                <div className="text-right flex-shrink-0">
-                  <p className="text-sm font-semibold text-yellow-700">{fmtCurrency(value)}</p>
-                  <p className="text-xs text-gray-500">{fmt(item.gold_weight)} g</p>
-                </div>
-              </div>
-              <div className="hidden sm:grid sm:grid-cols-[1fr_1fr_auto_auto_auto] gap-4 items-center">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{item.name}</p>
-                  <p className="text-xs text-gray-400">
-                    {item.purchased_at && new Date(item.purchased_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}
-                    {item.maturity_date && ` → ${new Date(item.maturity_date).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}`}
-                    {!item.maturity_date && item.buy_price != null && ` · ${fmtCurrency(item.buy_price)}`}
-                  </p>
-                  {item.notes && <p className="text-xs text-gray-400 truncate">{item.notes}</p>}
-                </div>
-                <p className="text-sm text-gray-600 truncate">{item.purchased_from ?? '—'}</p>
-                <p className="text-sm text-gray-700 text-right w-16">{fmt(item.gross_weight)}</p>
-                <p className="text-sm font-medium text-gray-900 text-right w-16">{fmt(item.gold_weight)}</p>
-                <p className="text-sm font-semibold text-yellow-700 text-right w-24">{fmtCurrency(value)}</p>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-      <div className="border-t-2 border-gray-200 bg-gray-50 px-4 py-3 hidden sm:grid sm:grid-cols-[1fr_1fr_auto_auto_auto] sm:gap-4">
-        <span className="text-sm font-semibold text-gray-700">Total</span>
-        <span />
-        <span className="text-sm text-gray-600 text-right w-16">{fmt(list.reduce((s, i) => s + i.gross_weight, 0))}</span>
-        <span className="text-sm font-bold text-gray-900 text-right w-16">{fmt(list.reduce((s, i) => s + i.gold_weight, 0))}</span>
-        <span className="text-sm font-bold text-yellow-700 text-right w-24">{fmtCurrency(list.reduce((s, i) => s + i.gold_weight, 0) * rate)}</span>
-      </div>
-    </div>
-  );
-
   return (
     <PageContainer maxWidth="7xl">
       <PageHeader
@@ -328,13 +351,13 @@ export default function GoldRegisterPage() {
             <h2 className="text-base font-bold text-gray-900">Physical Gold</h2>
             <p className="text-xs text-gray-500 mt-0.5">{fmt(physicalGrams)} g · {fmtCurrency(physicalValue)}</p>
           </div>
-          <RateEditor karat="22k" rate={rate22k} />
+          <RateEditor karat="22k" rate={rate22k} editingKarat={editingKarat} rateInput={rateInput} savingRate={savingRate} onRateInputChange={setRateInput} onStartEdit={startRateEdit} onSave={saveRate} onCancel={cancelRateEdit} />
         </div>
 
         {loading ? <LoadingSpinner message="Loading…" /> : physicalItems.length === 0 ? (
           <EmptyState icon={Coins} title="No physical gold" description="Add jewellery, coins or bars." action={{ label: '+ Add Item', onClick: openCreate }} />
         ) : (
-          <ItemTable list={physicalItems} rate={rate22k} />
+          <ItemTable list={physicalItems} rate={rate22k} onOpen={openView} />
         )}
       </div>
 
@@ -348,12 +371,12 @@ export default function GoldRegisterPage() {
                 <p className="text-xs text-gray-500 mt-0.5">{fmt(sgbGrams)} g · {fmtCurrency(sgbValue)}</p>
               )}
             </div>
-            <RateEditor karat="24k" rate={rate24k} />
+            <RateEditor karat="24k" rate={rate24k} editingKarat={editingKarat} rateInput={rateInput} savingRate={savingRate} onRateInputChange={setRateInput} onStartEdit={startRateEdit} onSave={saveRate} onCancel={cancelRateEdit} />
           </div>
           {sgbItems.length === 0 ? (
             <p className="text-sm text-gray-400 italic">No SGBs added yet.</p>
           ) : (
-            <ItemTable list={sgbItems} rate={rate24k} />
+            <ItemTable list={sgbItems} rate={rate24k} onOpen={openView} />
           )}
         </div>
       )}

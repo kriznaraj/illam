@@ -102,8 +102,42 @@ export default function ExpenseDetailModal({
     date: '',
   });
 
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch('/api/categories');
+
+      if (!res.ok) {
+        setToast({ message: 'Could not load categories', type: 'error' });
+        return;
+      }
+
+      const data = await res.json();
+      setCategories(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setToast({ message: 'Error loading categories: ' + String(err), type: 'error' });
+    }
+  };
+
+  const fetchEvents = async () => {
+    try {
+      const res = await fetch('/api/events');
+
+      if (!res.ok) {
+        // Events are optional, just log it
+        return;
+      }
+
+      const data = await res.json();
+      const activeEvents = Array.isArray(data) ? data.filter((e: Event) => e.is_active) : [];
+      setEvents(activeEvents);
+    } catch {
+      // Events are optional, silently fail
+    }
+  };
+
   useEffect(() => {
     if (isOpen && expense) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- load the form from the expense each time the modal opens
       setFormData({
         amount: expense.amount.toString(),
         category_id: expense.category_id,
@@ -129,7 +163,6 @@ export default function ExpenseDetailModal({
    * silently.
    */
   useEffect(() => {
-    setSuggestion(null);
     if (!isOpen || !expense?.needs_review || !expense.merchant) return;
     let cancelled = false;
     fetch(`/api/expenses/suggest-category?merchant=${encodeURIComponent(expense.merchant)}`)
@@ -141,6 +174,8 @@ export default function ExpenseDetailModal({
       .catch(() => undefined);
     return () => {
       cancelled = true;
+      // Cleared on the way out, so the next expense never shows this one's suggestion.
+      setSuggestion(null);
     };
   }, [isOpen, expense?.id, expense?.needs_review, expense?.merchant]);
 
@@ -152,7 +187,6 @@ export default function ExpenseDetailModal({
    * rather than a button that leads to an empty panel.
    */
   useEffect(() => {
-    setDuplicates(null);
     if (!isOpen || !expense?.needs_review) return;
     let cancelled = false;
     fetch(`/api/expenses/review?id=${expense.id}`)
@@ -166,6 +200,7 @@ export default function ExpenseDetailModal({
       });
     return () => {
       cancelled = true;
+      setDuplicates(null);
     };
   }, [isOpen, expense?.id, expense?.needs_review]);
 
@@ -207,39 +242,6 @@ export default function ExpenseDetailModal({
     },
     [expense, onSuccess]
   );
-
-  const fetchCategories = async () => {
-    try {
-      const res = await fetch('/api/categories');
-
-      if (!res.ok) {
-        setToast({ message: 'Could not load categories', type: 'error' });
-        return;
-      }
-
-      const data = await res.json();
-      setCategories(Array.isArray(data) ? data : []);
-    } catch (err) {
-      setToast({ message: 'Error loading categories: ' + String(err), type: 'error' });
-    }
-  };
-
-  const fetchEvents = async () => {
-    try {
-      const res = await fetch('/api/events');
-
-      if (!res.ok) {
-        // Events are optional, just log it
-        return;
-      }
-
-      const data = await res.json();
-      const activeEvents = Array.isArray(data) ? data.filter((e: Event) => e.is_active) : [];
-      setEvents(activeEvents);
-    } catch {
-      // Events are optional, silently fail
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

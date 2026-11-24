@@ -98,6 +98,7 @@ function ExpensesBrowseContent() {
     const name = searchParams.get('category');
     if (name && categories.length > 0) {
       const match = categories.find(c => c.name.toLowerCase() === name.toLowerCase());
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- applies the ?category= link once the async list has loaded
       if (match) setSelectedCategory(match.id);
     }
   }, [categories, searchParams]);
@@ -106,6 +107,7 @@ function ExpensesBrowseContent() {
     const name = searchParams.get('tag');
     if (name && tags.length > 0) {
       const match = tags.find((t) => t.name.toLowerCase() === name.toLowerCase());
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- applies the ?tag= link once the async list has loaded
       if (match) setSelectedTag(match.id);
     }
   }, [tags, searchParams]);

@@ -55,6 +55,94 @@ interface ProjectionData {
   target?: number;
 }
 
+/** Last 12 months of net worth plus a straight-line projection to the next milestone. */
+function buildProjection(
+reportData: any,
+currentNetWorth: number
+): { chartData: ProjectionData[]; median: number } | null {
+  if (!reportData?.months?.length || !reportData?.monthlyTotals) {
+    return null;
+  }
+
+  const months = reportData.months;
+  const monthlyTotals = reportData.monthlyTotals;
+
+  // Use last 12 months or all available data
+  const dataPoints = months.slice(-12);
+  const values = dataPoints.map((m: string) => monthlyTotals[m] || 0);
+
+  // Calculate linear regression (y = mx + b)
+  const n = values.length;
+  const sumX = (n * (n - 1)) / 2;
+  const sumY = values.reduce((sum: number, v: number) => sum + v, 0);
+  const sumXY = values.reduce((sum: number, v: number, i: number) => sum + (i * v), 0);
+  const sumX2 = (n * (n - 1) * (2 * n - 1)) / 6;
+
+  const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+  const intercept = (sumY - slope * sumX) / n;
+
+  // Determine next milestone
+  let targetAmount: number;
+  if (currentNetWorth < 50000000) {
+    targetAmount = 50000000; // 5 Crore
+  } else if (currentNetWorth < 100000000) {
+    targetAmount = 100000000; // 10 Crore
+  } else if (currentNetWorth < 500000000) {
+    targetAmount = 500000000; // 50 Crore
+  } else if (currentNetWorth < 1000000000) {
+    targetAmount = 1000000000; // 100 Crore
+  } else {
+    targetAmount = 5000000000; // 500 Crore
+  }
+
+  // Build chart data with historical + projection
+  const chartData: ProjectionData[] = [];
+
+  // Add historical data (last 12 months)
+  dataPoints.forEach((month: string, i: number) => {
+    chartData.push({
+      month: format(new Date(month + '-01'), 'MMM yy'),
+      actual: monthlyTotals[month] || 0
+    });
+  });
+
+  // Calculate median of actual values for reference line
+  const actualValues = values.filter((v: number) => v > 0).sort((a: number, b: number) => a - b);
+  const median = actualValues.length > 0
+    ? actualValues.length % 2 === 0
+      ? (actualValues[actualValues.length / 2 - 1] + actualValues[actualValues.length / 2]) / 2
+      : actualValues[Math.floor(actualValues.length / 2)]
+    : 0;
+
+  // Add projection if slope is positive and haven't reached target
+  if (slope > 0 && currentNetWorth < targetAmount) {
+    const monthsToTarget = Math.ceil((targetAmount - currentNetWorth) / slope);
+
+    // Project until we reach or exceed the target
+    for (let i = 1; i <= monthsToTarget + 1; i++) {
+      const projectedValue = intercept + slope * (n - 1 + i);
+      const projDate = new Date();
+      projDate.setMonth(projDate.getMonth() + i);
+
+      // Stop if we've exceeded the target
+      if (projectedValue > targetAmount * 1.05) break;
+
+      const isTargetPoint = projectedValue >= targetAmount && !chartData.some(p => p.target);
+
+      chartData.push({
+        month: format(projDate, 'MMM yy'),
+        projected: isTargetPoint ? targetAmount : projectedValue,
+        target: isTargetPoint ? targetAmount : undefined
+      });
+
+      // Stop after reaching target
+      if (isTargetPoint) break;
+    }
+  }
+
+  return { chartData, median };
+}
+
 export default function PortfolioInsightsPage() {
   const [loading, setLoading] = useState(true);
   const [insights, setInsights] = useState<Insight[]>([]);
@@ -95,7 +183,11 @@ export default function PortfolioInsightsPage() {
         const reportResponse = await fetch('/api/portfolio/report?months=12');
         if (reportResponse.ok) {
           const reportData = await reportResponse.json();
-          generateProjectionData(reportData, data.summary?.totalNetWorth || 0);
+          const projection = buildProjection(reportData, data.summary?.totalNetWorth || 0);
+          if (projection) {
+            setProjectionData(projection.chartData);
+            setMedianValue(projection.median);
+          }
         }
       }
     } catch (err) {
@@ -103,102 +195,19 @@ export default function PortfolioInsightsPage() {
     } finally {
       setLoading(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedMonth]);
 
-  const generateProjectionData = (reportData: any, currentNetWorth: number) => {
-    if (!reportData?.months?.length || !reportData?.monthlyTotals) {
-      return;
-    }
-
-    const months = reportData.months;
-    const monthlyTotals = reportData.monthlyTotals;
-
-    // Use last 12 months or all available data
-    const dataPoints = months.slice(-12);
-    const values = dataPoints.map((m: string) => monthlyTotals[m] || 0);
-
-    // Calculate linear regression (y = mx + b)
-    const n = values.length;
-    const sumX = (n * (n - 1)) / 2;
-    const sumY = values.reduce((sum: number, v: number) => sum + v, 0);
-    const sumXY = values.reduce((sum: number, v: number, i: number) => sum + (i * v), 0);
-    const sumX2 = (n * (n - 1) * (2 * n - 1)) / 6;
-
-    const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-    const intercept = (sumY - slope * sumX) / n;
-
-    // Determine next milestone
-    let targetAmount: number;
-    if (currentNetWorth < 50000000) {
-      targetAmount = 50000000; // 5 Crore
-    } else if (currentNetWorth < 100000000) {
-      targetAmount = 100000000; // 10 Crore
-    } else if (currentNetWorth < 500000000) {
-      targetAmount = 500000000; // 50 Crore
-    } else if (currentNetWorth < 1000000000) {
-      targetAmount = 1000000000; // 100 Crore
-    } else {
-      targetAmount = 5000000000; // 500 Crore
-    }
-
-    // Build chart data with historical + projection
-    const chartData: ProjectionData[] = [];
-
-    // Add historical data (last 12 months)
-    dataPoints.forEach((month: string, i: number) => {
-      chartData.push({
-        month: format(new Date(month + '-01'), 'MMM yy'),
-        actual: monthlyTotals[month] || 0
-      });
-    });
-
-    // Calculate median of actual values for reference line
-    const actualValues = values.filter((v: number) => v > 0).sort((a: number, b: number) => a - b);
-    const median = actualValues.length > 0
-      ? actualValues.length % 2 === 0
-        ? (actualValues[actualValues.length / 2 - 1] + actualValues[actualValues.length / 2]) / 2
-        : actualValues[Math.floor(actualValues.length / 2)]
-      : 0;
-
-    // Add projection if slope is positive and haven't reached target
-    if (slope > 0 && currentNetWorth < targetAmount) {
-      const monthsToTarget = Math.ceil((targetAmount - currentNetWorth) / slope);
-
-      // Project until we reach or exceed the target
-      for (let i = 1; i <= monthsToTarget + 1; i++) {
-        const projectedValue = intercept + slope * (n - 1 + i);
-        const projDate = new Date();
-        projDate.setMonth(projDate.getMonth() + i);
-
-        // Stop if we've exceeded the target
-        if (projectedValue > targetAmount * 1.05) break;
-
-        const isTargetPoint = projectedValue >= targetAmount && !chartData.some(p => p.target);
-
-        chartData.push({
-          month: format(projDate, 'MMM yy'),
-          projected: isTargetPoint ? targetAmount : projectedValue,
-          target: isTargetPoint ? targetAmount : undefined
-        });
-
-        // Stop after reaching target
-        if (isTargetPoint) break;
-      }
-    }
-
-    setProjectionData(chartData);
-    setMedianValue(median);
-  };
-
+  // Picked after mount, so the prerendered page never bakes in the build's month.
   useEffect(() => {
     if (!selectedMonth) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- hydration-safe: month chosen in the browser
       setSelectedMonth(latestMonth);
     }
   }, [latestMonth, selectedMonth]);
 
   useEffect(() => {
     if (selectedMonth) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch when the month changes
       fetchInsights();
     }
   }, [fetchInsights, selectedMonth]);

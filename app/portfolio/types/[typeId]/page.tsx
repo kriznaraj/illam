@@ -34,10 +34,16 @@ export default function PortfolioTypeDetailsPage() {
   const [typeTotal, setTypeTotal] = useState(0);
   const [typeTrend, setTypeTrend] = useState<{ month: string; value: number }[]>([]);
 
+  // Show the spinner again when typeId changes (set during render, not in the effect).
+  const [loadingFor, setLoadingFor] = useState(typeId);
+  if (typeId !== loadingFor) {
+    setLoadingFor(typeId);
+    if (typeId) setLoading(true);
+  }
+
   useEffect(() => {
     if (!typeId) return;
     let cancelled = false;
-    setLoading(true);
     Promise.all([
       fetch('/api/portfolio/account-types', { cache: 'no-store' }).then((r) => r.json()),
       fetch('/api/portfolio/accounts',      { cache: 'no-store' }).then((r) => r.json()),

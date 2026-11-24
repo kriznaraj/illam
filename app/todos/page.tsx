@@ -58,19 +58,6 @@ export default function TodosPage() {
     user_id: '',
   });
 
-  useEffect(() => {
-    fetchTodos();
-    fetchUsers();
-  }, []);
-
-  useEffect(() => {
-    const handleCacheCleared = () => {
-      fetchTodos();
-    };
-    window.addEventListener('cacheCleared', handleCacheCleared);
-    return () => window.removeEventListener('cacheCleared', handleCacheCleared);
-  }, []);
-
   const fetchTodos = async () => {
     try {
       const res = await fetch('/api/todos');
@@ -95,6 +82,20 @@ export default function TodosPage() {
       console.error('Failed to fetch users:', error);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time load on mount; state is set after the fetches resolve
+    fetchTodos();
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    const handleCacheCleared = () => {
+      fetchTodos();
+    };
+    window.addEventListener('cacheCleared', handleCacheCleared);
+    return () => window.removeEventListener('cacheCleared', handleCacheCleared);
+  }, []);
 
   const handleCreateTodo = () => {
     setSelectedTodo(null);

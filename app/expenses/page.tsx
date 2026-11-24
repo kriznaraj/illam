@@ -458,7 +458,7 @@ export default function ExpensesDashboardPage() {
       miscUnplannedPct: ratio(totals.miscUnplanned),
       oneTimePct: ratio(totals.oneTime),
     };
-  }, [expenses, classifyTrackerBucket]);
+  }, [countedExpenses, classifyTrackerBucket]);
   const wantTone = useMemo(
     () => getThresholdTone(trackerBreakdown.wantPct, { goodMax: 20, warnMax: 25 }),
     [trackerBreakdown.wantPct],

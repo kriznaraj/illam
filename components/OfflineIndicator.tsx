@@ -1,25 +1,30 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useSyncExternalStore } from 'react';
 import { Wifi, WifiOff } from 'lucide-react';
 
+function subscribeOnline(onChange: () => void): () => void {
+  window.addEventListener('online', onChange);
+  window.addEventListener('offline', onChange);
+  return () => {
+    window.removeEventListener('online', onChange);
+    window.removeEventListener('offline', onChange);
+  };
+}
+
 export default function OfflineIndicator() {
-  const [isOnline, setIsOnline] = useState(true);
+  // Online while prerendering; the browser's real value after hydration.
+  const isOnline = useSyncExternalStore(subscribeOnline, () => navigator.onLine, () => true);
   const [showIndicator, setShowIndicator] = useState(false);
 
   useEffect(() => {
-    // Initial state
-    setIsOnline(navigator.onLine);
-
     const handleOnline = () => {
-      setIsOnline(true);
       setShowIndicator(true);
       // Hide success message after 3 seconds
       setTimeout(() => setShowIndicator(false), 3000);
     };
 
     const handleOffline = () => {
-      setIsOnline(false);
       setShowIndicator(true);
     };
 

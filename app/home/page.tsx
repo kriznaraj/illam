@@ -51,6 +51,7 @@ export default function HomePage() {
   // Read the clock in the browser, after the first render: the page is prerendered at build
   // time, so a greeting or month computed while rendering would be the build's, not now.
   const [now, setNow] = useState<Date | null>(null);
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- hydration-safe read of the client clock
   useEffect(() => setNow(new Date()), []);
   const greeting = !now ? 'Hello' : now.getHours() < 12 ? 'Good morning' : now.getHours() < 17 ? 'Good afternoon' : 'Good evening';
   const firstName = currentUser?.full_name?.split(' ')[0];

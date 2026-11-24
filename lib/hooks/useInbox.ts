@@ -26,10 +26,14 @@ export function useInbox(view: InboxView, owner: InboxOwnerFilter) {
   const [cursor, setCursor] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
 
-  useEffect(() => {
+  // Reset while rendering (not in an effect) so the old filter's pages never show with the new one.
+  const filterKey = `${view}|${owner}`;
+  const [pagedKey, setPagedKey] = useState(filterKey);
+  if (pagedKey !== filterKey) {
+    setPagedKey(filterKey);
     setOlder([]);
     setCursor(null);
-  }, [view, owner]);
+  }
 
   useEffect(() => {
     const handleCacheCleared = () => {

@@ -195,6 +195,7 @@ export default function ImportCdslPage() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- loads accounts when the review step opens
     if (step === STEP.REVIEW) loadAccounts();
   }, [step, loadAccounts]);
 

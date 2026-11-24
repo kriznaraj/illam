@@ -74,6 +74,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
               <button
                 onClick={() => {
                   this.setState({ hasError: false, error: null, errorInfo: null });
+                  // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- a full reload is the point after a crash
                   window.location.href = '/';
                 }}
                 className="btn btn-primary w-full"
@@ -82,6 +83,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
               </button>
 
               <button
+                // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- full reload after a crash, as above
                 onClick={() => window.location.href = '/debug'}
                 className="btn btn-secondary w-full"
               >

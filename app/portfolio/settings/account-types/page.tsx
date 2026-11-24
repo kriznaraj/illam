@@ -39,10 +39,6 @@ export default function SettingsAccountTypesPage() {
   const [typeSaving, setTypeSaving] = useState(false);
   const [typeError, setTypeError] = useState('');
 
-  useEffect(() => {
-    fetchTypes();
-  }, []);
-
   const fetchTypes = async () => {
     setTypesLoading(true);
     try {
@@ -55,6 +51,11 @@ export default function SettingsAccountTypesPage() {
       setTypesLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch on mount
+    fetchTypes();
+  }, []);
 
   const openNewType = () => {
     setSelectedType(null);

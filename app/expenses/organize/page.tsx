@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { formatCurrency, formatDate } from '@/lib/utils';
@@ -283,6 +283,7 @@ export default function OrganizePage() {
   }, [activeTab, fetchEvents, fetchTags, fetchCategories]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- refetch (with its spinner) when the tab changes
     fetchData();
   }, [fetchData]);
 
@@ -650,7 +651,8 @@ export default function OrganizePage() {
   const filteredItems = items.filter(item =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  const groupedCategoryItems = useMemo(() => {
+  // Plain computation: `filteredItems` is a new array every render, so a useMemo here never hit.
+  const groupedCategoryItems = (() => {
     if (activeTab !== 'categories') return [];
     const grouped = new Map<string, ItemWithCount[]>();
     filteredItems.forEach((item) => {
@@ -670,7 +672,7 @@ export default function OrganizePage() {
       groupName,
       items: (grouped.get(groupName) || []).sort((a, b) => b.usage_count - a.usage_count),
     }));
-  }, [activeTab, filteredItems]);
+  })();
 
   const totalCount = items.length;
   const inUseCount = items.filter(i => i.usage_count > 0).length;

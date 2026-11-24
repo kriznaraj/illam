@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Sparkles } from 'lucide-react';
 import { madalApi } from '@/lib/inbox/client';
 import { useCachedFetch } from '@/lib/useClientCache';
@@ -91,7 +91,7 @@ export default function TransferClassifySheet({ transfer, onConfirm }: TransferC
    */
   const payee = cleanPayee(transfer.counterparty);
   const options = isCredit ? CREDIT_OPTIONS : DEBIT_OPTIONS;
-  const [kind, setKind] = useState<DecisionKind>(() =>
+  const [chosenKind, setKind] = useState<DecisionKind>(() =>
     // A credit arrives carrying the placeholder kind 'other'; it is asked about, not assumed.
     isCredit && !options.some((option) => option.value === transfer.kind) ? 'other' : transfer.kind
   );
@@ -129,12 +129,9 @@ export default function TransferClassifySheet({ transfer, onConfirm }: TransferC
   }, [transfer.id, transfer.inbox_item_id]);
 
   // Filled in, never forced: the person's own choice wins.
-  useEffect(() => {
-    if (suggestion && !kindTouched) setKind(suggestion.kind);
-  }, [suggestion, kindTouched]);
+  const kind = suggestion && !kindTouched ? suggestion.kind : chosenKind;
 
-  const accountsFetcher = useCallback(fetchAccounts, []);
-  const { data: accounts } = useCachedFetch<PortfolioAccount[]>('inbox-classify-accounts', accountsFetcher, {
+  const { data: accounts } = useCachedFetch<PortfolioAccount[]>('inbox-classify-accounts', fetchAccounts, {
     ttl: 30 * 60 * 1000,
   });
   const { categories } = useCategories();
@@ -145,6 +142,7 @@ export default function TransferClassifySheet({ transfer, onConfirm }: TransferC
 
   useEffect(() => {
     if (kind !== 'investment') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- leaving "investment" drops its candidate list and choice
       setMatches(null);
       setChoice(NEW_CONTRIBUTION);
       return;

@@ -104,12 +104,9 @@ export default function ActivityTrackerPage() {
   );
 
   useEffect(() => {
-    if (!activityEventIds) {
-      setOccurrenceCounts((prev) => (Object.keys(prev).length === 0 ? prev : {}));
-      setLastOccurrenceDates((prev) => (Object.keys(prev).length === 0 ? prev : {}));
-      setLoggedTodayByEventId((prev) => (Object.keys(prev).length === 0 ? prev : {}));
-      return;
-    }
+    // No activities: nothing to fetch. The maps are only read by event id, so entries left from
+    // events that are gone are never shown.
+    if (!activityEventIds) return;
 
     const activityIds = activityEventIds.split(',');
 

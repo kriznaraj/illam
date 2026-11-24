@@ -204,8 +204,14 @@ function CardDetailPanel({ card, selectedMonth, onRefresh }: {
   }, {});
   const hasDuplicates = Object.values(stmtsByMonth).some((g) => g.length > 1);
 
-  // Reset form state when the card or month changes
-  useEffect(() => { setMode('view'); setStmtAmount(''); }, [card.account.id, selectedMonth]);
+  // Reset form state when the card or month changes (during render, not in an effect).
+  const formKey = `${card.account.id}|${selectedMonth}`;
+  const [formFor, setFormFor] = useState(formKey);
+  if (formKey !== formFor) {
+    setFormFor(formKey);
+    setMode('view');
+    setStmtAmount('');
+  }
 
   // Use API-computed flag: true when billing date has passed and no statement for this cycle yet
   const canAdd = card.can_add_statement && !!card.expected.statement_date && !!card.expected.due_date;
@@ -571,6 +577,8 @@ export default function CreditCardsPage() {
     }
   }, []);
 
+  // Fetch on mount; refresh() only clears the previous error before its request starts.
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch on mount
   useEffect(() => { refresh(); }, [refresh]);
 
   useEffect(() => {

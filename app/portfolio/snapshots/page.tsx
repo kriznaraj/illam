@@ -57,10 +57,6 @@ export default function PortfolioSnapshotsPage() {
   const [showStale, setShowStale] = useState(false);
   const [lateStatements, setLateStatements] = useState<LateStatement[]>([]);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   // Statements are what fill this page on their own; one that stopped arriving left it
   // silently empty (Oct 2026). Separate from fetchData: the page never waits on it, and
   // a failure only means no banner.
@@ -100,6 +96,11 @@ export default function PortfolioSnapshotsPage() {
       else setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- data fetch on mount
+    fetchData();
+  }, []);
 
   const openModal = (account: PortfolioAccount) => {
     const monthDate = `${selectedMonth}-01`;

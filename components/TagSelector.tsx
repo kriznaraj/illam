@@ -40,6 +40,7 @@ export default function TagSelector({
   }, [userId]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch on mount; state is set when the request resolves
     fetchTags();
   }, [fetchTags]);
 

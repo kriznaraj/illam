@@ -3,6 +3,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import { formatCurrency, formatCompactCurrency, formatMonth } from '@/lib/utils';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine } from 'recharts';
 import { PageHeader } from '@/components/PageHeader';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
@@ -17,6 +18,7 @@ import { Briefcase, TriangleAlert } from 'lucide-react';
 
 
 export default function PortfolioDashboard() {
+  const router = useRouter();
   const { types, typeColors, typeIds } = useAccountTypes();
   const { loading, error, errorKind, rawAccounts, rawSnapshots, rawReport, refetch } = usePortfolioDashboardData();
   const [scope, setScope] = useState<'all' | 'equity'>(() => {
@@ -131,7 +133,7 @@ export default function PortfolioDashboard() {
           description="Start tracking your investments, savings, and assets by adding your first account."
           action={{
             label: "Add Your First Account",
-            onClick: () => window.location.href = "/portfolio/settings",
+            onClick: () => router.push("/portfolio/settings"),
             variant: "success"
           }}
         />

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { classNames } from '@/lib/utils';
 import { monthKeys } from '@/lib/utils/dateUtils';
 
@@ -89,14 +89,11 @@ export function MonthNavigator({
   const canGoNext = monthKeys.isWithin(nextMonth, effectiveMin, effectiveMax);
   const atJumpTarget = selected === jumpTarget;
 
-  const select = useCallback(
-    (month: string) => {
-      if (!monthKeys.isValid(month)) return;
-      const clamped = monthKeys.clamp(month, effectiveMin, effectiveMax);
-      if (clamped !== selected) onChange(clamped);
-    },
-    [effectiveMin, effectiveMax, onChange, selected],
-  );
+  const select = (month: string) => {
+    if (!monthKeys.isValid(month)) return;
+    const clamped = monthKeys.clamp(month, effectiveMin, effectiveMax);
+    if (clamped !== selected) onChange(clamped);
+  };
 
   const openPicker = () => {
     setPickerYear(Number(selected.slice(0, 4)));
@@ -122,11 +119,10 @@ export function MonthNavigator({
     };
   }, [pickerOpen]);
 
-  const yearBounds = useMemo(() => {
-    const minYear = effectiveMin ? Number(effectiveMin.slice(0, 4)) : Number(selected.slice(0, 4)) - 10;
-    const maxYear = effectiveMax ? Number(effectiveMax.slice(0, 4)) : Number(selected.slice(0, 4)) + 10;
-    return { minYear, maxYear };
-  }, [effectiveMin, effectiveMax, selected]);
+  const yearBounds = {
+    minYear: effectiveMin ? Number(effectiveMin.slice(0, 4)) : Number(selected.slice(0, 4)) - 10,
+    maxYear: effectiveMax ? Number(effectiveMax.slice(0, 4)) : Number(selected.slice(0, 4)) + 10,
+  };
 
   return (
     <div ref={containerRef} className={classNames('relative w-full max-w-md', className)}>

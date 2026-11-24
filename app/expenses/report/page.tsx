@@ -91,6 +91,7 @@ export default function ExpenseReportPage() {
   }, [monthsBack]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- refetch (with its spinner) when the period changes
     fetchData();
   }, [fetchData]);
 

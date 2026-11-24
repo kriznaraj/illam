@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { PageContainer } from '@/components/PageContainer';
 import { PageHeader } from '@/components/PageHeader';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
@@ -121,24 +121,27 @@ export default function AnnualReviewPage() {
   const [error, setError] = useState<string | null>(null);
   const [module, setModule] = useState<'selavu' | 'selvam'>('selavu');
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/annual-review');
-      const data = await response.json();
-      if (!response.ok) throw new Error(data?.error ?? 'Failed to load review');
-      setReview(data);
-      setError(null);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load review');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
+  // Loads once on mount; `loading` starts true, so there is nothing to reset first.
   useEffect(() => {
-    load();
-  }, [load]);
+    let cancelled = false;
+    (async () => {
+      try {
+        const response = await fetch('/api/annual-review');
+        const data = await response.json();
+        if (!response.ok) throw new Error(data?.error ?? 'Failed to load review');
+        if (cancelled) return;
+        setReview(data);
+        setError(null);
+      } catch (e) {
+        if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to load review');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const expenseChartData = useMemo(
     () =>

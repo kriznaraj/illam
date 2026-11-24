@@ -71,13 +71,14 @@ export default function InsightsPage() {
   const latestClosedMonth = monthKeys.shift(monthKeys.current(), -1);
   const earliestMonth = monthKeys.shift(latestClosedMonth, -11);
 
+  const userId = currentUser?.id;
   const fetchInsights = useCallback(async (force = false) => {
     setLoading(true);
     if (force) setRegenerating(true);
     try {
       const params = new URLSearchParams();
-      if (currentUser?.id) {
-        params.append('userId', currentUser.id);
+      if (userId) {
+        params.append('userId', userId);
       }
       if (selectedMonth) {
         params.append('month', selectedMonth);
@@ -102,7 +103,7 @@ export default function InsightsPage() {
       setLoading(false);
       setRegenerating(false);
     }
-  }, [currentUser?.id, selectedMonth]);
+  }, [userId, selectedMonth]);
 
   const handleRegenerate = async () => {
     // Clear cache first, then regenerate
@@ -122,12 +123,14 @@ export default function InsightsPage() {
   useEffect(() => {
     // Default to last closed month (previous month)
     if (!selectedMonth) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- the month comes from the client clock, so it is set after hydration, not baked into the prerender
       setSelectedMonth(latestClosedMonth);
     }
   }, [latestClosedMonth, selectedMonth]);
 
   useEffect(() => {
     if (selectedMonth && currentUser) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- refetch (with its spinner) whenever the month or user changes
       fetchInsights();
     }
   }, [currentUser, selectedMonth, fetchInsights]);

@@ -21,6 +21,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec tsc --noEmit
+      - run: pnpm lint
       - run: pnpm test:ci
       - run: pnpm build:skip-tests
 

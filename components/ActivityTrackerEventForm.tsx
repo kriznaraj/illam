@@ -34,6 +34,7 @@ export default function ActivityTrackerEventForm({
 
   useEffect(() => {
     if (event && mode === 'edit') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- load the form from the event each time it opens
       setTitle(event.title);
       setDescription(event.description || '');
       setEventDate(event.event_date);

@@ -38,6 +38,7 @@ export default function InvestmentDetailModal({
 
   useEffect(() => {
     if (!investment || !isOpen) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- load the form from the investment each time the modal opens
     setIsEditing(false);
     setShowDeleteConfirm(false);
     setError(null);

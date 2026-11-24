@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -15,13 +15,20 @@ function isStandalone(): boolean {
   );
 }
 
+function subscribeDisplayMode(onChange: () => void): () => void {
+  const query = window.matchMedia('(display-mode: standalone)');
+  query.addEventListener('change', onChange);
+  return () => query.removeEventListener('change', onChange);
+}
+
 export function usePWAInstall() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [isInstalled, setIsInstalled] = useState(false);
+  // Read in the browser only (false while prerendering), so hydration matches.
+  const standalone = useSyncExternalStore(subscribeDisplayMode, isStandalone, () => false);
+  const [installedNow, setIsInstalled] = useState(false);
+  const isInstalled = standalone || installedNow;
 
   useEffect(() => {
-    setIsInstalled(isStandalone());
-
     const onInstallPrompt = (event: Event) => {
       event.preventDefault();
       setInstallPrompt(event as BeforeInstallPromptEvent);

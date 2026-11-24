@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- The gold page's rate editor no longer loses what you type: it was rebuilt on every keystroke.
+
+### Changed
+
+- Code cleanup for React's new checks (no behaviour change). `pnpm lint` now fails on any
+  warning and runs in CI.
+
 ## 0.2.0 (2026-11-24)
 
 ### Security

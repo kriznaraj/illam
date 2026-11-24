@@ -41,9 +41,15 @@ export default function SettingsAccountDetailsPage() {
   // Archive toggle state
   const [archiving, setArchiving] = useState(false);
 
+  // Show the spinner again when id changes (set during render, not in the effect).
+  const [loadingFor, setLoadingFor] = useState(id);
+  if (id !== loadingFor) {
+    setLoadingFor(id);
+    if (id) setLoading(true);
+  }
+
   useEffect(() => {
     if (!id) return;
-    setLoading(true);
     Promise.all([
       fetch('/api/portfolio/accounts?includeArchived=true').then((r) => r.json()),
       fetch(`/api/portfolio/snapshots?accountId=${id}&limit=1`).then((r) => r.json()),

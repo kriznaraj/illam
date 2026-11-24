@@ -26,6 +26,9 @@ export default function AccountPage() {
   const [biometricMessage, setBiometricMessage] = useState('');
   const [theme, setTheme] = useState<Theme>('system');
 
+  // The theme lives in this device's storage, which the prerendered HTML can't know: read it
+  // after hydration so server and client render the same first frame.
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- hydration-safe read of a browser-only value
   useEffect(() => setTheme(readTheme()), []);
 
   const chooseTheme = (next: Theme) => {

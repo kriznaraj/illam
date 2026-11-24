@@ -1,3 +1,4 @@
+import { createElement } from 'react';
 import { formatCurrency } from '@/lib/utils';
 import { resolveInsightCardDisplay } from '@/lib/insights/cardDisplay';
 import type { InsightSeverity, InsightType } from '@/types';
@@ -81,6 +82,12 @@ function resolveIcon(icon: string, type: InsightType | undefined): LucideIcon {
   return (type && ICONS_BY_TYPE[type]) || Compass;
 }
 
+/** The card's icon. A module-level component, so the icon is picked from fixed lookups rather
+ *  than a component variable created while rendering the card. */
+function InsightIcon({ icon, type }: { icon: string; type: InsightType | undefined }) {
+  return createElement(resolveIcon(icon, type), { size: 20, 'aria-hidden': true });
+}
+
 interface InsightCardProps {
   /** An InsightIconKey; any other value (such as an emoji) falls back to an icon for `type`. */
   icon: string;
@@ -111,14 +118,12 @@ export function InsightCard({
     value,
     change,
   });
-  const Icon = resolveIcon(icon, type);
-
   return (
     <div className={`card ${tone} border-2 transition-all duration-200 hover:shadow-lg`}>
       <div className="flex items-start gap-4">
         {/* Icon */}
         <div className={`${iconTone} w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0`}>
-          <Icon size={20} aria-hidden />
+          <InsightIcon icon={icon} type={type} />
         </div>
 
         {/* Content */}

@@ -10,13 +10,6 @@ export default function DebugPage() {
   const [platform, setPlatform] = useState('');
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-    setUserAgent(navigator.userAgent);
-    setPlatform(navigator.platform);
-    loadLogs();
-  }, []);
-
   const loadLogs = () => {
     try {
       const storedLogs = JSON.parse(localStorage.getItem('expense-debug-logs') || '[]');
@@ -25,6 +18,17 @@ export default function DebugPage() {
       console.error('Failed to load logs:', e);
     }
   };
+
+  // Browser-only values (navigator, localStorage) are read after hydration so the prerendered
+  // HTML and the first client render match.
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- hydration-safe reads of browser-only values */
+    setMounted(true);
+    setUserAgent(navigator.userAgent);
+    setPlatform(navigator.platform);
+    loadLogs();
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, []);
 
   const clearLogs = () => {
     localStorage.removeItem('expense-debug-logs');

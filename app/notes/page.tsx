@@ -48,6 +48,7 @@ export default function NotesPage() {
   }, [showArchived]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- full reload (with its spinner) when the archive toggle changes
     fetchNotes('', true);
   }, [fetchNotes]);
 
